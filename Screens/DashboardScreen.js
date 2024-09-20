@@ -6,8 +6,10 @@ import Icon from 'react-native-vector-icons/Ionicons'; // Import an icon library
 const DashboardScreen = () => {
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
+  const [day, setDay] = useState(new Date().getDate());
   const [showModal, setShowModal] = useState(false); // State to manage modal visibility
-  
+  const [selectedViewMode, setSelectedViewMode] = useState("Daily"); // State to track the selected view mode
+
   // Expense, income, and total values (dummy data for now)
   const expense = 0;
   const income = 0;
@@ -39,19 +41,58 @@ const DashboardScreen = () => {
     return monthNames[monthIndex];
   };
 
+  // Update the date based on the selected view mode
+  const updateDateForViewMode = (mode) => {
+    setSelectedViewMode(mode);
+    const currentDate = new Date();
+    
+    if (mode === "Daily") {
+      setDay(currentDate.getDate());
+      setMonth(currentDate.getMonth());
+      setYear(currentDate.getFullYear());
+    } else if (mode === "Weekly") {
+      const firstDayOfWeek = currentDate.getDate() - currentDate.getDay() + 1; // Monday as the first day
+      setDay(firstDayOfWeek);
+      setMonth(currentDate.getMonth());
+      setYear(currentDate.getFullYear());
+    } else if (mode === "Monthly") {
+      setDay(1); // Reset to the first of the month in monthly mode
+      setMonth(currentDate.getMonth());
+      setYear(currentDate.getFullYear());
+    } else if (mode === "3 Months") {
+      const quarterStartMonth = Math.floor(currentDate.getMonth() / 3) * 3; // Find the start of the quarter
+      setMonth(quarterStartMonth);
+      setDay(1);
+    } else if (mode === "6 Months") {
+      const halfYearStartMonth = currentDate.getMonth() < 6 ? 0 : 6; // First half or second half of the year
+      setMonth(halfYearStartMonth);
+      setDay(1);
+    } else if (mode === "Yearly") {
+      setMonth(0); // Set to January
+      setDay(1);
+    }
+  };
+
   return (
     <View style={DashboardStyle.container}>
       <View style={DashboardStyle.monthSelector}>
         <TouchableOpacity onPress={handlePrevMonth}>
           <Text style={DashboardStyle.arrow}>{"<"}</Text>
         </TouchableOpacity>
-        <Text style={DashboardStyle.monthText}>{getMonthName(month)} {year}</Text>
+        <Text style={DashboardStyle.monthText}>
+          {selectedViewMode === "Daily" ? `${getMonthName(month)} ${day}, ${year}` 
+          : selectedViewMode === "Weekly" ? `Week of ${getMonthName(month)} ${day}, ${year}` 
+          : selectedViewMode === "Monthly" ? `${getMonthName(month)} ${year}`
+          : selectedViewMode === "3 Months" ? `Quarter Starting ${getMonthName(month)} ${year}` 
+          : selectedViewMode === "6 Months" ? `Half-Year Starting ${getMonthName(month)} ${year}`
+          : `Year ${year}`}
+        </Text>
         <TouchableOpacity onPress={handleNextMonth}>
           <Text style={DashboardStyle.arrow}>{">"}</Text>
         </TouchableOpacity>
         {/* Add icon button here */}
         <TouchableOpacity onPress={() => setShowModal(true)} style={DashboardStyle.iconButton}>
-          <Icon name="options-outline" size={24} color="white" />
+          <Icon name="options-outline" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -87,16 +128,27 @@ const DashboardScreen = () => {
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Display Options</Text>
-            {/* Add your display options here, like the image you provided */}
             <View style={styles.modalContent}>
               {/* View mode options */}
               <Text style={styles.optionTitle}>View mode:</Text>
-              <Text style={styles.optionText}>Daily</Text>
-              <Text style={styles.optionText}>Weekly</Text>
-              <Text style={styles.optionText}>Monthly</Text>
-              <Text style={styles.optionText}>3 Months</Text>
-              <Text style={styles.optionText}>6 Months</Text>
-              <Text style={styles.optionText}>Yearly</Text>
+              <TouchableOpacity onPress={() => updateDateForViewMode("Daily")}>
+                <Text style={[styles.optionText, selectedViewMode === "Daily" && styles.selectedOption]}>Daily</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => updateDateForViewMode("Weekly")}>
+                <Text style={[styles.optionText, selectedViewMode === "Weekly" && styles.selectedOption]}>Weekly</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => updateDateForViewMode("Monthly")}>
+                <Text style={[styles.optionText, selectedViewMode === "Monthly" && styles.selectedOption]}>Monthly</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => updateDateForViewMode("3 Months")}>
+                <Text style={[styles.optionText, selectedViewMode === "3 Months" && styles.selectedOption]}>3 Months</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => updateDateForViewMode("6 Months")}>
+                <Text style={[styles.optionText, selectedViewMode === "6 Months" && styles.selectedOption]}>6 Months</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => updateDateForViewMode("Yearly")}>
+                <Text style={[styles.optionText, selectedViewMode === "Yearly" && styles.selectedOption]}>Yearly</Text>
+              </TouchableOpacity>
 
               {/* Show total options */}
               <Text style={styles.optionTitle}>Show total:</Text>
@@ -156,8 +208,9 @@ const styles = StyleSheet.create({
     color: 'blue',
     fontSize: 16,
   },
-  iconButton: {
-    marginLeft: 10,
+  selectedOption: {
+    fontWeight: 'bold',
+    color: 'blue',
   },
 });
 
