@@ -11,6 +11,9 @@ import AnalysisScreen from "./Screens/AnalysisScreen";
 import BudgetScreen from "./Screens/BudgetScreen";
 import AccountScreen from "./Screens/AccountScreen";
 import CategoryScreen from "./Screens/CategoryScreen";
+import ExpenseInputScreen from "./Screens/ExpenseInputScreen";
+import IncomeInputScreen from "./Screens/IncomeInputScreen";
+import TransferInputScreen from "./Screens/TransferInputScreen";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -70,6 +73,21 @@ const MainStackNavigator = () => {
         name="Dashboard"
         component={DrawerNavigator}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ExpenseInput"
+        component={ExpenseInputScreen}
+        options={{ headerShown: true, title: 'Expense Input' }}
+      />
+      <Stack.Screen
+        name="IncomeInput"
+        component={IncomeInputScreen}
+        options={{ headerShown: true, title: 'Income Input' }}
+      />
+      <Stack.Screen
+        name="TransferInput"
+        component={TransferInputScreen}
+        options={{ headerShown: true, title: 'Transfer Input' }}
       />
     </Stack.Navigator>
   );
