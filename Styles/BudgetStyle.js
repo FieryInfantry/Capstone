@@ -18,6 +18,26 @@ const BudgetStyle = StyleSheet.create({
     textAlign: 'center',
     color: '#888',
   },
+  // Added monthSelector style
+  monthSelector: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Center horizontally
+    alignItems: 'center',     // Center vertically
+    marginBottom: 20,
+  },
+  // Style for the month text
+  monthText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 15, // Add space around the month text
+    textAlign: 'center',
+  },
+  // Style for arrows
+  arrow: {
+    fontSize: 24,
+    color: '#007AFF',
+    paddingHorizontal: 10,
+  },
   categoryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -78,4 +98,5 @@ const BudgetStyle = StyleSheet.create({
     color: '#007AFF', // or any color you prefer
   },
 });
+
 export default BudgetStyle;

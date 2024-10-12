@@ -1,4 +1,3 @@
-// BudgetModal.js
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, Modal, StyleSheet } from "react-native";
 
@@ -6,9 +5,11 @@ const BudgetModal = ({ visible, onClose, budgetItem, onSaveBudget }) => {
   const [budget, setBudget] = useState("");
 
   const handleSave = () => {
-    // Call the onSaveBudget function with the item name and budget
-    onSaveBudget(budgetItem, budget);
+    const currentDate = new Date(); // Capture the current date
+    // Call the onSaveBudget function with the item name, budget, and date
+    onSaveBudget(budgetItem, budget, currentDate);
     setBudget(""); // Reset budget input
+    onClose(); // Close modal after saving
   };
 
   return (
