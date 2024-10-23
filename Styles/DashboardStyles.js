@@ -88,6 +88,20 @@ const DashboardStyles = StyleSheet.create({
     borderRadius: 8, // Added border radius for consistency
     elevation: 1, // Added elevation for shadow effect (Android)
   },
+  settingsButton: {
+    marginTop: 20, // Adds space above the button
+    padding: 16,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    elevation: 2,
+  },
+  settingsButtonText: {
+    fontSize: 16,
+    color: '#007bff', // Button text color
+  },
+  
 });
 
 export default DashboardStyles;

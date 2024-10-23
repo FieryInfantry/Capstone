@@ -36,7 +36,6 @@ const DashboardScreen = ({ navigation }) => {
             <Text>Individual balances</Text>
           </View>
         </View>
-        {/* Repeat for more accounts if needed */}
       </View>
 
       <View style={DashboardStyles.section}>
@@ -79,16 +78,24 @@ const DashboardScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('BankList')}>
           <Text>Bank</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() =>navigation.navigate('InsuranceScreen')}>
           <Text>Insurance</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() =>navigation.navigate('GovernmentScreen')}>
           <Text>Government</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() =>navigation.navigate('CalculatorScreen')}>
           <Text>Calculator</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Settings Button */}
+      <TouchableOpacity 
+        style={DashboardStyles.settingsButton} 
+        onPress={() => navigation.navigate('SettingsScreen')}
+      >
+        <Text style={DashboardStyles.settingsButtonText}>Settings</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
