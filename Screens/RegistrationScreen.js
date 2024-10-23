@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';  // Import axios
 import styles from '../Styles/styles';
 
 const RegistrationScreen = () => {
@@ -8,12 +9,27 @@ const RegistrationScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigation = useNavigation();
 
-  const navigation = useNavigation(); // Initialize navigation
+  const handleRegistration = async () => {
+    if (password !== confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
 
-  const handleRegistration = () => {
-    // Handle registration logic here
-    console.log('Registered with:', fullName, email, password);
+    try {
+      const response = await axios.post('http://localhost:3000/register', {
+        fullName,
+        email,
+        password,
+      });
+
+      console.log('Registration successful', response.data);
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Registration error', error);
+      alert('Registration failed');
+    }
   };
 
   return (
