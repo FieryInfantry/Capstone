@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
-const DashboardScreen = () => {
+
+const DashboardScreen = ({ navigation }) => {
   return (
     <ScrollView style={DashboardStyles.container}>
       <View style={DashboardStyles.header}>
@@ -75,7 +76,7 @@ const DashboardScreen = () => {
       </View>
 
       <View style={DashboardStyles.navigation}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('BankList')}>
           <Text>Bank</Text>
         </TouchableOpacity>
         <TouchableOpacity>
