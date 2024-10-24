@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt'); // For password hashing
+const nodemailer = require('nodemailer');
+const crypto = require('crypto'); // For generating verification code
 
 const app = express();
 
@@ -26,6 +28,18 @@ const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   password: { type: String, required: true },
+  resetPasswordToken: { type: String }, // Token for resetting password
+  resetPasswordExpires: { type: Date }  // Token expiry time
+});
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  host: "smtp.gmail.com",
+  port: 587,
+  auth: {
+    user: 'bgpad3741@gmail.com', // Replace with your email
+    pass: 'pzjw comd vfmn hwbw'         
+  }
 });
 // Bank Schema
 const bankSchema = new mongoose.Schema({

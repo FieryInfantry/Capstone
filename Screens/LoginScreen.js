@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios'; // Import axios for API requests
 import styles from '../Styles/styles';
@@ -20,6 +20,10 @@ const LoginScreen = () => {
     navigation.navigate('Registration');
   };
 
+  const navigateToResetPassword = () => {
+    navigation.navigate('ResetPassword'); // Navigate to Reset Password Screen
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in both email and password.');
@@ -28,7 +32,7 @@ const LoginScreen = () => {
   
     try {
       // Make a request to the backend for login
-      const response = await axios.post('http://192.168.1.111:3000/login', {
+      const response = await axios.post('http://localhost:3000/login', {
         email,
         password,
       });
@@ -57,10 +61,11 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.111:3000/forgot-password', { email: forgotPasswordEmail });
+      const response = await axios.post('http://localhost:3000/forgot-password', { email: forgotPasswordEmail });
       Alert.alert('Success', response.data.message);
       toggleModal(); // Close the modal after successful submission
       setForgotPasswordEmail(''); // Clear the email input for forgot password
+      navigateToResetPassword(); // Navigate to reset password screen
     } catch (error) {
       if (error.response) {
         Alert.alert('Error', error.response.data.error || 'Something went wrong');
@@ -111,22 +116,26 @@ const LoginScreen = () => {
         animationType="slide"
         onRequestClose={toggleModal}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Reset Your Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email address"
-              value={forgotPasswordEmail} // Bind to the new state
-              onChangeText={setForgotPasswordEmail} // Update the state on change
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            <TouchableOpacity style={styles.modalButton} onPress={handleForgotPassword}>
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={toggleModal}>
+          <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalTitle}>Reset Your Password</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your email address"
+                  value={forgotPasswordEmail}
+                  onChangeText={setForgotPasswordEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity style={styles.modalButton} onPress={handleForgotPassword}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       <Text style={styles.terms}>Terms and Conditions | Privacy Policy</Text>

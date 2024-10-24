@@ -16,6 +16,7 @@ import InsuranceScreen from "./Screens/InsuranceScreen";
 import UpdateInsuranceScreen from "./Screens/UpdateInsuranceScreen";
 import GovernmentScreen from "./Screens/GovernmentScreen";
 import CalculatorScreen from "./Screens/CalculatorScreen";
+import ResetPasswordScreen from "./Screens/ResetPasswordScreen";
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,8 @@ const App = () => {
           component={RegistrationScreen}
           options={{ headerShown: false }}
         />
+         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen}
+         options={{ headerShown: false }} />
         <Stack.Screen
           name="Dashboard"
           component={DashboardScreen}
