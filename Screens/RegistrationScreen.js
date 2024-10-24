@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -18,11 +19,12 @@ const RegistrationScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/register', {
+      const response = await axios.post('http://192.168.1.111:3000/register', {
         fullName,
         email,
         password,
       });
+      
 
       console.log('Registration successful', response.data);
       navigation.navigate('Login');
