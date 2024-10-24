@@ -1,103 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Modal } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import axios from 'axios';
 
 const AddUpdateBank = ({ route, navigation }) => {
-  const { bank, updateBank, addBank } = route.params || {};
+  const { bank } = route.params || {};
   const [bankName, setBankName] = useState(bank ? bank.name : '');
   const [accountNumber, setAccountNumber] = useState(bank ? bank.accountNumber : '');
   const [accountType, setAccountType] = useState(bank ? bank.type : '');
   const [interestRate, setInterestRate] = useState(bank ? bank.interestRate : '');
   const [rewards, setRewards] = useState(bank ? bank.rewards : '');
 
-  // State for the password modal
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [password, setPassword] = useState('');
-
   useEffect(() => {
     navigation.setOptions({ title: bank ? 'Update Bank' : 'Add Bank' });
   }, [bank]);
 
-  const handleSave = () => {
-    setIsModalVisible(true);
+  const handleSave = async () => {
+  const bankDetails = {
+    id: bank ? bank._id : null,
+    name: bankName,
+    accountNumber,
+    type: accountType,
+    interestRate,
+    rewards,
   };
 
-  const handlePasswordConfirm = () => {
-    if (password) {
-      const bankDetails = {
-        id: bank ? bank.id : Math.random().toString(), // Use a random ID for new banks
-        name: bankName,
-        accountNumber,
-        type: accountType,
-        interestRate,
-        rewards,
-      };
-
-      if (bank) {
-        updateBank(bankDetails); // Update existing bank
-      } else {
-        addBank(bankDetails); // Add new bank
-      }
-
-      setIsModalVisible(false); // Close the modal
-      setPassword(''); // Reset password
-      navigation.goBack(); // Navigate back after saving
+  try {
+    if (bank) {
+      // Update existing bank via API
+      await axios.put(`http://localhost:3000/banks/${bank._id}`, bankDetails);
+    } else {
+      // Add new bank via API
+      await axios.post('http://localhost:3000/banks', bankDetails);
     }
-  };
+    navigation.goBack(); // Go back to the bank list after saving
+  } catch (error) {
+    console.error('Error saving bank:', error);
+    alert(`Error saving bank: ${error.response?.data?.error || error.message}`);
+  }
+};
+
 
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
-        placeholder="Enter bank name"
+        placeholder="Bank Name"
         value={bankName}
         onChangeText={setBankName}
+        style={styles.input}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Enter account number"
+        placeholder="Account Number"
         value={accountNumber}
         onChangeText={setAccountNumber}
-        keyboardType="numeric"
+        style={styles.input}
       />
       <TextInput
-        style={styles.input}
         placeholder="Account Type"
         value={accountType}
         onChangeText={setAccountType}
+        style={styles.input}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Enter interest rate"
+        placeholder="Interest Rate"
         value={interestRate}
         onChangeText={setInterestRate}
-        keyboardType="numeric"
+        style={styles.input}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Enter rewards details (optional)"
+        placeholder="Rewards"
         value={rewards}
         onChangeText={setRewards}
+        style={styles.input}
       />
       <Button title="Save" onPress={handleSave} />
-      <Button title="Cancel" onPress={() => navigation.goBack()} />
-
-      {/* Password confirmation modal */}
-      <Modal visible={isModalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text>Enter Password to Save</Text>
-            <TextInput
-              style={styles.input}
-              secureTextEntry={true}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password"
-            />
-            <Button title="Submit" onPress={handlePasswordConfirm} />
-            <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -111,19 +86,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     marginBottom: 16,
     padding: 8,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
   },
 });
 

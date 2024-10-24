@@ -5,6 +5,7 @@ const DashboardStyles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f5f5f5',
+    paddingBottom: 80, // Added padding to avoid content being hidden under the fixed nav bar
   },
   header: {
     flexDirection: 'row',
@@ -80,13 +81,29 @@ const DashboardStyles = StyleSheet.create({
     elevation: 2, // Added elevation for shadow effect (Android)
   },
   navigation: {
+    position: 'absolute', // Make the navigation fixed at the bottom
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20, // Increased margin for better separation
     paddingVertical: 16,
     backgroundColor: '#fff',
-    borderRadius: 8, // Added border radius for consistency
+    borderTopLeftRadius: 8, // Added border radius for consistency
+    borderTopRightRadius: 8, // Added border radius for consistency
     elevation: 1, // Added elevation for shadow effect (Android)
+  },
+  navButton: {
+    flex: 1, // Allow nav buttons to take equal space
+    alignItems: 'center', // Center the items in the button
+  },
+  navItem: {
+    alignItems: 'center', // Center align items in each navigation button
+  },
+  navIcon: {
+    width: 24,
+    height: 24,
+    marginBottom: 5, // Add margin to the bottom of the icon to separate from text
   },
   settingsButton: {
     marginTop: 20, // Adds space above the button
@@ -101,7 +118,6 @@ const DashboardStyles = StyleSheet.create({
     fontSize: 16,
     color: '#007bff', // Button text color
   },
-  
 });
 
 export default DashboardStyles;

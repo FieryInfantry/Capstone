@@ -1,53 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, Modal, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Button, FlatList } from 'react-native';
+import axios from 'axios';
+import styles from '../Styles/styles'; // Ensure this path is correct
 
-const BankList = ({ navigation }) => {
-  const [banks, setBanks] = useState([
-    {
-      id: '1',
-      name: 'Bank A',
-      type: 'Savings',
-      balance: '$5000',
-      interestRate: '1.5%',
-      rewards: 'Cashback',
-    },
-  ]);
+const BankList = ({ navigation, user }) => {
+  const [banks, setBanks] = useState([]);
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentBank, setCurrentBank] = useState(null);
+  // Fetch banks when component mounts
+  useEffect(() => {
+    fetchBanks();
+  }, []);
 
-  const handleDelete = (id) => {
-    setCurrentBank({ id, action: 'delete' });
-    setIsModalVisible(true);
+  const fetchBanks = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/banks');
+      setBanks(response.data);
+    } catch (error) {
+      console.error('Error fetching banks:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      console.log('Attempting to delete bank with ID:', id);
+      await axios.delete(`http://localhost:3000/banks/${id}`);
+      fetchBanks(); // Refresh banks after deletion
+    } catch (error) {
+      console.error('Error deleting bank:', error);
+    }
   };
 
   const handleUpdate = (bank) => {
-    navigation.navigate('AddUpdateBank', { bank, updateBank: updateBank });
-  };
-
-  const updateBank = (updatedBank) => {
-    setBanks((prevBanks) =>
-      prevBanks.map((bank) => (bank.id === updatedBank.id ? updatedBank : bank))
-    );
-  };
-
-  const addBank = (newBank) => {
-    setBanks((prevBanks) => [...prevBanks, newBank]);
-  };
-
-  const confirmDelete = () => {
-    if (currentBank) {
-      setBanks((prevBanks) => prevBanks.filter((bank) => bank.id !== currentBank.id));
-      setCurrentBank(null);
-    }
-    setIsModalVisible(false);
+    navigation.navigate('AddUpdateBank', { bank });
   };
 
   return (
     <View style={styles.container}>
       <FlatList
         data={banks}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.bankItem}>
             <Text>{item.name}</Text>
@@ -56,59 +47,13 @@ const BankList = ({ navigation }) => {
             <Text>{item.interestRate}</Text>
             <Text>{item.rewards}</Text>
             <Button title="Update" onPress={() => handleUpdate(item)} />
-            <Button title="Delete" onPress={() => handleDelete(item.id)} />
+            <Button title="Delete" onPress={() => handleDelete(item._id)} />
           </View>
         )}
       />
-      <Button title="Add Bank" onPress={() => navigation.navigate('AddUpdateBank', { addBank })} />
-      
-      {/* Modal for password confirmation for deletion */}
-      {isModalVisible && (
-        <Modal transparent={true} animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text>Enter Password to Confirm Deletion</Text>
-              <TextInput
-                style={styles.input}
-                secureTextEntry={true}
-                placeholder="Password"
-              />
-              <Button title="Confirm" onPress={confirmDelete} />
-              <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
-            </View>
-          </View>
-        </Modal>
-      )}
+      <Button title="Add Bank" onPress={() => navigation.navigate('AddUpdateBank')} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  bankItem: {
-    marginBottom: 16,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-  },
-  input: {
-    borderBottomWidth: 1,
-    marginBottom: 16,
-    padding: 8,
-  },
-});
 
 export default BankList;
