@@ -9,6 +9,7 @@ import AddUpdateBank from "./Screens/AddUpdateBank";
 import LoginScreen from "./Screens/LoginScreen";
 import RegistrationScreen from "./Screens/RegistrationScreen";
 import DashboardScreen from "./Screens/DashboardScreen";
+<<<<<<< Updated upstream
 import SettingsScreen from "./Screens/SettingsScreen"; // Import SettingsScreen
 import UpdateInfoScreen from "./Screens/UpdateInfoScreen";
 import ChangePasswordScreen from "./Screens/ChangepasswordScreen";
@@ -17,6 +18,9 @@ import UpdateInsuranceScreen from "./Screens/UpdateInsuranceScreen";
 import GovernmentScreen from "./Screens/GovernmentScreen";
 import CalculatorScreen from "./Screens/CalculatorScreen";
 
+=======
+import ResetPasswordScreen from "./Screens/ResetPasswordScreen";
+>>>>>>> Stashed changes
 const Stack = createStackNavigator();
 
 // Main App
@@ -35,6 +39,8 @@ const App = () => {
           component={RegistrationScreen}
           options={{ headerShown: false }}
         />
+         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen}
+         options={{ headerShown: false }} />
         <Stack.Screen
           name="Dashboard"
           component={DashboardScreen}
