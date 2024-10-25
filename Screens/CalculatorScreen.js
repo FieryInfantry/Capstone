@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import axios from 'axios'; // Import Axios for API calls
 import styles from '../Styles/styles'; // Adjust the import according to your file structure
 import { LineChart } from 'react-native-chart-kit';
 
@@ -31,6 +32,21 @@ const CalculatorScreen = () => {
     setDuration('');
     setPredictedValues([]);
     setModalVisible(false);
+  };
+
+  const saveInvestment = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/investments', {
+        investmentAmount: investmentAmount,
+        interestRate: interestRate,
+        duration: duration,
+      });
+      console.log('Investment saved:', response.data);
+      resetInputs(); // Reset inputs after saving
+    } catch (error) {
+      console.error('Error saving investment:', error);
+      console.error('Response data:', error.response?.data); // Log the error response for more details
+    }
   };
 
   return (
@@ -117,7 +133,7 @@ const CalculatorScreen = () => {
             <TouchableOpacity style={styles.modalButton} onPress={resetInputs}>
               <Text style={styles.buttonText}>Reset</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton}>
+            <TouchableOpacity style={styles.modalButton} onPress={saveInvestment}>
               <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>

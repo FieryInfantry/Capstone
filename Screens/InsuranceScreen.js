@@ -1,88 +1,131 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, Modal, TextInput, StyleSheet } from 'react-native';
-import styles from '../Styles/styles'; // Adjust the import according to your file structure
 import { MaterialIcons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker'; // Make sure this is installed
+import { Picker } from '@react-native-picker/picker'; // Ensure this is installed
+import axios from 'axios'; // Ensure axios is installed
 
 const InsuranceScreen = () => {
-  const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [addModalVisible, setAddModalVisible] = useState(false); // New state for Add modal
+  const [addModalVisible, setAddModalVisible] = useState(false);
 
   // State for modal inputs
   const [companyName, setCompanyName] = useState('company1');
-  const [policyName, setPolicyName] = useState('');
+  const [policyName, setpolicyName] = useState('');
   const [coverageType, setCoverageType] = useState('life insurance');
   const [premiumAmount, setPremiumAmount] = useState('');
   const [interestRate, setInterestRate] = useState('');
   const [potentialBenefits, setPotentialBenefits] = useState('');
+  const [insuranceList, setInsuranceList] = useState([]); // To store the list of insurance policies
+  const [selectedInsuranceId, setSelectedInsuranceId] = useState(null); // To store selected insurance ID for update
 
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
+  useEffect(() => {
+    fetchInsurances(); // Fetch insurance data when the component mounts
+  }, []);
+
+  const fetchInsurances = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/insurances'); // Adjust the URL as needed
+      setInsuranceList(response.data);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch insurance data');
+    }
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = (insurance) => {
+    setSelectedInsuranceId(insurance._id);
+    setCompanyName(insurance.provider);
+    setpolicyName(insurance.policyName);
+    setCoverageType(insurance.coverageType);
+    setPremiumAmount(insurance.premium);
+    setInterestRate(insurance.interestRate);
+    setPotentialBenefits(insurance.potentialBenefits);
     setModalVisible(true);
   };
 
-  const handleDelete = () => {
-    Alert.alert('Delete', 'You clicked Delete');
-    // Implement delete functionality here
+  const handleDelete = async (insuranceId) => {
+    try {
+      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`); // Adjust the URL as needed
+      Alert.alert('Success', 'Insurance policy deleted successfully');
+      fetchInsurances(); // Refresh the list after deletion
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete insurance policy');
+    }
   };
 
-  const handleSave = () => {
-    // Save the data and close modal
-    Alert.alert('Update', 'Insurance policy updated successfully');
-    setModalVisible(false);
-    // Implement the save functionality here
+  const handleSave = async () => {
+    const updatedInsurance = {
+      policyName,
+      provider: companyName,
+      coverageType,
+      premium: premiumAmount,
+      interestRate,
+      potentialBenefits,
+    };
+
+    try {
+      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance); // Adjust the URL as needed
+      Alert.alert('Update', 'Insurance policy updated successfully');
+      setModalVisible(false);
+      fetchInsurances(); // Refresh the list after updating
+    } catch (error) {
+      Alert.alert('Error', 'Failed to update insurance policy');
+    }
   };
 
-  const handleAddSave = () => {
-    Alert.alert('Add', 'Insurance policy added successfully');
-    setAddModalVisible(false);
-    // Implement add functionality here
+  const handleAddSave = async () => {
+    const newInsurance = {
+      policyName,
+      provider: companyName,
+      coverageType,
+      premium: premiumAmount,
+      interestRate,
+      potentialBenefits,
+    };
+
+    try {
+      await axios.post('http://localhost:3000/insurances', newInsurance); // Adjust the URL as needed
+      Alert.alert('Add', 'Insurance policy added successfully');
+      setAddModalVisible(false);
+      fetchInsurances(); // Refresh the list after adding
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add insurance policy');
+    }
   };
 
   const handleCancel = () => {
     setModalVisible(false);
-    setAddModalVisible(false); // Close add modal
+    setAddModalVisible(false);
+    // Reset input states
+    setCompanyName('company1');
+    setpolicyName('');
+    setCoverageType('life insurance');
+    setPremiumAmount('');
+    setInterestRate('');
+    setPotentialBenefits('');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.detailsContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Insurance Policy</Text>
-          <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-            <MaterialIcons name="more-vert" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.title}>Insurance Policies</Text>
 
-        {menuVisible && (
-          <View style={styles.menu}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleUpdate}>
-              <Text>Update</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={handleDelete}>
-              <Text>Delete</Text>
-            </TouchableOpacity>
+        {insuranceList.map((insurance) => (
+          <View key={insurance._id} style={styles.card}>
+            <Text style={styles.label}>Policy Name: {insurance.policyName}</Text>
+            <Text style={styles.label}>Coverage Details: {insurance.coverageType}</Text>
+            <Text style={styles.label}>Premium Payment: {insurance.premium} annually</Text>
+            <Text style={styles.label}>Interest Rate: {insurance.interestRate}</Text>
+            <Text style={styles.label}>Potential Benefits: {insurance.potentialBenefits}</Text>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={() => handleUpdate(insurance)}>
+                <Text style={styles.buttonText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => handleDelete(insurance._id)}>
+                <Text style={styles.buttonText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        )}
-
-        <Text style={styles.label}>Policy Number:</Text>
-        <Text style={styles.value}>123456789</Text>
-        <Text style={styles.label}>Coverage Details:</Text>
-        <Text style={styles.value}>Comprehensive Coverage</Text>
-        <Text style={styles.label}>Premium Payment:</Text>
-        <Text style={styles.value}>10000 annually</Text>
-        <Text style={styles.label}>Schedule:</Text>
-        <Text style={styles.value}>Monthly</Text>
-        <Text style={styles.label}>Interest Rate/ Dividend Rate:</Text>
-        <Text style={styles.value}>3%</Text>
-        <Text style={styles.label}>History:</Text>
-        <Text style={styles.value}>No claims history</Text>
-        <Text style={styles.label}>Potential Benefits Details:</Text>
-        <Text style={styles.value}>Life coverage, accident coverage</Text>
+        ))}
       </View>
 
       {/* Modal for updating insurance details */}
@@ -114,7 +157,7 @@ const InsuranceScreen = () => {
               style={styles.input}
               placeholder="Enter Policy Name"
               value={policyName}
-              onChangeText={setPolicyName}
+              onChangeText={setpolicyName}
             />
 
             <Text style={styles.label}>Coverage Type:</Text>
@@ -124,9 +167,9 @@ const InsuranceScreen = () => {
                 onValueChange={(itemValue) => setCoverageType(itemValue)}
                 style={styles.picker}
               >
-                <Picker.Item label="Life Insurance" value="life insurance" />
-                <Picker.Item label="Health Insurance" value="health insurance" />
-                <Picker.Item label="Car Insurance" value="car insurance" />
+                <Picker.Item label="Life Insurance" value="Life Insurance" />
+                <Picker.Item label="Health Insurance" value="Health Insurance" />
+                <Picker.Item label="Car Insurance" value="Car Insurance" />
               </Picker>
             </View>
 
@@ -195,7 +238,7 @@ const InsuranceScreen = () => {
               style={styles.input}
               placeholder="Enter Policy Name"
               value={policyName}
-              onChangeText={setPolicyName}
+              onChangeText={setpolicyName}
             />
 
             <Text style={styles.label}>Coverage Type:</Text>
@@ -205,9 +248,9 @@ const InsuranceScreen = () => {
                 onValueChange={(itemValue) => setCoverageType(itemValue)}
                 style={styles.picker}
               >
-                <Picker.Item label="Life Insurance" value="life insurance" />
-                <Picker.Item label="Health Insurance" value="health insurance" />
-                <Picker.Item label="Car Insurance" value="car insurance" />
+                <Picker.Item label="Life Insurance" value="Life Insurance" />
+                <Picker.Item label="Health Insurance" value="Health Insurance" />
+                <Picker.Item label="Car Insurance" value="Car Insurance" />
               </Picker>
             </View>
 
@@ -244,5 +287,95 @@ const InsuranceScreen = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  detailsContainer: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    elevation: 3,
+  },
+  label: {
+    fontSize: 16,
+    marginVertical: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    backgroundColor: 'white',
+    margin: 20,
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: '#cccccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  pickerContainer: {
+    borderColor: '#cccccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  modalButton: {
+    backgroundColor: '#28a745',
+    padding: 10,
+    borderRadius: 5,
+    marginVertical: 5,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+});
 
 export default InsuranceScreen;

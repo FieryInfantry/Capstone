@@ -61,7 +61,10 @@ const DashboardScreen = ({ navigation }) => {
         </View>
 
         <View style={DashboardStyles.actionButtonsContainer}>
-          <TouchableOpacity style={DashboardStyles.actionButton}>
+          <TouchableOpacity 
+            style={DashboardStyles.actionButton} 
+            onPress={() => navigation.navigate('AddUpdateBank')} // Navigate to AddUpdateBank
+          >
             <Text>Add new savings</Text>
           </TouchableOpacity>
           <TouchableOpacity style={DashboardStyles.actionButton}>

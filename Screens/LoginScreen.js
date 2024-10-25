@@ -40,6 +40,8 @@ const LoginScreen = () => {
       // If login is successful, navigate to Dashboard
       if (response.status === 200) {
         console.log('Login successful', response.data);
+        setEmail(''); // Clear the email input
+        setPassword(''); // Clear the password input
         navigation.navigate('Dashboard'); // Redirect to DashboardScreen
       }
     } catch (error) {
