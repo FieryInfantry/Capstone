@@ -74,23 +74,25 @@ const InsuranceScreen = () => {
 
   const handleAddSave = async () => {
     const newInsurance = {
-      policyName,
+      policyName, // Ensure the field name matches the schema
       provider: companyName,
       coverageType,
-      premium: premiumAmount,
-      interestRate,
+      premium: parseFloat(premiumAmount), // Parse as a number
+      interestRate: parseFloat(interestRate) || undefined, // Handle optional values
       potentialBenefits,
     };
-
+  
     try {
-      await axios.post('http://localhost:3000/insurances', newInsurance); // Adjust the URL as needed
+      await axios.post('http://localhost:3000/insurances', newInsurance);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
-      fetchInsurances(); // Refresh the list after adding
+      fetchInsurances(); // Refresh list after adding
     } catch (error) {
+      console.error(error); // Log error for debugging
       Alert.alert('Error', 'Failed to add insurance policy');
     }
   };
+  
 
   const handleCancel = () => {
     setModalVisible(false);
@@ -111,6 +113,7 @@ const InsuranceScreen = () => {
 
         {insuranceList.map((insurance) => (
           <View key={insurance._id} style={styles.card}>
+            <Text style={styles.label}>Provider: {insurance.provider}</Text>
             <Text style={styles.label}>Policy Name: {insurance.policyName}</Text>
             <Text style={styles.label}>Coverage Details: {insurance.coverageType}</Text>
             <Text style={styles.label}>Premium Payment: {insurance.premium} annually</Text>
@@ -377,5 +380,4 @@ const styles = StyleSheet.create({
     right: 20,
   },
 });
-
 export default InsuranceScreen;

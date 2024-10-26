@@ -63,15 +63,15 @@ const DashboardScreen = ({ navigation }) => {
         <View style={DashboardStyles.actionButtonsContainer}>
           <TouchableOpacity 
             style={DashboardStyles.actionButton} 
-            onPress={() => navigation.navigate('AddUpdateBank')} // Navigate to AddUpdateBank
+            onPress={() => navigation.navigate('AddUpdateBank')}
           >
             <Text>Add new savings</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={DashboardStyles.actionButton}>
+          <TouchableOpacity 
+            style={DashboardStyles.actionButton} 
+            onPress={() => navigation.navigate('CalculatorScreen')} // Navigate to CalculatorScreen
+          >
             <Text>Add new investment</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={DashboardStyles.actionButton}>
-            <Text>Access investment calculator</Text>
           </TouchableOpacity>
         </View>
 

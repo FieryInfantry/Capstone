@@ -53,7 +53,7 @@
 
   const insuranceSchema = new mongoose.Schema({
     provider: { type: String, required: true },
-    PolicyName: { type: String, required: true },
+    policyName: { type: String, required: true },
     coverageType: { type: String, required: true }, // Add coverageType
     premium: { type: Number, required: true }, // Change premiumAmount to premium
     interestRate: { type: Number, required: false }, // Optional field
@@ -304,17 +304,17 @@ const InvestmentSchema = new mongoose.Schema({
 
 // Create Insurance
 app.post('/insurances', async (req, res) => {
-  const {  provider, PolicyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
+  const {  provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
 
   // Check if all required fields are provided
-  if (!provider  || !PolicyName || !coverageType || !premium) {
+  if (!provider  || !policyName || !coverageType || !premium) {
       return res.status(400).json({ error: 'Policy Name, Provider, Coverage Type, and Premium are required.' });
   }
 
   try {
       const newInsurance = new Insurance({
           provider,
-          PolicyName,
+          policyName,
           coverageType,
           premium,
           interestRate, // Optional field
@@ -333,17 +333,17 @@ app.post('/insurances', async (req, res) => {
 // Update Insurance
 app.put('/insurances/:id', async (req, res) => {
   const { id } = req.params;
-  const {  provider, PolicyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
+  const {  provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
 
   // You can choose to enforce the same validation rules as above.
-  if (!provider || !PolicyName || !coverageType || !premium) {
+  if (!provider || !policyName || !coverageType || !premium) {
       return res.status(400).json({ error: 'Policy Name, Provider, Coverage Type, and Premium are required.' });
   }
 
   try {
       const updatedInsurance = await Insurance.findByIdAndUpdate(
           id,
-          { provider,PolicyName,  coverageType, premium, interestRate, potentialBenefits },
+          { provider,policyName,  coverageType, premium, interestRate, potentialBenefits },
           { new: true } // Return the updated document
       );
 
