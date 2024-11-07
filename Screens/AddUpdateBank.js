@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For token storage
+import { useUser } from '../Context/UserContext'; // Import the UserContext
 
 const banksData = {
   "GM Bank": [
@@ -54,6 +56,8 @@ const AddUpdateBank = ({ route, navigation }) => {
   const [accountBalance, setAccountBalance] = useState(bank ? bank.balance : '');
   const [reward, setReward] = useState(bank ? bank.rewards : '');
 
+  const { token } = useUser();
+
   const handleBankChange = (bankName) => {
     setSelectedBank(bankName);
     setAccountType('');
@@ -74,7 +78,6 @@ const AddUpdateBank = ({ route, navigation }) => {
   };
 
   
-
   const handleSave = async () => {
     const bankDetails = {
       name: selectedBank,
@@ -85,12 +88,28 @@ const AddUpdateBank = ({ route, navigation }) => {
       rewards: reward,
     };
 
+    // If the token is not available in context, try fetching it from AsyncStorage
+    let userToken = token || await AsyncStorage.getItem('authToken');
+    if (!userToken) {
+      Alert.alert('Error', 'User is not authenticated.');
+      return;
+    }
+
     try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`, // Include the token in the header
+        },
+      };
+
       if (bankId) {
-        await axios.put(`http://localhost:3000/banks/${bankId}`, bankDetails);
+        // For existing bank, use PUT method
+        await axios.put(`http://localhost:3000/banks/${bankId}`, bankDetails, config);
       } else {
-        await axios.post('http://localhost:3000/banks', bankDetails);
+        // For new bank, use POST method
+        await axios.post('http://localhost:3000/banks', bankDetails, config);
       }
+
       navigation.goBack();
     } catch (error) {
       console.error('Error saving bank:', error);

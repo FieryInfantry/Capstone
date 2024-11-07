@@ -1,3 +1,4 @@
+require('dotenv').config();
   const express = require('express');
   const mongoose = require('mongoose');
   const cors = require('cors');
@@ -5,6 +6,9 @@
   const bcrypt = require('bcrypt'); // For password hashing
   const nodemailer = require('nodemailer');
   const crypto = require('crypto'); // For generating verification code
+  const jwt = require('jsonwebtoken');
+
+  const { JWT_SECRET_KEY } = process.env;
 
   const app = express();
 
@@ -18,6 +22,19 @@
   // URL encode the password if it contains special characters
   const encodedPassword = encodeURIComponent('adminpass123'); // Replace with your actual password
   const mongoURISafe = `mongodb+srv://bryanmobphone:${encodedPassword}@budgetapp.uk6oe.mongodb.net/BudgetApp?retryWrites=true&w=majority`;
+
+  const authenticateUser = (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+  
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET_KEY);
+      req.userId = decoded.userId; // Attach user ID to the request
+      next();
+    } catch (error) {
+      res.status(403).json({ error: "Invalid token" });
+    }
+  };
 
   mongoose.connect(mongoURISafe, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
@@ -43,45 +60,34 @@
   });
   // Bank Schema
   const bankSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     accountNumber: { type: String, required: true },
     type: { type: String, required: true },
     interestRate: { type: String, required: true },
     rewards: { type: String, required: false },
-    balance: { type: Number, default: 0 }, // Add balance field
+    balance: { type: Number, default: 0 }
   });
 
   const insuranceSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     provider: { type: String, required: true },
     policyName: { type: String, required: true },
-    coverageType: { type: String, required: true }, // Add coverageType
-    premium: { type: Number, required: true }, // Change premiumAmount to premium
-    interestRate: { type: Number, required: false }, // Optional field
-    potentialBenefits: { type: String, required: false }, // Optional field
-});
-const InvestmentSchema = new mongoose.Schema({
-  investmentAmount: {
-    type: Number,
-    required: true,
-  },
-  interestRate: {
-    type: Number,
-    required: true,
-  },
-  duration: {
-    type: Number,
-    required: true,
-  },
-  predictedValues: {
-    type: [Number],
-    default: [],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+    coverageType: { type: String, required: true },
+    premium: { type: Number, required: true },
+    interestRate: { type: Number, required: false },
+    potentialBenefits: { type: String, required: false }
+  });
 
+
+const InvestmentSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  investmentAmount: { type: Number, required: true },
+  interestRate: { type: Number, required: true },
+  duration: { type: Number, required: true },
+  predictedValues: { type: [Number], default: [] },
+  createdAt: { type: Date, default: Date.now }
+});
 
 
   const Investment = mongoose.model('Investment', InvestmentSchema);
@@ -126,29 +132,44 @@ const InvestmentSchema = new mongoose.Schema({
 
 
   // Login Route
-  app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+  // Login Route
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
 
-    try {
-      // Check if the user exists
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid email or password' });
-      }
-
-      // Compare passwords
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid email or password' });
-      }
-
-      // Login success
-      res.status(200).json({ message: 'Login successful' });
-    } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ error: 'Server error' });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
-  });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET_KEY, { expiresIn: '1h' });
+
+    // Send full name and token in the response
+    res.status(200).json({ message: 'Login successful', token, user: { fullName: user.fullName, email: user.email } });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+  // Protected Route Example
+app.get('/profile', authenticateUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
   // Forgot Password Route
   app.post('/forgot-password', async (req, res) => {
@@ -231,21 +252,21 @@ const InvestmentSchema = new mongoose.Schema({
 
 
   // Get All Banks
-  app.get('/banks', async (req, res) => {
+  app.get('/banks', authenticateUser, async (req, res) => {
     try {
-      const banks = await Bank.find(); // Retrieve all banks
-      res.status(200).json(banks); // Send banks in the response
+      const banks = await Bank.find({ userId: req.userId });
+      res.status(200).json(banks);
     } catch (error) {
-      res.status(500).json({ error: 'Error retrieving banks' }); // Handle error
+      res.status(500).json({ error: 'Error retrieving banks' });
     }
   });
 
 
   // Create Banks
-  app.post('/banks', async (req, res) => {
-    const { name, accountNumber, type, interestRate, rewards, balance } = req.body; // Include balance
-    const newBank = new Bank({ name, accountNumber, type, interestRate, rewards, balance }); // Add balance
-
+  app.post('/banks', authenticateUser, async (req, res) => {
+    const { name, accountNumber, type, interestRate, rewards, balance } = req.body;
+    const newBank = new Bank({ userId: req.userId, name, accountNumber, type, interestRate, rewards, balance });
+  
     try {
       await newBank.save();
       res.status(201).json(newBank);
@@ -255,24 +276,18 @@ const InvestmentSchema = new mongoose.Schema({
   });
 
   // Update Bank
-  app.put('/banks/:id', async (req, res) => {
+  app.put('/banks/:id', authenticateUser, async (req, res) => {
     const { id } = req.params;
-    const { name, accountNumber, type, interestRate, rewards, balance } = req.body; // Include balance
-
+    const { name, accountNumber, type, interestRate, rewards, balance } = req.body;
+  
     try {
-      const updatedBank = await Bank.findByIdAndUpdate(id, {
-        name,
-        accountNumber,
-        type,
-        interestRate,
-        rewards,
-        balance, // Update balance
-      }, { new: true });
-
-      if (!updatedBank) {
-        return res.status(404).json({ error: 'Bank not found' });
-      }
-      
+      const updatedBank = await Bank.findOneAndUpdate(
+        { _id: id, userId: req.userId },
+        { name, accountNumber, type, interestRate, rewards, balance },
+        { new: true }
+      );
+  
+      if (!updatedBank) return res.status(404).json({ error: 'Bank not found or not authorized' });
       res.status(200).json(updatedBank);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -280,15 +295,13 @@ const InvestmentSchema = new mongoose.Schema({
   });
 
   // Delete Bank
-  app.delete('/banks/:id', async (req, res) => {
+  app.delete('/banks/:id', authenticateUser, async (req, res) => {
     const { id } = req.params;
-
+  
     try {
-      const deletedBank = await Bank.findByIdAndDelete(id);
-      if (!deletedBank) {
-        return res.status(404).json({ error: 'Bank not found' });
-      }
-      
+      const deletedBank = await Bank.findOneAndDelete({ _id: id, userId: req.userId });
+      if (!deletedBank) return res.status(404).json({ error: 'Bank not found or not authorized' });
+  
       res.status(204).send();
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -296,127 +309,126 @@ const InvestmentSchema = new mongoose.Schema({
   });
 
   app.post('/logout', (req, res) => {
-    // Since you're not using sessions or tokens, just inform the client to clear local data.
-    
-    // Respond with success message
     res.status(200).json({ message: 'Logout successful' });
-  });
+  })
 
 // Create Insurance
-app.post('/insurances', async (req, res) => {
-  const {  provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
+app.post('/insurances', authenticateUser, async (req, res) => {
+  const { provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
 
-  // Check if all required fields are provided
-  if (!provider  || !policyName || !coverageType || !premium) {
-      return res.status(400).json({ error: 'Policy Name, Provider, Coverage Type, and Premium are required.' });
+  if (!provider || !policyName || !coverageType || !premium) {
+    return res.status(400).json({ error: 'Provider, Policy Name, Coverage Type, and Premium are required.' });
   }
 
   try {
-      const newInsurance = new Insurance({
-          provider,
-          policyName,
-          coverageType,
-          premium,
-          interestRate, // Optional field
-          potentialBenefits, // Optional field
-      });
+    const newInsurance = new Insurance({
+      userId: req.userId,
+      provider,
+      policyName,
+      coverageType,
+      premium,
+      interestRate,
+      potentialBenefits
+    });
 
-      const savedInsurance = await newInsurance.save();
-      res.status(201).json(savedInsurance);
+    const savedInsurance = await newInsurance.save();
+    res.status(201).json(savedInsurance);
   } catch (error) {
-      console.error('Error creating insurance:', error);
-      res.status(400).json({ error: error.message });
+    console.error('Error creating insurance:', error);
+    res.status(400).json({ error: error.message });
   }
 });
+
 
 
 // Update Insurance
-app.put('/insurances/:id', async (req, res) => {
+app.put('/insurances/:id', authenticateUser, async (req, res) => {
   const { id } = req.params;
-  const {  provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
+  const { provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;
 
-  // You can choose to enforce the same validation rules as above.
   if (!provider || !policyName || !coverageType || !premium) {
-      return res.status(400).json({ error: 'Policy Name, Provider, Coverage Type, and Premium are required.' });
+    return res.status(400).json({ error: 'Provider, Policy Name, Coverage Type, and Premium are required.' });
   }
 
   try {
-      const updatedInsurance = await Insurance.findByIdAndUpdate(
-          id,
-          { provider,policyName,  coverageType, premium, interestRate, potentialBenefits },
-          { new: true } // Return the updated document
-      );
+    const updatedInsurance = await Insurance.findOneAndUpdate(
+      { _id: id, userId: req.userId },
+      { provider, policyName, coverageType, premium, interestRate, potentialBenefits },
+      { new: true }
+    );
 
-      if (!updatedInsurance) {
-          return res.status(404).json({ error: 'Insurance not found.' });
-      }
+    if (!updatedInsurance) {
+      return res.status(404).json({ error: 'Insurance not found or not authorized' });
+    }
 
-      res.json(updatedInsurance);
+    res.json(updatedInsurance);
   } catch (error) {
-      console.error('Error updating insurance:', error);
-      res.status(400).json({ error: error.message });
+    console.error('Error updating insurance:', error);
+    res.status(400).json({ error: error.message });
   }
 });
 
-
   // Delete Insurance
-  app.delete('/insurances/:id', async (req, res) => {
+  app.delete('/insurances/:id', authenticateUser, async (req, res) => {
     const { id } = req.params;
-
+  
     try {
-      const deletedInsurance = await Insurance.findByIdAndDelete(id);
+      const deletedInsurance = await Insurance.findOneAndDelete({ _id: id, userId: req.userId });
       if (!deletedInsurance) {
-        return res.status(404).json({ error: 'Insurance not found' });
+        return res.status(404).json({ error: 'Insurance not found or not authorized' });
       }
-
+  
       res.status(204).send();
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
   });
 
-app.get('/insurances', async (req, res) => {
-    try {
-      const insurances = await Insurance.find(); // Fetch all insurances from the database
-      res.status(200).json(insurances);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Failed to fetch insurance data' });
-    }
-  });
 
-  app.post('/investments', async (req, res) => {
-    console.log(req.body); // Log incoming data
+  //Get All Insurance
 
-    const { investmentAmount, interestRate, duration } = req.body;
-
-    // Validate input
-    if (!investmentAmount || !interestRate || !duration) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    try {
-        const investment = new Investment({
-            investmentAmount,
-            interestRate,
-            duration,
-        });
-
-        await investment.save();
-        res.status(201).json(investment);
-    } catch (error) {
-        console.error('Error saving investment:', error);
-        res.status(500).json({ message: 'Server error', error });
-    }
-});
-
-
-app.get('/investments', async (req, res) => {
+app.get('/insurances', authenticateUser, async (req, res) => {
   try {
-    const investment = await Investment.find(); // Fetch all insurances from the database
-    res.status(200).json(investment);
+    const insurances = await Insurance.find({ userId: req.userId });
+    res.status(200).json(insurances);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Failed to fetch insurance data' });
+  }
+});
+
+
+//Create Investments
+app.post('/investments', authenticateUser, async (req, res) => {
+  const { investmentAmount, interestRate, duration } = req.body;
+
+  if (!investmentAmount || !interestRate || !duration) {
+    return res.status(400).json({ message: 'Investment Amount, Interest Rate, and Duration are required.' });
+  }
+
+  try {
+    const investment = new Investment({
+      userId: req.userId,
+      investmentAmount,
+      interestRate,
+      duration
+    });
+
+    await investment.save();
+    res.status(201).json(investment);
+  } catch (error) {
+    console.error('Error saving investment:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+
+app.get('/investments', authenticateUser, async (req, res) => {
+  try {
+    const investments = await Investment.find({ userId: req.userId });
+    res.status(200).json(investments);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch investment data' });
   }
 });

@@ -20,9 +20,13 @@ import ResetPasswordScreen from "./Screens/ResetPasswordScreen";
 
 const Stack = createStackNavigator();
 
+//Context
+import { UserProvider } from './Context/UserContext';
+
 // Main App
 const App = () => {
   return (
+    <UserProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         {/* Auth Screens */}
@@ -92,6 +96,7 @@ const App = () => {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </UserProvider>
   );
 };
 

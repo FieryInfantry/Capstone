@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios'; // Import axios for API requests
+import { useUser } from '../Context/UserContext'; // Import context to set user data and token
 import styles from '../Styles/styles';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For token storage
+
 
 const LoginScreen = () => {
   const [email, setEmail] = useState(''); // For login
   const [password, setPassword] = useState(''); // For login
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState(''); // For forgot password
   const [isModalVisible, setModalVisible] = useState(false);
-  
+
+  const { setUserData, setToken } = useUser(); // Access setUserData and setToken from context to save user data and token
   const navigation = useNavigation();
 
   const toggleModal = () => {
@@ -29,23 +33,29 @@ const LoginScreen = () => {
       Alert.alert('Error', 'Please fill in both email and password.');
       return;
     }
-  
+
     try {
-      // Make a request to the backend for login
-      const response = await axios.post('http://localhost:3000/login', {
-        email,
-        password,
-      });
-  
-      // If login is successful, navigate to Dashboard
+      const response = await axios.post('http://localhost:3000/login', { email, password });
+
       if (response.status === 200) {
         console.log('Login successful', response.data);
-        setEmail(''); // Clear the email input
-        setPassword(''); // Clear the password input
-        navigation.navigate('Dashboard'); // Redirect to DashboardScreen
+        setEmail('');  // Clear email and password fields
+        setPassword('');
+
+        // Store user data and token using the useUser context
+        setUserData(response.data.user); // Set the user data in the context
+        const token = response.data.token; // Extract the token from the response
+
+        // Store the token in AsyncStorage for persistence
+        await AsyncStorage.setItem('authToken', token);
+
+        // Store token in context
+        setToken(token);
+
+        // Navigate to the Dashboard after successful login
+        navigation.navigate('Dashboard');
       }
     } catch (error) {
-      // Handle login errors
       if (error.response) {
         console.error('Login error', error.response.data);
         Alert.alert('Login Failed', error.response.data.error || 'Invalid email or password');

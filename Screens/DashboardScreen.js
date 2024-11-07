@@ -1,14 +1,19 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
+import { useUser } from '../Context/UserContext'; // Import the UserContext
 
 const DashboardScreen = ({ navigation }) => {
+  const { userData } = useUser();  // Access user data from context
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={DashboardStyles.container}>
         <View style={DashboardStyles.header}>
           <Text style={DashboardStyles.logo}>LOGO</Text>
-          <Text style={DashboardStyles.welcome}>Welcome, {"[User Name]"}!</Text>
+          <Text style={DashboardStyles.welcome}>
+          Welcome, {userData?.fullName || '[User Name]'}!
+          </Text>
         </View>
 
         <View style={DashboardStyles.summaryContainer}>
@@ -69,7 +74,7 @@ const DashboardScreen = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity 
             style={DashboardStyles.actionButton} 
-            onPress={() => navigation.navigate('CalculatorScreen')} // Navigate to CalculatorScreen
+            onPress={() => navigation.navigate('CalculatorScreen')}
           >
             <Text>Add new investment</Text>
           </TouchableOpacity>
