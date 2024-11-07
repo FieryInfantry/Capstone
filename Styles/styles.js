@@ -4,26 +4,29 @@ const styles = StyleSheet.create({
   // Container Styles
   container: {
     flex: 1,
-    justifyContent: 'flex-start', // Changed to flex-start for better alignment
+    justifyContent: 'flex-start', 
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F6FCDF', // Updated background color
   },
   
   // Text Styles
   title: {
     fontSize: 30,
     fontWeight: 'bold',
+    fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 30,
   },
   footerText: {
     fontSize: 14,
     color: '#333',
+    fontFamily: 'YourPreferredFont', // Updated font
     marginTop: 20,
   },
   terms: {
@@ -31,14 +34,17 @@ const styles = StyleSheet.create({
     color: '#888',
     marginTop: 40,
     textAlign: 'center',
+    fontFamily: 'YourPreferredFont', // Updated font
   },
   label: {
     fontSize: 18,
+    fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 8,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 15,
   },
   
@@ -58,9 +64,10 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     alignSelf: 'flex-end',
     marginVertical: 5,
+    fontFamily: 'YourPreferredFont', // Updated font
   },
   button: {
-    backgroundColor: '#333',
+    backgroundColor: '#859F3D', // Updated button color
     padding: 15,
     borderRadius: 5,
     width: '100%',
@@ -71,6 +78,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'YourPreferredFont', // Updated font
   },
   actionButton: {
     backgroundColor: '#fff',
@@ -80,18 +88,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     elevation: 2,
-    width: '100%', // Full width for action buttons
+    width: '100%',
   },
   
   // Specific button styles for actions
   updateButton: {
-    backgroundColor: '#3e3c3c', 
+    backgroundColor: '#859F3D', // Updated color to match theme
   },
   changePasswordButton: {
-    backgroundColor: '#3e3c3c',
+    backgroundColor: '#859F3D', // Updated color to match theme
   },
   logoutButton: {
-    backgroundColor: '#3e3c3c', 
+    backgroundColor: '#859F3D', // Updated color to match theme
   },
   optionButton: {
     flex: 1,
@@ -123,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#859F3D', // Updated button color
     padding: 12,
     borderRadius: 5,
     width: '100%',
@@ -131,7 +139,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   cancelButton: {
-    backgroundColor: '#3e3c3c', 
+    backgroundColor: '#859F3D', // Updated button color
   },
 
   // Insurance Screen Specific Styles
@@ -163,14 +171,15 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     elevation: 2,
-    width: '100%', // Ensures the details container takes full width
+    width: '100%',
   },
   value: {
     fontSize: 16,
+    fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 12,
   },
   
-  // Picker (Dropdown) Styles (for both company and coverage type dropdowns)
+  // Picker (Dropdown) Styles
   pickerContainer: {
     width: '100%',
     borderWidth: 1,
@@ -197,7 +206,7 @@ const styles = StyleSheet.create({
 
   // Graph Specific Button Styles
   calculateButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#859F3D', // Updated button color
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',

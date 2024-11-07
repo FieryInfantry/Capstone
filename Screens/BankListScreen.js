@@ -1,35 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
-import styles from '../Styles/styles'; // Ensure this path is correct
-import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // For accessing user token
+import { useUser } from '../Context/UserContext'; // Access the UserContext for theme
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import styles from '../Styles/styles'; // Ensure correct import path for styles
 
-const BankList = ({ navigation }) => {
+const BankListScreen = () => {
+  const { theme } = useUser();  // Get theme from context
   const [banks, setBanks] = useState([]);
+  const navigation = useNavigation();
 
-  // Fetch banks when component mounts or screen is focused
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchBanks();
-    }, [])
-  );
+  useEffect(() => {
+    fetchBanks();
+  }, []);
 
   const fetchBanks = async () => {
     try {
-      // Get the user's token from AsyncStorage for authentication
       const token = await AsyncStorage.getItem('authToken');
-      
       if (!token) {
         Alert.alert('Error', 'User not authenticated. Please log in.');
         return;
       }
 
-      // Fetch the list of banks from the API with the user's token for authentication
       const response = await axios.get('http://localhost:3000/banks', {
-        headers: { Authorization: `Bearer ${token}` } // Include token in the header
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       setBanks(response.data);
     } catch (error) {
       console.error('Error fetching banks:', error);
@@ -39,21 +36,17 @@ const BankList = ({ navigation }) => {
 
   const handleDelete = async (id) => {
     try {
-      // Get the user's token for authentication
       const token = await AsyncStorage.getItem('authToken');
-      
       if (!token) {
         Alert.alert('Error', 'User not authenticated. Please log in.');
         return;
       }
 
-      console.log('Attempting to delete bank with ID:', id);
       await axios.delete(`http://localhost:3000/banks/${id}`, {
-        headers: { Authorization: `Bearer ${token}` } // Include token in the header
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Optimistically remove the bank from the state
-      setBanks(prevBanks => prevBanks.filter(bank => bank._id !== id));
+      setBanks((prevBanks) => prevBanks.filter((bank) => bank._id !== id));
     } catch (error) {
       console.error('Error deleting bank:', error);
       Alert.alert('Error', 'Failed to delete bank. Please try again later.');
@@ -61,34 +54,73 @@ const BankList = ({ navigation }) => {
   };
 
   const handleUpdate = (bank) => {
-    // Navigate to the AddUpdateBank screen with the selected bank details
     navigation.navigate('AddUpdateBank', { bank });
   };
 
   return (
-    <View style={styles.container}>
-      {banks.length === 0 ? (
-        <Text>No banks available. Please add a bank.</Text>
-      ) : (
-        <FlatList
-          data={banks}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.bankItem}>
-              <Text>Name: {item.name}</Text>
-              <Text>Type: {item.type}</Text>
-              <Text>Balance: {item.balance}</Text>
-              <Text>Interest Rate: {item.interestRate}</Text>
-              <Text>Rewards: {item.rewards}</Text>
-              <Button title="Update" onPress={() => handleUpdate(item)} />
-              <Button title="Delete" onPress={() => handleDelete(item._id)} />
-            </View>
-          )}
-        />
-      )}
-      <Button title="Add Bank" onPress={() => navigation.navigate('AddUpdateBank')} />
+    <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
+      <View style={{ padding: 20 }}>
+
+        {banks.length === 0 ? (
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16, textAlign: "center" }}>
+            No banks available. Please add a bank.
+          </Text>
+        ) : (
+          <FlatList
+            data={banks}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <View style={{ marginVertical: 10, padding: 15, borderRadius: 8, backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF' }}>
+                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
+                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Type: {item.type}</Text>
+                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Balance: {item.balance}</Text>
+                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate: {item.interestRate}</Text>
+                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Rewards: {item.rewards}</Text>
+
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
+                    marginVertical: 5,
+                    borderRadius: 5,
+                  }}
+                  onPress={() => handleUpdate(item)}
+                >
+                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Update</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    backgroundColor: theme === 'dark' ? '#B93A3A' : '#FF8C8C',
+                    marginVertical: 5,
+                    borderRadius: 5,
+                  }}
+                  onPress={() => handleDelete(item._id)}
+                >
+                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        )}
+
+        <TouchableOpacity
+          style={{
+            padding: 15,
+            backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
+            borderRadius: 8,
+            marginTop: 20,
+          }}
+          onPress={() => navigation.navigate('AddUpdateBank')}
+        >
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center' }}>
+            Add New Bank
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-export default BankList;
+export default BankListScreen;

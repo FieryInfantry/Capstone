@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 const SettingsStyle = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    fontFamily: 'YourPreferredFont',
     marginBottom: 20,
   },
   section: {
@@ -16,31 +16,30 @@ const SettingsStyle = StyleSheet.create({
   },
   label: {
     fontSize: 18,
+    fontFamily: 'YourPreferredFont',
     marginBottom: 8,
   },
   themeOptions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  optionButton: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 12,
-    marginHorizontal: 4,
+  iconButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    elevation: 2,
+    padding: 10,
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#fff',
     padding: 16,
     marginVertical: 4,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
     elevation: 2,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#fff', // Button text color
   },
 });
 

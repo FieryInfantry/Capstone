@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import axios from 'axios'; // Import Axios for API calls
+import { useUser } from '../Context/UserContext'; // Import UserContext
 import styles from '../Styles/styles'; // Adjust the import according to your file structure
 import { LineChart } from 'react-native-chart-kit';
 
 const CalculatorScreen = () => {
+  const { theme } = useUser(); // Access theme from context
+
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [interestRate, setInterestRate] = useState('');
   const [duration, setDuration] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [predictedValues, setPredictedValues] = useState([]);
-  
+
   const calculateInvestment = () => {
     const principal = parseFloat(investmentAmount);
     const rate = parseFloat(interestRate) / 100;
     const years = parseInt(duration);
-    
+
     const values = [];
     for (let i = 1; i <= years; i++) {
       const amount = principal * Math.pow(1 + rate, i);
@@ -49,35 +52,48 @@ const CalculatorScreen = () => {
     }
   };
 
+  const containerStyle = {
+    flex: 1,
+    backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',
+  };
+
+  const textColor = theme === 'dark' ? '#FFF' : '#000';
+  const modalBackground = {
+    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Investment Calculator</Text>
+    <View style={containerStyle}>
+      <Text style={{ color: textColor, fontSize: 24, fontWeight: 'bold' }}>Investment Calculator</Text>
       
-      <Text style={styles.label}>Enter Investment Amount</Text>
+      <Text style={{ color: textColor }}>Enter Investment Amount</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: textColor }]}
         value={investmentAmount}
         onChangeText={setInvestmentAmount}
         keyboardType="numeric"
       />
       
-      <Text style={styles.label}>Enter Interest Rate (%)</Text>
+      <Text style={{ color: textColor }}>Enter Interest Rate (%)</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: textColor }]}
         value={interestRate}
         onChangeText={setInterestRate}
         keyboardType="numeric"
       />
       
-      <Text style={styles.label}>Enter Duration (Years)</Text>
+      <Text style={{ color: textColor }}>Enter Duration (Years)</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: textColor }]}
         value={duration}
         onChangeText={setDuration}
         keyboardType="numeric"
       />
       
-      <TouchableOpacity style={styles.modalButton} onPress={calculateInvestment}>
+      <TouchableOpacity
+        style={styles.modalButton}
+        onPress={calculateInvestment}
+      >
         <Text style={styles.buttonText}>Calculate</Text>
       </TouchableOpacity>
 
@@ -86,12 +102,12 @@ const CalculatorScreen = () => {
         visible={modalVisible}
         animationType="slide"
       >
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, modalBackground]}>
           <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Investment Predictions</Text>
+            <Text style={{ color: textColor, fontSize: 20, fontWeight: 'bold' }}>Investment Predictions</Text>
             <ScrollView>
               {predictedValues.map((value, index) => (
-                <Text key={index}>
+                <Text key={index} style={{ color: textColor }}>
                   Predicted value after {index + 1} year: {value}
                 </Text>
               ))}
@@ -101,9 +117,9 @@ const CalculatorScreen = () => {
                 labels: Array.from({ length: predictedValues.length }, (_, i) => (i + 1).toString()),
                 datasets: [
                   {
-                    data: predictedValues.map(val => parseFloat(val))
-                  }
-                ]
+                    data: predictedValues.map(val => parseFloat(val)),
+                  },
+                ],
               }}
               width={300} // Adjust width as needed
               height={220}
@@ -117,17 +133,17 @@ const CalculatorScreen = () => {
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 style: {
-                  borderRadius: 16
+                  borderRadius: 16,
                 },
                 propsForDots: {
                   r: "6",
                   strokeWidth: "2",
-                  stroke: "#ffa726"
-                }
+                  stroke: "#ffa726",
+                },
               }}
               style={{
                 marginVertical: 8,
-                borderRadius: 16
+                borderRadius: 16,
               }}
             />
             <TouchableOpacity style={styles.modalButton} onPress={resetInputs}>

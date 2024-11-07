@@ -4,49 +4,52 @@ const DashboardStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
-    paddingBottom: 80, // Added padding to avoid content being hidden under the fixed nav bar
+    backgroundColor: '#F6FCDF', // Updated background color
+    paddingBottom: 80, // Padding to avoid content hidden under nav bar
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20, // Increased margin for better separation
+    marginBottom: 20, 
   },
   logo: {
     fontSize: 24,
     fontWeight: 'bold',
+    fontFamily: 'YourPreferredFont', // Updated font
   },
   welcome: {
     fontSize: 18,
+    fontFamily: 'YourPreferredFont', // Updated font
   },
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20, // Increased margin for better separation
+    marginBottom: 20,
   },
   summaryBox: {
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
-    marginHorizontal: 4, // Use horizontal margin for better spacing
+    marginHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8, // Added border radius for a softer look
-    elevation: 2, // Added elevation for shadow effect (Android)
+    borderRadius: 8,
+    elevation: 2,
   },
   section: {
-    marginBottom: 20, // Increased margin for better separation
+    marginBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8, // Added margin for spacing between header and content
+    marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'YourPreferredFont', // Updated font
   },
   seeAll: {
     color: '#007bff',
@@ -57,8 +60,8 @@ const DashboardStyles = StyleSheet.create({
     marginTop: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 8, // Added border radius for consistency
-    elevation: 1, // Added elevation for shadow effect (Android)
+    borderRadius: 8,
+    elevation: 1,
   },
   bankLogo: {
     width: 40,
@@ -68,20 +71,20 @@ const DashboardStyles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20, // Increased margin for better separation
+    marginTop: 20,
   },
   actionButton: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#859F3D', // Updated button color
     padding: 16,
-    marginHorizontal: 4, // Use horizontal margin for better spacing
+    marginHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8, // Added border radius for a softer look
-    elevation: 2, // Added elevation for shadow effect (Android)
+    borderRadius: 8,
+    elevation: 2,
   },
   navigation: {
-    position: 'absolute', // Make the navigation fixed at the bottom
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
@@ -89,24 +92,24 @@ const DashboardStyles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingVertical: 16,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 8, // Added border radius for consistency
-    borderTopRightRadius: 8, // Added border radius for consistency
-    elevation: 1, // Added elevation for shadow effect (Android)
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    elevation: 1,
   },
   navButton: {
-    flex: 1, // Allow nav buttons to take equal space
-    alignItems: 'center', // Center the items in the button
+    flex: 1,
+    alignItems: 'center',
   },
   navItem: {
-    alignItems: 'center', // Center align items in each navigation button
+    alignItems: 'center',
   },
   navIcon: {
     width: 24,
     height: 24,
-    marginBottom: 5, // Add margin to the bottom of the icon to separate from text
+    marginBottom: 5,
   },
   settingsButton: {
-    marginTop: 20, // Adds space above the button
+    marginTop: 20,
     padding: 16,
     backgroundColor: '#fff',
     alignItems: 'center',
@@ -116,7 +119,8 @@ const DashboardStyles = StyleSheet.create({
   },
   settingsButtonText: {
     fontSize: 16,
-    color: '#007bff', // Button text color
+    color: '#007bff',
+    fontFamily: 'YourPreferredFont', // Updated font
   },
 });
 

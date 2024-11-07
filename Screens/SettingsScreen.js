@@ -1,13 +1,21 @@
-import React from 'react';
+// SettingsScreen.js
+import React, { useEffect } from 'react';
 import { Alert, View, Text, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Import navigation hook
-import styles from '../Styles/styles'; // Update to your merged styles file
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Import Icon from react-native-vector-icons
+import { useUser } from '../Context/UserContext'; // Import the UserContext hook
+import styles from '../Styles/styles'; // Import your merged styles
 
 const SettingsScreen = () => {
-  const navigation = useNavigation(); // Initialize navigation
+  const { theme, toggleTheme } = useUser(); // Access theme and toggle function from UserContext
+  const navigation = useNavigation();
+
+  // Fetch the saved theme preference when the component mounts
+  useEffect(() => {
+    // AsyncStorage logic is now handled by context, no need to manage state manually here
+  }, []);
 
   const handleChangePassword = () => {
-    // Placeholder for password change functionality
     Alert.alert('Change Password pressed');
   };
 
@@ -18,12 +26,7 @@ const SettingsScreen = () => {
       });
 
       if (response.ok) {
-        // Clear any stored user data
-        // For example, using AsyncStorage
-        // await AsyncStorage.removeItem('userToken');
-
-        // Navigate back to the login screen
-        navigation.navigate('Login'); // Adjust based on your navigation setup
+        navigation.navigate('Login');
       } else {
         Alert.alert('Logout Failed', 'Please try again.');
       }
@@ -33,47 +36,44 @@ const SettingsScreen = () => {
     }
   };
 
-  
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+    <View style={[styles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
+      <Text style={[styles.title, { color: theme === 'dark' ? '#fff' : '#000' }]}>Settings</Text>
 
       {/* Theme Selection Section */}
       <View style={styles.section}>
-        <Text style={styles.label}>Theme</Text>
-        <View style={styles.themeOptions}>
-          <TouchableOpacity style={styles.optionButton}>
-            <Text>Dark</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.optionButton}>
-            <Text>Light</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={[styles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Theme</Text>
+        <TouchableOpacity onPress={toggleTheme} style={styles.iconButton}>
+          <Icon
+            name={theme === 'dark' ? 'moon' : 'sunny'} // Toggle between moon and sun icons
+            size={30}
+            color={theme === 'dark' ? '#fff' : '#000'}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Language Selection Section */}
       <View style={styles.section}>
-        <Text style={styles.label}>Language</Text>
-        {/* Add language options here if needed */}
+        <Text style={[styles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Language</Text>
       </View>
 
       {/* Action Buttons */}
-      <TouchableOpacity 
-        style={[styles.actionButton, styles.updateButton]} 
-        onPress={() => navigation.navigate('UpdateInfoScreen')} // Navigate to UpdateInfoScreen
+      <TouchableOpacity
+        style={[styles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
+        onPress={() => navigation.navigate('UpdateInfoScreen')}
       >
         <Text style={styles.buttonText}>Update Personal Info</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.actionButton, styles.changePasswordButton]} 
+      <TouchableOpacity
+        style={[styles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={() => navigation.navigate('ChangepasswordScreen')}
       >
         <Text style={styles.buttonText}>Change Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={[styles.actionButton, styles.logoutButton]} 
+      <TouchableOpacity
+        style={[styles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={handleLogout}
       >
         <Text style={styles.buttonText}>Logout</Text>
