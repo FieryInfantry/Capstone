@@ -1,110 +1,177 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, Alert, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
-import { useUser } from '../Context/UserContext'; // Assuming you're using this context
-import styles from '../Styles/styles'; // Ensure this path is correct
-import { useFocusEffect } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../Context/UserContext';
+import AddUpdateStyle from '../Styles/AddUpdateStyle'; // Import the styles
 
-const BankList = ({ navigation }) => {
-  const { theme } = useUser();  // Access theme from context
-  const [banks, setBanks] = useState([]);
+const banksData = {
+  "GM Bank": [
+    { label: 'Easy Savings Account', rate: '0.20%' },
+    { label: 'Regular Savings Account', rate: '0.20%' },
+    { label: 'Silver Savings Account', rate: 'Subject to evaluation' },
+    { label: 'Microfinance Savings Account', rate: '0.20%' },
+    { label: 'Regular Checking Account', rate: 'Not applicable' },
+    { label: 'Combo Checking Account', rate: '0.20%' },
+    { label: 'Gold Checking Account', rate: 'Subject to evaluation' },
+    { label: 'Time Deposit Account', rate: 'Subject to evaluation' },
+  ],
+  "FICO Bank": [
+    { label: 'Ordinary Savings Account', rate: '1% to 4% per annum' },
+    { label: 'Smart Savings Account', rate: '2% to 5% per annum' },
+    { label: 'Bigtime Savings Account', rate: '4% to 7% per annum' },
+    { label: 'Pangarap Savings Account', rate: '4% to 7% per annum' },
+    { label: 'Checking Account', rate: 'Typically no interest earned' },
+    { label: 'Time Deposit - 30 days', rate: '0.375% per annum' },
+    { label: 'Time Deposit - 60 days', rate: '0.5% per annum' },
+    { label: 'Time Deposit - 90 days', rate: '0.625% per annum' },
+    { label: 'Time Deposit - 180 days', rate: '0.75% per annum' },
+    { label: 'Time Deposit - 360 days', rate: '1.25% per annum' },
+    { label: 'Joint Account', rate: 'Generally the same as individual accounts' },
+    { label: 'Dollar Savings Account', rate: '0.25% per annum' },
+    { label: 'Other Specialized Accounts (Kiddie Savers)', rate: '0.25% per annum' },
+    { label: 'Senior Citizens Account', rate: '0.25% per annum' },
+  ],
+  "BDO": [
+    { label: 'Savings Account', rate: '0.25% per annum for balances above ₱50,000; 0.125% for balances below ₱50,000' },
+    { label: 'Checking Account', rate: 'Typically no interest earned' },
+    { label: 'Time Deposit - 30 days', rate: '0.375% per annum' },
+    { label: 'Time Deposit - 60 days', rate: '0.5% per annum' },
+    { label: 'Time Deposit - 90 days', rate: '0.625% per annum' },
+    { label: 'Time Deposit - 180 days', rate: '0.75% per annum' },
+    { label: 'Time Deposit - 360 days', rate: '1.25% per annum' },
+    { label: 'Joint Account', rate: 'Same as individual savings/checking accounts' },
+    { label: 'Dollar Savings Account', rate: '0.25% per annum' },
+    { label: 'Other Specialized Accounts', rate: '0.25% per annum (Kiddie Savers, Senior Citizens Account)' },
+  ],
+};
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchBanks();
-    }, [])
-  );
+const AddUpdateBank = ({ route, navigation }) => {
+  const { bank } = route.params || {}; // Expecting the full bank object if updating
+  const bankId = bank ? bank._id : null; // Getting bank ID if it's an update
+  const [selectedBank, setSelectedBank] = useState(bank ? bank.name : 'GM Bank');
+  const [accountNumber, setAccountNumber] = useState(bank ? bank.accountNumber : '');
+  const [accountType, setAccountType] = useState(bank ? bank.type : '');
+  const [interestRate, setInterestRate] = useState(bank ? bank.interestRate : '');
+  const [accountBalance, setAccountBalance] = useState(bank ? bank.balance : '');
+  const [reward, setReward] = useState(bank ? bank.rewards : '');
 
-  const fetchBanks = async () => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) {
-        Alert.alert('Error', 'User not authenticated. Please log in.');
-        return;
-      }
+  const { token } = useUser();
 
-      const response = await axios.get('http://localhost:3000/banks', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setBanks(response.data);
-    } catch (error) {
-      console.error('Error fetching banks:', error);
-      Alert.alert('Error', 'Failed to fetch banks. Please try again later.');
-    }
+  const handleBankChange = (bankName) => {
+    setSelectedBank(bankName);
+    setAccountType('');
+    setInterestRate('');
+    generateAccountNumber(bankName);
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const token = await AsyncStorage.getItem('authToken');
-      if (!token) {
-        Alert.alert('Error', 'User not authenticated. Please log in.');
-        return;
-      }
-
-      await axios.delete(`http://localhost:3000/banks/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setBanks(prevBanks => prevBanks.filter(bank => bank._id !== id));
-    } catch (error) {
-      console.error('Error deleting bank:', error);
-      Alert.alert('Error', 'Failed to delete bank. Please try again later.');
-    }
+  const handleAccountTypeChange = (itemValue) => {
+    setAccountType(itemValue);
+    const selectedAccount = banksData[selectedBank].find(account => account.label === itemValue);
+    setInterestRate(selectedAccount ? selectedAccount.rate : '');
+    generateAccountNumber(selectedBank);
   };
 
-  const handleUpdate = (bank) => {
-    navigation.navigate('AddUpdateBank', { bank });
+  const generateAccountNumber = () => {
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
+    setAccountNumber(randomDigits.toString());
+  };
+
+  const handleSave = async () => {
+    const bankDetails = {
+      name: selectedBank,
+      accountNumber,
+      type: accountType,
+      interestRate,
+      balance: accountBalance,
+      rewards: reward,
+    };
+
+    let userToken = token || await AsyncStorage.getItem('authToken');
+    if (!userToken) {
+      Alert.alert('Error', 'User is not authenticated.');
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      };
+
+      if (bankId) {
+        await axios.put(`http://localhost:3000/banks/${bankId}`, bankDetails, config);
+      } else {
+        await axios.post('http://localhost:3000/banks', bankDetails, config);
+      }
+
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error saving bank:', error);
+      Alert.alert('Error saving bank', error.response?.data?.error || error.message);
+    }
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={[styles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
-        {banks.length === 0 ? (
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>No banks available. Please add a bank.</Text>
-        ) : (
-          <FlatList
-            data={banks}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <View style={styles.detailsContainer}>
-                <Text style={[styles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Name: {item.name}</Text>
-                <Text style={[styles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Type: {item.type}</Text>
-                <Text style={[styles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Balance: {item.balance}</Text>
-                <Text style={[styles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Interest Rate: {item.interestRate}</Text>
-                <Text style={[styles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Rewards: {item.rewards}</Text>
+    <View style={AddUpdateStyle.container}>
+      <Text>Select Bank</Text>
+      <Picker
+        selectedValue={selectedBank}
+        onValueChange={handleBankChange}
+        style={AddUpdateStyle.picker}
+      >
+        {Object.keys(banksData).map((bank) => (
+          <Picker.Item key={bank} label={bank} value={bank} />
+        ))}
+      </Picker>
 
-                {/* Update Button */}
-                <TouchableOpacity
-                  style={[styles.button, styles.updateButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
-                  onPress={() => handleUpdate(item)}
-                >
-                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Update</Text>
-                </TouchableOpacity>
+      <TextInput
+        placeholder="Account Number"
+        value={accountNumber}
+        editable={false}
+        style={AddUpdateStyle.input}
+      />
 
-                {/* Delete Button */}
-                <TouchableOpacity
-                  style={[styles.button, styles.deleteButton, { backgroundColor: theme === 'dark' ? '#B93A3A' : '#FF8C8C' }]}
-                  onPress={() => handleDelete(item._id)}
-                >
-                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
-        )}
+      <Text>Account Type</Text>
+      <Picker
+        selectedValue={accountType}
+        onValueChange={handleAccountTypeChange}
+        style={AddUpdateStyle.picker}
+      >
+        {banksData[selectedBank].map((account) => (
+          <Picker.Item key={account.label} label={account.label} value={account.label} />
+        ))}
+      </Picker>
 
-        {/* Add Bank Button */}
-        <TouchableOpacity
-          style={[styles.button, styles.addButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
-          onPress={() => navigation.navigate('AddUpdateBank')}
-        >
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Add Bank</Text>
-        </TouchableOpacity>
-      </View>
+      <TextInput
+        placeholder="Interest Rate"
+        value={interestRate}
+        editable={false}
+        style={AddUpdateStyle.input}
+      />
+
+      <TextInput
+        placeholder="Account Balance"
+        value={accountBalance}
+        onChangeText={setAccountBalance}
+        keyboardType="numeric"
+        style={AddUpdateStyle.input}
+      />
+
+      <TextInput
+        placeholder="Reward"
+        value={reward}
+        onChangeText={setReward}
+        style={AddUpdateStyle.input}
+      />
+
+      <TouchableOpacity style={AddUpdateStyle.button} onPress={handleSave}>
+        <Text style={AddUpdateStyle.buttonText}>Save</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default BankList;
+export default AddUpdateBank;

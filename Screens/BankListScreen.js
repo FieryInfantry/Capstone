@@ -60,9 +60,10 @@ const BankListScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
       <View style={{ padding: 20 }}>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 24 }}>Bank List</Text>
 
         {banks.length === 0 ? (
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16, textAlign: "center" }}>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16 }}>
             No banks available. Please add a bank.
           </Text>
         ) : (
