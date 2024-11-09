@@ -312,6 +312,8 @@ app.get('/profile', authenticateUser, async (req, res) => {
     res.status(200).json({ message: 'Logout successful' });
   })
 
+
+  
 // Create Insurance
 app.post('/insurances', authenticateUser, async (req, res) => {
   const { provider, policyName, coverageType, premium, interestRate, potentialBenefits } = req.body;

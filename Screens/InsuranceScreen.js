@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Alert, Modal, TextInput, StyleSheet } fro
 import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker'; // Ensure this is installed
 import axios from 'axios'; // Ensure axios is installed
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const InsuranceScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -24,10 +25,23 @@ const InsuranceScreen = () => {
 
   const fetchInsurances = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/insurances'); // Adjust the URL as needed
+      // Get the user's token from AsyncStorage for authentication
+      const token = await AsyncStorage.getItem('authToken');
+      
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      // Fetch the list of insurances from the API with the user's token for authentication
+      const response = await axios.get('http://localhost:3000/insurances', {
+        headers: { Authorization: `Bearer ${token}` } // Include token in the header
+      });
+  
       setInsuranceList(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch insurance data');
+      console.error('Error fetching insurances:', error);
+      Alert.alert('Error', 'Failed to fetch insurance data. Please try again later.');
     }
   };
 
@@ -42,16 +56,6 @@ const InsuranceScreen = () => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (insuranceId) => {
-    try {
-      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`); // Adjust the URL as needed
-      Alert.alert('Success', 'Insurance policy deleted successfully');
-      fetchInsurances(); // Refresh the list after deletion
-    } catch (error) {
-      Alert.alert('Error', 'Failed to delete insurance policy');
-    }
-  };
-
   const handleSave = async () => {
     const updatedInsurance = {
       policyName,
@@ -61,17 +65,57 @@ const InsuranceScreen = () => {
       interestRate,
       potentialBenefits,
     };
-
+  
     try {
-      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance); // Adjust the URL as needed
+      // Get the user's token from AsyncStorage for authentication
+      const userToken = await AsyncStorage.getItem('authToken');
+      if (!userToken) {
+        Alert.alert('Error', 'User is not authenticated. Please log in.');
+        return;
+      }
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`, // Include the token in the header
+        },
+      };
+  
+      // Send the PUT request to update the insurance
+      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
       fetchInsurances(); // Refresh the list after updating
     } catch (error) {
+      console.error('Error updating insurance:', error);
       Alert.alert('Error', 'Failed to update insurance policy');
     }
   };
-
+  
+  const handleDelete = async (insuranceId) => {
+    try {
+      // Get the user's token from AsyncStorage for authentication
+      const userToken = await AsyncStorage.getItem('authToken');
+      if (!userToken) {
+        Alert.alert('Error', 'User is not authenticated. Please log in.');
+        return;
+      }
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`, // Include the token in the header
+        },
+      };
+  
+      // Send the DELETE request to delete the insurance
+      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`, config);
+      Alert.alert('Success', 'Insurance policy deleted successfully');
+      fetchInsurances(); // Refresh the list after deletion
+    } catch (error) {
+      console.error('Error deleting insurance:', error);
+      Alert.alert('Error', 'Failed to delete insurance policy');
+    }
+  };
+  
   const handleAddSave = async () => {
     const newInsurance = {
       policyName, // Ensure the field name matches the schema
@@ -83,12 +127,26 @@ const InsuranceScreen = () => {
     };
   
     try {
-      await axios.post('http://localhost:3000/insurances', newInsurance);
+      // Get the user's token from AsyncStorage for authentication
+      const userToken = await AsyncStorage.getItem('authToken');
+      if (!userToken) {
+        Alert.alert('Error', 'User is not authenticated. Please log in.');
+        return;
+      }
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`, // Include the token in the header
+        },
+      };
+  
+      // Send the POST request to add the insurance
+      await axios.post('http://localhost:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
       fetchInsurances(); // Refresh list after adding
     } catch (error) {
-      console.error(error); // Log error for debugging
+      console.error('Error adding insurance:', error);
       Alert.alert('Error', 'Failed to add insurance policy');
     }
   };
