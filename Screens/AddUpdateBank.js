@@ -102,9 +102,9 @@ const AddUpdateBank = ({ route, navigation }) => {
       };
 
       if (bankId) {
-        await axios.put(`http://localhost:3000/banks/${bankId}`, bankDetails, config);
+        await axios.put(`http://192.168.1.104:3000/banks/${bankId}`, bankDetails, config);
       } else {
-        await axios.post('http://localhost:3000/banks', bankDetails, config);
+        await axios.post('http://192.168.1.104:3000/banks', bankDetails, config);
       }
 
       navigation.goBack();

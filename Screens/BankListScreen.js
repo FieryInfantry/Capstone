@@ -5,7 +5,8 @@ import { useUser } from '../Context/UserContext'; // Access the UserContext for 
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../Styles/styles'; // Ensure correct import path for styles
-
+import { MaterialIcons } from '@expo/vector-icons';
+import InsuranceStyle from '../Styles/InsuranceStyle';
 const BankListScreen = () => {
   const { theme } = useUser();  // Get theme from context
   const [banks, setBanks] = useState([]);
@@ -23,7 +24,7 @@ const BankListScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/banks', {
+      const response = await axios.get('http://192.168.1.104:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -42,7 +43,7 @@ const BankListScreen = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:3000/banks/${id}`, {
+      await axios.delete(`http://192.168.1.104:3000/banks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -101,25 +102,20 @@ const BankListScreen = () => {
                 >
                   <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Delete</Text>
                 </TouchableOpacity>
+
+                
               </View>
             )}
           />
         )}
 
-        <TouchableOpacity
-          style={{
-            padding: 15,
-            backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
-            borderRadius: 8,
-            marginTop: 20,
-          }}
-          onPress={() => navigation.navigate('AddUpdateBank')}
-        >
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center' }}>
-            Add New Bank
-          </Text>
-        </TouchableOpacity>
+
       </View>
+      <TouchableOpacity
+        style={InsuranceStyle.addButton}
+          onPress={() => navigation.navigate('AddUpdateBank')}
+        >        <MaterialIcons name="add" size={70} color="Black" />
+        </TouchableOpacity>
     </View>
   );
 };

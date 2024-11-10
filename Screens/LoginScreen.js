@@ -35,7 +35,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/login', { email, password });
+      const response = await axios.post('http://192.168.1.104:3000/login', { email, password });
 
       if (response.status === 200) {
         console.log('Login successful', response.data);
