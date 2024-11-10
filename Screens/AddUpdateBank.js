@@ -87,32 +87,36 @@ const AddUpdateBank = ({ route, navigation }) => {
       balance: accountBalance,
       rewards: reward,
     };
-
+  
     let userToken = token || await AsyncStorage.getItem('authToken');
     if (!userToken) {
       Alert.alert('Error', 'User is not authenticated.');
       return;
     }
-
+  
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       };
-
+  
       if (bankId) {
+        // Update bank
         await axios.put(`http://192.168.1.104:3000/banks/${bankId}`, bankDetails, config);
       } else {
+        // Add new bank
         await axios.post('http://192.168.1.104:3000/banks', bankDetails, config);
       }
-
-      navigation.goBack();
+  
+      // Trigger the bank list to be refreshed after save
+      navigation.goBack(); // Go back to the bank list screen after saving
     } catch (error) {
       console.error('Error saving bank:', error);
       Alert.alert('Error saving bank', error.response?.data?.error || error.message);
     }
   };
+  
 
   return (
     <View style={AddUpdateStyle.container}>

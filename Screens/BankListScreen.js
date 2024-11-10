@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
-import { useUser } from '../Context/UserContext'; // Access the UserContext for theme
-import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../Context/UserContext'; 
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import styles from '../Styles/styles'; // Ensure correct import path for styles
 import { MaterialIcons } from '@expo/vector-icons';
 import InsuranceStyle from '../Styles/InsuranceStyle';
+
 const BankListScreen = () => {
-  const { theme } = useUser();  // Get theme from context
+  const { theme } = useUser();
   const [banks, setBanks] = useState([]);
   const navigation = useNavigation();
-
-  useEffect(() => {
-    fetchBanks();
-  }, []);
 
   const fetchBanks = async () => {
     try {
@@ -28,12 +24,18 @@ const BankListScreen = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setBanks(response.data);
+      setBanks(response.data); // Update state with fetched data
     } catch (error) {
       console.error('Error fetching banks:', error);
       Alert.alert('Error', 'Failed to fetch banks. Please try again later.');
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchBanks(); // Refresh bank list when screen gains focus
+    }, [])
+  );
 
   const handleDelete = async (id) => {
     try {
@@ -102,20 +104,17 @@ const BankListScreen = () => {
                 >
                   <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Delete</Text>
                 </TouchableOpacity>
-
-                
               </View>
             )}
           />
         )}
-
-
       </View>
       <TouchableOpacity
         style={InsuranceStyle.addButton}
-          onPress={() => navigation.navigate('AddUpdateBank')}
-        >        <MaterialIcons name="add" size={70} color="Black" />
-        </TouchableOpacity>
+        onPress={() => navigation.navigate('AddUpdateBank')}
+      >
+        <MaterialIcons name="add" size={50} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
