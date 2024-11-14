@@ -13,8 +13,14 @@ const DashboardScreen = ({ navigation }) => {
         <View style={DashboardStyles.header}>
           <Text style={[DashboardStyles.logo, { color: theme === 'dark' ? '#fff' : '#000' }]}>LOGO</Text>
           <Text style={[DashboardStyles.welcome, { color: theme === 'dark' ? '#fff' : '#000' }]}>
-            Welcome, {userData?.fullName || '[User Name]'}!
-          </Text>
+  Welcome, 
+  <Text style={{ fontWeight: 'bold', color: theme === 'dark' ? '#fff' : '#000' }}>
+    {userData?.fullName || '[User Name]'}
+  </Text>
+  !
+</Text>
+
+
         </View>
 
         <View style={DashboardStyles.summaryContainer}>

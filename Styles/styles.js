@@ -10,6 +10,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#F6FCDF', // Updated background color
   },
+  logo: {
+    paddingTop: 100,
+    paddingBottom: 50,
+    width: 100,
+    height: 50,
+    marginBottom: 5,
+  },
   
   // Text Styles
   title: {

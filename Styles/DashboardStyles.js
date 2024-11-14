@@ -16,11 +16,9 @@ const DashboardStyles = StyleSheet.create({
   logo: {
     fontSize: 24,
     fontWeight: 'bold',
-    fontFamily: 'YourPreferredFont', // Updated font
   },
   welcome: {
     fontSize: 18,
-    fontFamily: 'YourPreferredFont', // Updated font
   },
   summaryContainer: {
     flexDirection: 'row',

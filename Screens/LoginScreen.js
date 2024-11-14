@@ -5,6 +5,7 @@ import axios from 'axios'; // Import axios for API requests
 import { useUser } from '../Context/UserContext'; // Import context to set user data and token
 import styles from '../Styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For token storage
+import { Image } from 'react-native';
 
 
 const LoginScreen = () => {
@@ -35,7 +36,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.104:3000/login', { email, password });
+      const response = await axios.post('http://localhost:3000/login', { email, password });
 
       if (response.status === 200) {
         console.log('Login successful', response.data);
@@ -89,8 +90,9 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>LOGO</Text>
-      <Text style={styles.subtitle}>Welcome to</Text>
+      <Text style={styles.title}>
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
+      </Text>
 
       <TextInput
         style={styles.input}
