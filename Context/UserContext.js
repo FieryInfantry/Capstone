@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AsyncStorage } from 'react-native'; // For persisting theme in AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Updated import
 
 const UserContext = createContext();
 
@@ -11,9 +11,13 @@ export const UserProvider = ({ children }) => {
   // Load the theme from AsyncStorage when the app starts
   useEffect(() => {
     const loadTheme = async () => {
-      const savedTheme = await AsyncStorage.getItem('theme');
-      if (savedTheme) {
-        setTheme(savedTheme);
+      try {
+        const savedTheme = await AsyncStorage.getItem('theme');
+        if (savedTheme) {
+          setTheme(savedTheme);
+        }
+      } catch (error) {
+        console.error('Failed to load theme', error);
       }
     };
 
@@ -24,7 +28,11 @@ export const UserProvider = ({ children }) => {
   const toggleTheme = async () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    await AsyncStorage.setItem('theme', newTheme); // Persist theme in AsyncStorage
+    try {
+      await AsyncStorage.setItem('theme', newTheme); // Persist theme in AsyncStorage
+    } catch (error) {
+      console.error('Failed to save theme', error);
+    }
   };
 
   return (

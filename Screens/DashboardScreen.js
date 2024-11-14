@@ -19,13 +19,13 @@ const DashboardScreen = ({ navigation }) => {
 
         <View style={DashboardStyles.summaryContainer}>
           <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Current Savings</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Savings</Text>
           </View>
           <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Current Investments</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Investments</Text>
           </View>
           <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Future Value Predictions</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Future Value Predictions</Text>
           </View>
         </View>
 
@@ -37,8 +37,8 @@ const DashboardScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View style={DashboardStyles.accountBox}>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Connected bank account</Text>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Individual balances</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Connected bank account</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Individual balances</Text>
           </View>
         </View>
 
@@ -50,7 +50,7 @@ const DashboardScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View style={DashboardStyles.accountBox}>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Details such as interest rates, dividends, etc.</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Details such as interest rates, dividends, etc.</Text>
           </View>
         </View>
 
@@ -62,7 +62,7 @@ const DashboardScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View style={DashboardStyles.accountBox}>
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Details like date, amount, and description.</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Details like date, amount, and description.</Text>
           </View>
         </View>
 
