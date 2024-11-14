@@ -49,10 +49,10 @@ const InsuranceStyle = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Adjusted to make the background slightly visible
   },
   modalView: {
-    backgroundColor: 'white',
+    backgroundColor: '#F6FCDF', // Matching background color
     padding: 20,
     borderRadius: 10,
     width: '80%',
@@ -62,10 +62,11 @@ const InsuranceStyle = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
+    color: '#4CAF50', // Matching text color
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#4CAF50', // Matching border color
     borderRadius: 5,
     marginBottom: 15,
   },
@@ -74,14 +75,14 @@ const InsuranceStyle = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderColor: '#ddd',
+    borderColor: '#4CAF50', // Matching border color
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
     paddingLeft: 10,
   },
   modalButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#4CAF50', // Matching theme button color
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
