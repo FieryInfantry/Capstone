@@ -13,7 +13,7 @@ const InsuranceScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [companyName, setCompanyName] = useState('company1');
-  const [policyName, setpolicyName] = useState('');
+  const [policyName, setPolicyName] = useState('');
   const [coverageType, setCoverageType] = useState('life insurance');
   const [premiumAmount, setPremiumAmount] = useState('');
   const [interestRate, setInterestRate] = useState('');
@@ -27,19 +27,16 @@ const InsuranceScreen = () => {
 
   const fetchInsurances = async () => {
     try {
-      // Get the user's token from AsyncStorage for authentication
       const token = await AsyncStorage.getItem('authToken');
-      
       if (!token) {
         Alert.alert('Error', 'User not authenticated. Please log in.');
         return;
       }
-  
-      // Fetch the list of insurances from the API with the user's token for authentication
-      const response = await axios.get('http://192.168.1.104:3000/insurances', {
-        headers: { Authorization: `Bearer ${token}` } // Include token in the header
+
+      const response = await axios.get('http://localhost:3000/insurances', {
+        headers: { Authorization: `Bearer ${token}` }
       });
-  
+
       setInsuranceList(response.data);
     } catch (error) {
       console.error('Error fetching insurances:', error);
@@ -50,7 +47,7 @@ const InsuranceScreen = () => {
   const handleUpdate = (insurance) => {
     setSelectedInsuranceId(insurance._id);
     setCompanyName(insurance.provider);
-    setpolicyName(insurance.policyName);
+    setPolicyName(insurance.policyName);
     setCoverageType(insurance.coverageType);
     setPremiumAmount(insurance.premium);
     setInterestRate(insurance.interestRate);
@@ -67,105 +64,96 @@ const InsuranceScreen = () => {
       interestRate,
       potentialBenefits,
     };
-  
+
     try {
-      // Get the user's token from AsyncStorage for authentication
       const userToken = await AsyncStorage.getItem('authToken');
       if (!userToken) {
         Alert.alert('Error', 'User is not authenticated. Please log in.');
         return;
       }
-  
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`, // Include the token in the header
+          Authorization: `Bearer ${userToken}`,
         },
       };
-  
-      // Send the PUT request to update the insurance
-      await axios.put(`http://192.168.1.104:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
+
+      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
-      fetchInsurances(); // Refresh the list after updating
+      fetchInsurances();
     } catch (error) {
       console.error('Error updating insurance:', error);
       Alert.alert('Error', 'Failed to update insurance policy');
     }
   };
-  
+
   const handleDelete = async (insuranceId) => {
     try {
-      // Get the user's token from AsyncStorage for authentication
       const userToken = await AsyncStorage.getItem('authToken');
       if (!userToken) {
         Alert.alert('Error', 'User is not authenticated. Please log in.');
         return;
       }
-  
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`, // Include the token in the header
+          Authorization: `Bearer ${userToken}`,
         },
       };
-  
-      // Send the DELETE request to delete the insurance
-      await axios.delete(`http://192.168.1.104:3000/insurances/${insuranceId}`, config);
+
+      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`, config);
       Alert.alert('Success', 'Insurance policy deleted successfully');
-      fetchInsurances(); // Refresh the list after deletion
+      fetchInsurances();
     } catch (error) {
       console.error('Error deleting insurance:', error);
       Alert.alert('Error', 'Failed to delete insurance policy');
     }
   };
-  
+
   const handleAddSave = async () => {
     const newInsurance = {
-      policyName, // Ensure the field name matches the schema
+      policyName,
       provider: companyName,
       coverageType,
-      premium: parseFloat(premiumAmount), // Parse as a number
-      interestRate: parseFloat(interestRate) || undefined, // Handle optional values
+      premium: parseFloat(premiumAmount),
+      interestRate: parseFloat(interestRate) || undefined,
       potentialBenefits,
     };
-  
+
     try {
-      // Get the user's token from AsyncStorage for authentication
       const userToken = await AsyncStorage.getItem('authToken');
       if (!userToken) {
         Alert.alert('Error', 'User is not authenticated. Please log in.');
         return;
       }
-  
+
       const config = {
         headers: {
-          Authorization: `Bearer ${userToken}`, // Include the token in the header
+          Authorization: `Bearer ${userToken}`,
         },
       };
-  
-      // Send the POST request to add the insurance
-      await axios.post('http://192.168.1.104:3000/insurances', newInsurance, config);
+
+      await axios.post('http://localhost:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
-      fetchInsurances(); // Refresh list after adding
+      fetchInsurances();
     } catch (error) {
       console.error('Error adding insurance:', error);
       Alert.alert('Error', 'Failed to add insurance policy');
     }
   };
-  
 
   const handleCancel = () => {
     setModalVisible(false);
     setAddModalVisible(false);
-    // Reset input states
     setCompanyName('company1');
-    setpolicyName('');
+    setPolicyName('');
     setCoverageType('life insurance');
     setPremiumAmount('');
     setInterestRate('');
     setPotentialBenefits('');
   };
-
 
   const containerStyle = { 
     flex: 1, 
@@ -177,6 +165,13 @@ const InsuranceScreen = () => {
   };
 
   const textColor = theme === 'dark' ? '#FFF' : '#000';
+
+  const modalContainerStyle = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)', // Adjusted opacity for modal background
+  };
 
   return (
     <View style={containerStyle}>
@@ -210,8 +205,8 @@ const InsuranceScreen = () => {
         visible={modalVisible}
         onRequestClose={handleCancel}
       >
-        <View style={[InsuranceStyle.modalContainer, modalBackground]}>
-          <View style={InsuranceStyle.modalView}>
+        <View style={modalContainerStyle}>
+          <View style={[InsuranceStyle.modalView, modalBackground]}>
             <Text style={[InsuranceStyle.modalTitle, { color: textColor }]}>Update Insurance Details</Text>
 
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Insurance Company:</Text>
@@ -231,7 +226,7 @@ const InsuranceScreen = () => {
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Policy Name"
               value={policyName}
-              onChangeText={setpolicyName}
+              onChangeText={setPolicyName}
             />
 
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
@@ -250,17 +245,19 @@ const InsuranceScreen = () => {
             <TextInput
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Premium Amount"
+              keyboardType="numeric"
               value={premiumAmount}
               onChangeText={setPremiumAmount}
-              keyboardType="numeric"
             />
+
             <TextInput
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Interest Rate"
+              keyboardType="numeric"
               value={interestRate}
               onChangeText={setInterestRate}
-              keyboardType="numeric"
             />
+
             <TextInput
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Potential Benefits"
@@ -268,31 +265,31 @@ const InsuranceScreen = () => {
               onChangeText={setPotentialBenefits}
             />
 
-            <TouchableOpacity style={InsuranceStyle.modalButton} onPress={handleSave}>
-              <Text style={InsuranceStyle.buttonText}>Save</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={InsuranceStyle.modalButton} onPress={handleCancel}>
-              <Text style={InsuranceStyle.buttonText}>Cancel</Text>
-            </TouchableOpacity>
+            <View style={InsuranceStyle.buttonContainer}>
+              <TouchableOpacity style={InsuranceStyle.button} onPress={handleSave}>
+                <Text style={InsuranceStyle.buttonText}>Save Changes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={InsuranceStyle.button} onPress={handleCancel}>
+                <Text style={InsuranceStyle.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>
-
-      {/* Button to open Add modal */}
       <TouchableOpacity style={InsuranceStyle.addButton} onPress={() => setAddModalVisible(true)}>
         <MaterialIcons name="add" size={70} color="Black" />
       </TouchableOpacity>
 
-      {/* Modal for adding new insurance details */}
+      {/* Modal for adding new insurance */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={addModalVisible}
         onRequestClose={handleCancel}
       >
-        <View style={[InsuranceStyle.modalContainer, modalBackground]}>
-          <View style={InsuranceStyle.modalView}>
-            <Text style={[InsuranceStyle.modalTitle, { color: textColor }]}>Add Insurance Details</Text>
+        <View style={modalContainerStyle}>
+          <View style={[InsuranceStyle.modalView, modalBackground]}>
+            <Text style={[InsuranceStyle.modalTitle, { color: textColor }]}>Add New Insurance</Text>
 
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Insurance Company:</Text>
             <View style={InsuranceStyle.pickerContainer}>
@@ -311,7 +308,7 @@ const InsuranceScreen = () => {
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Policy Name"
               value={policyName}
-              onChangeText={setpolicyName}
+              onChangeText={setPolicyName}
             />
 
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
@@ -330,17 +327,19 @@ const InsuranceScreen = () => {
             <TextInput
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Premium Amount"
+              keyboardType="numeric"
               value={premiumAmount}
               onChangeText={setPremiumAmount}
-              keyboardType="numeric"
             />
+
             <TextInput
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Interest Rate"
+              keyboardType="numeric"
               value={interestRate}
               onChangeText={setInterestRate}
-              keyboardType="numeric"
             />
+
             <TextInput
               style={[InsuranceStyle.input, { color: textColor }]}
               placeholder="Enter Potential Benefits"
@@ -348,12 +347,14 @@ const InsuranceScreen = () => {
               onChangeText={setPotentialBenefits}
             />
 
-            <TouchableOpacity style={InsuranceStyle.modalButton} onPress={handleAddSave}>
-              <Text style={InsuranceStyle.buttonText}>Save</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={InsuranceStyle.modalButton} onPress={handleCancel}>
-              <Text style={InsuranceStyle.buttonText}>Cancel</Text>
-            </TouchableOpacity>
+            <View style={InsuranceStyle.buttonContainer}>
+              <TouchableOpacity style={InsuranceStyle.button} onPress={handleAddSave}>
+                <Text style={InsuranceStyle.buttonText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={InsuranceStyle.button} onPress={handleCancel}>
+                <Text style={InsuranceStyle.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </Modal>

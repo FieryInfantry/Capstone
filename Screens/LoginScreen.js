@@ -5,7 +5,7 @@ import axios from 'axios'; // Import axios for API requests
 import { useUser } from '../Context/UserContext'; // Import context to set user data and token
 import styles from '../Styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For token storage
-
+import Icon from 'react-native-vector-icons/Ionicons'; // Import Icon for theme toggle
 
 const LoginScreen = () => {
   const [email, setEmail] = useState(''); // For login
@@ -13,7 +13,7 @@ const LoginScreen = () => {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState(''); // For forgot password
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const { setUserData, setToken } = useUser(); // Access setUserData and setToken from context to save user data and token
+  const { setUserData, setToken, theme, toggleTheme } = useUser(); // Access setUserData and setToken from context to save user data and token
   const navigation = useNavigation();
 
   const toggleModal = () => {
@@ -35,12 +35,12 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.104:3000/login', { email, password });
+      const response = await axios.post('http://localhost:3000/login', { email, password });
 
       if (response.status === 200) {
         console.log('Login successful', response.data);
         setEmail('');  // Clear email and password fields
-        setPassword('');
+        setPassword(''); // Clear password field
 
         // Store user data and token using the useUser context
         setUserData(response.data.user); // Set the user data in the context
@@ -88,12 +88,12 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>LOGO</Text>
-      <Text style={styles.subtitle}>Welcome to</Text>
+    <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
+      <Text style={{ fontSize: 24, color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center', marginTop: 50 }}>LOGO</Text>
+      <Text style={{ fontSize: 18, color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center' }}>Welcome to</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
         placeholder="Enter your Email"
         value={email}
         onChangeText={setEmail}
@@ -102,7 +102,7 @@ const LoginScreen = () => {
       />
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
         placeholder="Password"
         secureTextEntry
         value={password}
@@ -110,15 +110,20 @@ const LoginScreen = () => {
       />
 
       <TouchableOpacity onPress={toggleModal}>
-        <Text style={styles.forgotPassword}>Forgot your password?</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center' }}>Forgot your password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Sign In</Text>
+      <TouchableOpacity style={[styles.button, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} onPress={handleLogin}>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Sign In</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={navigateToRegistration}>
-        <Text style={styles.footerText}>Don't have an account? Sign up now!</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center' }}>Don't have an account? Sign up now!</Text>
+      </TouchableOpacity>
+
+      {/* Dark Mode Toggle Button */}
+      <TouchableOpacity onPress={toggleTheme} style={{ position: 'absolute', top: 40, right: 20 }}>
+        <Icon name={theme === 'dark' ? 'moon' : 'sunny'} size={30} color={theme === 'dark' ? '#fff' : '#000'} />
       </TouchableOpacity>
 
       {/* Forgot Password Modal */}
@@ -131,18 +136,18 @@ const LoginScreen = () => {
         <TouchableWithoutFeedback onPress={toggleModal}>
           <View style={styles.modalContainer}>
             <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={styles.modalView}>
-                <Text style={styles.modalTitle}>Reset Your Password</Text>
+              <View style={[styles.modalView, { backgroundColor: theme === 'dark' ? '#333' : '#fff' }]}>
+                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Reset Your Password</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
                   placeholder="Enter your email address"
                   value={forgotPasswordEmail}
                   onChangeText={setForgotPasswordEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
-                <TouchableOpacity style={styles.modalButton} onPress={handleForgotPassword}>
-                  <Text style={styles.buttonText}>Submit</Text>
+                <TouchableOpacity style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} onPress={handleForgotPassword}>
+                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Submit</Text>
                 </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
@@ -150,7 +155,7 @@ const LoginScreen = () => {
         </TouchableWithoutFeedback>
       </Modal>
 
-      <Text style={styles.terms}>Terms and Conditions | Privacy Policy</Text>
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center', marginTop: 20 }}>Terms and Conditions | Privacy Policy</Text>
     </View>
   );
 };

@@ -57,7 +57,7 @@ const AddUpdateBank = ({ route, navigation }) => {
   const [accountBalance, setAccountBalance] = useState(bank ? bank.balance : '');
   const [reward, setReward] = useState(bank ? bank.rewards : '');
 
-  const { token } = useUser();
+  const { token, theme } = useUser();
 
   const handleBankChange = (bankName) => {
     setSelectedBank(bankName);
@@ -103,10 +103,10 @@ const AddUpdateBank = ({ route, navigation }) => {
   
       if (bankId) {
         // Update bank
-        await axios.put(`http://192.168.1.104:3000/banks/${bankId}`, bankDetails, config);
+        await axios.put(`http://localhost:3000/banks/${bankId}`, bankDetails, config);
       } else {
         // Add new bank
-        await axios.post('http://192.168.1.104:3000/banks', bankDetails, config);
+        await axios.post('http://localhost:3000/banks', bankDetails, config);
       }
   
       // Trigger the bank list to be refreshed after save
@@ -116,15 +116,14 @@ const AddUpdateBank = ({ route, navigation }) => {
       Alert.alert('Error saving bank', error.response?.data?.error || error.message);
     }
   };
-  
 
   return (
-    <View style={AddUpdateStyle.container}>
-      <Text>Select Bank</Text>
+    <View style={[AddUpdateStyle.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Select Bank</Text>
       <Picker
         selectedValue={selectedBank}
         onValueChange={handleBankChange}
-        style={AddUpdateStyle.picker}
+        style={[AddUpdateStyle.picker, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
       >
         {Object.keys(banksData).map((bank) => (
           <Picker.Item key={bank} label={bank} value={bank} />
@@ -135,14 +134,14 @@ const AddUpdateBank = ({ route, navigation }) => {
         placeholder="Account Number"
         value={accountNumber}
         editable={false}
-        style={AddUpdateStyle.input}
+        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
       />
 
-      <Text>Account Type</Text>
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Account Type</Text>
       <Picker
         selectedValue={accountType}
         onValueChange={handleAccountTypeChange}
-        style={AddUpdateStyle.picker}
+        style={[AddUpdateStyle.picker, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
       >
         {banksData[selectedBank].map((account) => (
           <Picker.Item key={account.label} label={account.label} value={account.label} />
@@ -153,7 +152,7 @@ const AddUpdateBank = ({ route, navigation }) => {
         placeholder="Interest Rate"
         value={interestRate}
         editable={false}
-        style={AddUpdateStyle.input}
+        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
       />
 
       <TextInput
@@ -161,17 +160,17 @@ const AddUpdateBank = ({ route, navigation }) => {
         value={accountBalance}
         onChangeText={setAccountBalance}
         keyboardType="numeric"
-        style={AddUpdateStyle.input}
+        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
       />
 
       <TextInput
         placeholder="Reward"
         value={reward}
         onChangeText={setReward}
-        style={AddUpdateStyle.input}
+        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
       />
 
-      <TouchableOpacity style={AddUpdateStyle.button} onPress={handleSave}>
+      <TouchableOpacity style={[AddUpdateStyle.button, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} onPress={handleSave}>
         <Text style={AddUpdateStyle.buttonText}>Save</Text>
       </TouchableOpacity>
     </View>
