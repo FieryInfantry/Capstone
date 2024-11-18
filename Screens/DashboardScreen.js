@@ -11,10 +11,10 @@ const DashboardScreen = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       <ScrollView style={[DashboardStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
         <View style={DashboardStyles.header}>
-          <Text style={[DashboardStyles.logo, { color: theme === 'dark' ? '#fff' : '#000' }]}>LOGO</Text>
-          <Text style={[DashboardStyles.welcome, { color: theme === 'dark' ? '#fff' : '#000' }]}>
+          <Image source={require('../assets/logo.png')} style={DashboardStyles.logo} />
+          <Text style={[DashboardStyles.welcome, { color: theme === 'dark' ? '#fff' : '#000', paddingTop: 50}]}>
   Welcome, 
-  <Text style={{ fontWeight: 'bold', color: theme === 'dark' ? '#fff' : '#000' }}>
+  <Text style={{ fontWeight: 'bold', color: theme === 'dark' ? '#fff' : '#000'}}>
     {userData?.fullName || '[User Name]'}
   </Text>
   !
@@ -118,6 +118,12 @@ const DashboardScreen = ({ navigation }) => {
           <View style={DashboardStyles.navItem}>
             <Image source={require('../assets/calculator.png')} style={DashboardStyles.navIcon} />
             <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Calculator</Text>
+          </View>
+        </TouchableOpacity>        
+        <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('BudgetScreen')}>
+          <View style={DashboardStyles.navItem}>
+          <Image source={require('../assets/budget.png')} style={DashboardStyles.navIcon} />
+            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Budget</Text>
           </View>
         </TouchableOpacity>
       </View>

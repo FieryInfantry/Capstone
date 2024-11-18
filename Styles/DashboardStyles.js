@@ -14,8 +14,10 @@ const DashboardStyles = StyleSheet.create({
     marginBottom: 20, 
   },
   logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    width: 50,
+    height: 80,
+    marginTop: 30,
+    marginBottom: -20,
   },
   welcome: {
     fontSize: 18,
@@ -23,7 +25,7 @@ const DashboardStyles = StyleSheet.create({
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+
   },
   summaryBox: {
     flex: 1,

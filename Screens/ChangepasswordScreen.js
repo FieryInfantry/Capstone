@@ -19,7 +19,7 @@ const ChangePasswordScreen = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/change-password',
+        'http://192.168.22.220:3000/change-password',
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );

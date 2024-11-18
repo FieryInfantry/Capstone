@@ -103,10 +103,10 @@ const AddUpdateBank = ({ route, navigation }) => {
   
       if (bankId) {
         // Update bank
-        await axios.put(`http://localhost:3000/banks/${bankId}`, bankDetails, config);
+        await axios.put(`http://192.168.22.220:3000/banks/${bankId}`, bankDetails, config);
       } else {
         // Add new bank
-        await axios.post('http://localhost:3000/banks', bankDetails, config);
+        await axios.post('http://192.168.22.220:3000/banks', bankDetails, config);
       }
   
       // Trigger the bank list to be refreshed after save

@@ -33,7 +33,7 @@ const InsuranceScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/insurances', {
+      const response = await axios.get('http://192.168.22.220:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -78,7 +78,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
+      await axios.put(`http://192.168.22.220:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
       fetchInsurances();
@@ -102,7 +102,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`, config);
+      await axios.delete(`http://192.168.22.220:3000/insurances/${insuranceId}`, config);
       Alert.alert('Success', 'Insurance policy deleted successfully');
       fetchInsurances();
     } catch (error) {
@@ -134,7 +134,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.post('http://localhost:3000/insurances', newInsurance, config);
+      await axios.post('http://192.168.22.220:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
       fetchInsurances();

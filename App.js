@@ -18,7 +18,10 @@ import UpdateInsuranceScreen from "./Screens/UpdateInsuranceScreen";
 import GovernmentScreen from "./Screens/GovernmentScreen";
 import CalculatorScreen from "./Screens/CalculatorScreen";
 import ResetPasswordScreen from "./Screens/ResetPasswordScreen";
-
+import BudgetScreen from "./Screens/BudgetScreen";
+import ExpenseInputScreen from "./Screens/ExpenseInputScreen";
+import IncomeInputScreen from "./Screens/IncomeInputScreen";
+import TransferInputScreen from "./Screens/TransferInput";
 // Import context
 import { UserProvider } from './Context/UserContext';
 
@@ -110,6 +113,26 @@ const App = () => {
             name="CalculatorScreen"
             component={CalculatorScreen}
             options={{ title: "Calculator" }}
+          />
+          <Stack.Screen
+            name="BudgetScreen"
+            component={BudgetScreen}
+            options={{ title: "Budget Screen" }}
+          />
+          <Stack.Screen
+            name="ExpenseInputScreen"
+            component={ExpenseInputScreen}
+            options={{ title: "Expense Input" }}
+          />
+          <Stack.Screen
+            name="IncomeInputScreen"
+            component={IncomeInputScreen}
+            options={{ title: "Income Input" }}
+          />
+          <Stack.Screen
+            name="TransferInputScreen"
+            component={TransferInputScreen}
+            options={{ title: "Transfer Input" }}
           />
         </Stack.Navigator>
       </NavigationContainer>
