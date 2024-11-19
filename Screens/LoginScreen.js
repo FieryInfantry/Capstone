@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios'; // Import axios for API requests
 import { useUser } from '../Context/UserContext'; // Import context to set user data and token
@@ -91,6 +91,7 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
 
       <TextInput
         style={styles.input}

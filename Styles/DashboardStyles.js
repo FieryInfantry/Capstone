@@ -119,7 +119,7 @@ const DashboardStyles = StyleSheet.create({
   },
   settingsButtonText: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#000000',
     fontFamily: 'YourPreferredFont', // Updated font
   },
 });
