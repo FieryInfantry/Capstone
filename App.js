@@ -22,6 +22,7 @@ import BudgetScreen from "./Screens/BudgetScreen";
 import ExpenseInputScreen from "./Screens/ExpenseInputScreen";
 import IncomeInputScreen from "./Screens/IncomeInputScreen";
 import TransferInputScreen from "./Screens/TransferInput";
+
 // Import context
 import { UserProvider } from './Context/UserContext';
 
@@ -33,14 +34,19 @@ const App = () => {
   return (
     <UserProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Splash">
-
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{
+            gestureEnabled: true,  // Enable swipe gestures across all screens
+            gestureDirection: 'horizontal',  // Swipe direction for back gesture
+            cardStyle: { backgroundColor: 'white' }, // Optional, set card style
+          }}
+        >
           <Stack.Screen
             name="Splash"
             component={SplashScreen}
             options={{ headerShown: false }}
           />
-
 
           <Stack.Screen
             name="Login"
@@ -58,7 +64,6 @@ const App = () => {
             options={{ headerShown: false }}
           />
 
-
           <Stack.Screen
             name="Dashboard"
             component={DashboardScreen}
@@ -73,7 +78,9 @@ const App = () => {
           <Stack.Screen
             name="AddUpdateBank"
             component={AddUpdateBank}
-            options={{ title: "Add/Update Bank" }}
+            options={({ route }) => ({
+              title: route.params?.bank ? 'Update Bank' : 'Add Bank',
+            })}
           />
 
           <Stack.Screen
@@ -92,11 +99,10 @@ const App = () => {
             options={{ title: "Change Password" }}
           />
 
-
           <Stack.Screen
             name="InsuranceScreen"
             component={InsuranceScreen}
-            options={{ title: "Insurance" }}
+            options={{ title: "Insurance Screen" }}
           />
           <Stack.Screen
             name="UpdateInsuranceScreen"
@@ -104,7 +110,7 @@ const App = () => {
             options={{ title: "Update Insurance" }}
           />
 
-           <Stack.Screen
+          <Stack.Screen
             name="GovernmentScreen"
             component={GovernmentScreen}
             options={{ title: "Government" }}

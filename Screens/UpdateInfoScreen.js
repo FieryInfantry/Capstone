@@ -32,75 +32,67 @@ const UpdateInfoScreen = () => {
 
   return (
     <View style={containerStyle}>
-      <Text style={{ color: textColor, fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>
-        Personal Information
-      </Text>
 
-      <Text style={{ color: textColor, marginBottom: 5 }}>Enter your name</Text>
-      <TextInput
-        style={{
-          backgroundColor: inputBackground,
-          color: textColor,
-          borderRadius: 5,
-          padding: 10,
-          marginBottom: 20,
-        }}
-        value={name}
-        onChangeText={setName}
-      />
+<Text style={{ color: textColor, marginBottom: 5 }}>Full Name</Text>
+<TextInput
+  style={{
+    backgroundColor: inputBackground,
+    color: textColor,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  }}
+  placeholder="Name"
+  placeholderTextColor="#aaa"
+  value={name}
+  onChangeText={setName}
+/>
 
-      <Text style={{ color: textColor, marginBottom: 5 }}>Enter your email</Text>
-      <TextInput
-        style={{
-          backgroundColor: inputBackground,
-          color: textColor,
-          borderRadius: 5,
-          padding: 10,
-          marginBottom: 20,
-        }}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+<Text style={{ color: textColor, marginBottom: 5 }}>Email</Text>
+<TextInput
+  style={{
+    backgroundColor: inputBackground,
+    color: textColor,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  }}
+  placeholder="Email"
+  placeholderTextColor="#aaa"
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+/>
 
-      <Text style={{ color: textColor, marginBottom: 5 }}>Enter your phone number</Text>
-      <TextInput
-        style={{
-          backgroundColor: inputBackground,
-          color: textColor,
-          borderRadius: 5,
-          padding: 10,
-          marginBottom: 20,
-        }}
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="phone-pad"
-      />
+<Text style={{ color: textColor, marginBottom: 5 }}>Phone Number</Text>
+<TextInput
+  style={{
+    backgroundColor: inputBackground,
+    color: textColor,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  }}
+  placeholder="Number"
+  placeholderTextColor="#aaa"
+  value={phone}
+  onChangeText={setPhone}
+  keyboardType="phone-pad"
+/>
 
-      <TouchableOpacity
-        style={{
-          backgroundColor: buttonBackground,
-          padding: 15,
-          borderRadius: 5,
-          alignItems: 'center',
-          marginBottom: 10,
-        }}
-        onPress={handleSave}
-      >
-        <Text style={{ color: buttonTextColor, fontSize: 16 }}>Save</Text>
-      </TouchableOpacity>
+<TouchableOpacity
+  style={{
+    backgroundColor: buttonBackground,
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  }}
+  onPress={handleSave}
+>
+  <Text style={{ color: buttonTextColor, fontSize: 16 }}>Save</Text>
+</TouchableOpacity>
 
-      <TouchableOpacity
-        style={{
-          backgroundColor: cancelButtonBackground,
-          padding: 15,
-          borderRadius: 5,
-          alignItems: 'center',
-        }}
-        onPress={handleCancel}
-      >
-        <Text style={{ color: buttonTextColor, fontSize: 16 }}>Cancel</Text>
-      </TouchableOpacity>
     </View>
   );
 };

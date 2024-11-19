@@ -10,24 +10,40 @@ const ChangePasswordScreen = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false); // Show password state for current password
+  const [showNewPassword, setShowNewPassword] = useState(false); // Show password state for new password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Show password state for confirm password
 
   const handleSave = async () => {
-    if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'New password and confirm password do not match.');
-      return;
-    }
-
+    // First, check if the current password is correct
     try {
       const response = await axios.post(
-        'http://192.168.22.220:3000/change-password',
-        { currentPassword, newPassword },
+        'http://192.168.22.220:3000/verify-password',
+        { currentPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      Alert.alert('Success', response.data.message);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      if (response.data.valid) {
+        // If the current password is correct, check if new password and confirm password match
+        if (newPassword !== confirmPassword) {
+          Alert.alert('Error', 'New password and confirm password do not match.');
+          return;
+        }
+
+        // Proceed with changing the password
+        const changePasswordResponse = await axios.post(
+          'http://192.168.1.102:3000/change-password',
+          { currentPassword, newPassword },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        Alert.alert('Success', changePasswordResponse.data.message);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        Alert.alert('Error', 'Current password is incorrect.');
+      }
     } catch (error) {
       Alert.alert('Error', error.response?.data?.error || 'Password change failed');
     }
@@ -51,44 +67,42 @@ const ChangePasswordScreen = () => {
 
   return (
     <View style={containerStyle}>
-      <Text style={[styles.title, { color: theme === 'dark' ? '#FFF' : '#000' }]}>Change Password</Text>
-      
+      {/* Current Password */}
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>Current Password</Text>
       <TextInput
         style={styles.input}
         value={currentPassword}
         onChangeText={setCurrentPassword}
-        secureTextEntry
+        secureTextEntry={!showCurrentPassword}
         placeholder="Current Password"
       />
       
+      {/* New Password */}
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>New Password</Text>
       <TextInput
         style={styles.input}
         value={newPassword}
         onChangeText={setNewPassword}
-        secureTextEntry
+        secureTextEntry={!showNewPassword}
         placeholder="New Password"
       />
       
+      {/* Confirm Password */}
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>Confirm Password</Text>
       <TextInput
         style={styles.input}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
-        secureTextEntry
+        secureTextEntry={!showConfirmPassword}
         placeholder="Confirm Password"
       />
 
+      {/* Save Button */}
       <TouchableOpacity
         style={[styles.button, { backgroundColor: buttonBackgroundColor }]} // Apply dynamic background color based on theme
         onPress={handleSave}
       >
         <Text style={styles.buttonText}>Save</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: buttonBackgroundColor }]} // Apply dynamic background color based on theme
-        onPress={handleCancel}
-      >
-        <Text style={styles.buttonText}>Cancel</Text>
       </TouchableOpacity>
     </View>
   );

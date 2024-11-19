@@ -77,13 +77,13 @@ const DashboardScreen = ({ navigation }) => {
             style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} 
             onPress={() => navigation.navigate('AddUpdateBank')}
           >
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Add new savings</Text>
+            <Text style={{ color: 'white' }}>Add new savings</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} 
             onPress={() => navigation.navigate('CalculatorScreen')}
           >
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Add new investment</Text>
+            <Text style={{ color: 'white' }}>Add new investment</Text>
           </TouchableOpacity>
         </View>
 

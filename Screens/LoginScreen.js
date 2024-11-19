@@ -31,29 +31,39 @@ const LoginScreen = () => {
   };
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    if (!email && !password) {
       Alert.alert('Error', 'Please fill in both email and password.');
       return;
     }
-
+    
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address.');
+      return;
+    }
+  
+    if (!password) {
+      Alert.alert('Error', 'Please enter your password.');
+      return;
+    }
+  
     try {
-      const response = await axios.post('http://192.168.22.220:3000/login', { email, password });
-
+      const response = await axios.post('http://192.168.1.102:3000/login', { email, password });
+  
       if (response.status === 200) {
         console.log('Login successful', response.data);
         setEmail('');  // Clear email and password fields
         setPassword(''); // Clear password field
-
+  
         // Store user data and token using the useUser context
         setUserData(response.data.user); // Set the user data in the context
         const token = response.data.token; // Extract the token from the response
-
+  
         // Store the token in AsyncStorage for persistence
         await AsyncStorage.setItem('authToken', token);
-
+  
         // Store token in context
         setToken(token);
-
+  
         // Navigate to the Dashboard after successful login
         navigation.navigate('Dashboard');
       }
@@ -67,6 +77,7 @@ const LoginScreen = () => {
       }
     }
   };
+  
 
   const handleForgotPassword = async () => {
     if (!forgotPasswordEmail) {
@@ -94,30 +105,32 @@ const LoginScreen = () => {
       <Text style={styles.title}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
       </Text>
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>Email</Text>
+<TextInput
+  style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
+  placeholder="Email"
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+  autoCapitalize="none"
+/>
 
-      <TextInput
-        style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-        placeholder="Enter your Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+<Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>Password</Text>
+<TextInput
+  style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
+  placeholder="Password"
+  secureTextEntry
+  value={password}
+  onChangeText={setPassword}
+/>
 
-      <TextInput
-        style={[styles.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
 
       <TouchableOpacity onPress={toggleModal}>
         <Text style={{ color: theme === 'dark' ? '#fff' : '#000', textAlign: 'center' }}>Forgot your password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} onPress={handleLogin}>
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Sign In</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Log In</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={navigateToRegistration}>

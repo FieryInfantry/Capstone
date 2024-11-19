@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, Image } from 'react-native';
 import axios from 'axios';
 import { useUser } from '../Context/UserContext'; 
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -12,6 +12,7 @@ const BankListScreen = () => {
   const [banks, setBanks] = useState([]);
   const navigation = useNavigation();
 
+  // Fetch banks data
   const fetchBanks = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
@@ -20,7 +21,7 @@ const BankListScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.22.220:3000/banks', {
+      const response = await axios.get('http://192.168.1.102:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -37,6 +38,7 @@ const BankListScreen = () => {
     }, [])
   );
 
+  // Handle bank deletion
   const handleDelete = async (id) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
@@ -45,7 +47,7 @@ const BankListScreen = () => {
         return;
       }
 
-      await axios.delete(`http://192.168.22.220:3000/banks/${id}`, {
+      await axios.delete(`http://192.168.1.102:3000/banks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -56,15 +58,33 @@ const BankListScreen = () => {
     }
   };
 
+  // Handle update navigation
   const handleUpdate = (bank) => {
     navigation.navigate('AddUpdateBank', { bank });
   };
 
+  // Set up navigation options to add the "+" button in the header
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ paddingRight: 15 }} // Add padding to the right
+          onPress={() => navigation.navigate('AddUpdateBank')}
+        >
+          <MaterialIcons 
+            name="add" 
+            size={30} 
+            color="black" // Change the icon color to white
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, theme]);
+  
+
   return (
     <View style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
       <View style={{ padding: 20 }}>
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 24 }}>Bank List</Text>
-
         {banks.length === 0 ? (
           <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16 }}>
             No banks available. Please add a bank.
@@ -87,10 +107,17 @@ const BankListScreen = () => {
                     backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
                     marginVertical: 5,
                     borderRadius: 5,
+                    flexDirection: 'row',  // Align text and icon horizontally
+                    alignItems: 'center',  // Align the items vertically
                   }}
                   onPress={() => handleUpdate(item)}
                 >
-                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Update</Text>
+                  {/* Image Icon */}
+                  <Image
+                    source={require('../assets/edit.png')}  // Replace with your icon path
+                    style={{ width: 20, height: 20, marginRight: 10 }} // Icon size and margin
+                  />
+                  <Text style={{ color: 'white' }}>Edit</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -102,19 +129,13 @@ const BankListScreen = () => {
                   }}
                   onPress={() => handleDelete(item._id)}
                 >
-                  <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Delete</Text>
+                  <Text style={{ color: 'white' }}>Delete</Text>
                 </TouchableOpacity>
               </View>
             )}
           />
         )}
       </View>
-      <TouchableOpacity
-        style={InsuranceStyle.addButton}
-        onPress={() => navigation.navigate('AddUpdateBank')}
-      >
-        <MaterialIcons name="add" size={50} color="black" />
-      </TouchableOpacity>
     </View>
   );
 };

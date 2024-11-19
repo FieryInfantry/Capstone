@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useUser } from '../Context/UserContext'; // Import UserContext
 import InsuranceStyle from '../Styles/InsuranceStyle'; // Import the styles
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const InsuranceScreen = () => {
   const { theme } = useUser(); // Access theme from context
@@ -21,6 +23,25 @@ const InsuranceScreen = () => {
   const [insuranceList, setInsuranceList] = useState([]);
   const [selectedInsuranceId, setSelectedInsuranceId] = useState(null);
 
+  const navigation = useNavigation(); // For navigation control
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ paddingRight: 15 }} // Add padding to the right
+          onPress={() => setAddModalVisible(true)} // Show modal when clicked
+        >
+          <MaterialIcons 
+            name="add" 
+            size={30} 
+            color="black" // Icon color
+          />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   useEffect(() => {
     fetchInsurances(); // Fetch insurance data when the component mounts
   }, []);
@@ -33,7 +54,7 @@ const InsuranceScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.22.220:3000/insurances', {
+      const response = await axios.get('http://192.168.1.102:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -78,7 +99,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.put(`http://192.168.22.220:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
+      await axios.put(`http://192.168.1.102:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
       fetchInsurances();
@@ -102,7 +123,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.delete(`http://192.168.22.220:3000/insurances/${insuranceId}`, config);
+      await axios.delete(`http://192.168.1.102:3000/insurances/${insuranceId}`, config);
       Alert.alert('Success', 'Insurance policy deleted successfully');
       fetchInsurances();
     } catch (error) {
@@ -134,7 +155,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.post('http://192.168.22.220:3000/insurances', newInsurance, config);
+      await axios.post('http://192.168.1.102:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
       fetchInsurances();
@@ -176,7 +197,6 @@ const InsuranceScreen = () => {
   return (
     <View style={containerStyle}>
       <View style={InsuranceStyle.detailsContainer}>
-        <Text style={[InsuranceStyle.title, { color: textColor }]}>Insurance Policies</Text>
 
         {insuranceList.map((insurance) => (
           <View key={insurance._id} style={[InsuranceStyle.card, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF' }]}>
@@ -188,10 +208,17 @@ const InsuranceScreen = () => {
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Potential Benefits: {insurance.potentialBenefits}</Text>
             <View style={InsuranceStyle.buttonContainer}>
               <TouchableOpacity style={InsuranceStyle.button} onPress={() => handleUpdate(insurance)}>
+                <Image
+                  source={require('../assets/edit.png')}  // Replace with your icon path
+                  style={{ width: 20, height: 20, marginRight: 10 }} // Icon size and margin
+                />
                 <Text style={InsuranceStyle.buttonText}>Edit</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={InsuranceStyle.button} onPress={() => handleDelete(insurance._id)}>
-                <Text style={InsuranceStyle.buttonText}>Delete</Text>
+              <TouchableOpacity 
+                style={[InsuranceStyle.button, { backgroundColor: 'red' }]} 
+                onPress={() => handleDelete(insurance._id)}
+              >  
+                <Text style={[InsuranceStyle.buttonText, { color: 'white' }]}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -222,45 +249,43 @@ const InsuranceScreen = () => {
               </Picker>
             </View>
 
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Policy Name:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Policy Name"
+              style={InsuranceStyle.input}
               value={policyName}
               onChangeText={setPolicyName}
             />
+<Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
+<View style={InsuranceStyle.pickerContainer}>
+  <Picker
+    selectedValue={coverageType}  // Check if this is bound to state correctly
+    onValueChange={setCoverageType} // Directly set the state
+    style={InsuranceStyle.picker}
+  >
+    <Picker.Item label="Life Insurance" value="Life Insurance" />
+    <Picker.Item label="Health Insurance" value="Health Insurance" />
+    <Picker.Item label="Car Insurance" value="Car Insurance" />
+  </Picker>
+</View>
 
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
-            <View style={InsuranceStyle.pickerContainer}>
-              <Picker
-                selectedValue={coverageType}
-                onValueChange={(itemValue) => setCoverageType(itemValue)}
-                style={InsuranceStyle.picker}
-              >
-                <Picker.Item label="Life Insurance" value="Life Insurance" />
-                <Picker.Item label="Health Insurance" value="Health Insurance" />
-                <Picker.Item label="Car Insurance" value="Car Insurance" />
-              </Picker>
-            </View>
 
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Premium Amount:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Premium Amount"
+              style={InsuranceStyle.input}
               keyboardType="numeric"
               value={premiumAmount}
               onChangeText={setPremiumAmount}
             />
-
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Interest Rate:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Interest Rate"
+              style={InsuranceStyle.input}
               keyboardType="numeric"
               value={interestRate}
               onChangeText={setInterestRate}
             />
-
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Potential Benefits:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Potential Benefits"
+              style={InsuranceStyle.input}
               value={potentialBenefits}
               onChangeText={setPotentialBenefits}
             />
@@ -276,9 +301,6 @@ const InsuranceScreen = () => {
           </View>
         </View>
       </Modal>
-      <TouchableOpacity style={InsuranceStyle.addButton} onPress={() => setAddModalVisible(true)}>
-        <MaterialIcons name="add" size={70} color="Black" />
-      </TouchableOpacity>
 
       {/* Modal for adding new insurance */}
       <Modal
@@ -289,7 +311,7 @@ const InsuranceScreen = () => {
       >
         <View style={modalContainerStyle}>
           <View style={[InsuranceStyle.modalView, modalBackground]}>
-            <Text style={[InsuranceStyle.modalTitle, { color: textColor }]}>Add New Insurance</Text>
+            <Text style={[InsuranceStyle.modalTitle, { color: textColor }]}>Add Insurance Policy</Text>
 
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Insurance Company:</Text>
             <View style={InsuranceStyle.pickerContainer}>
@@ -304,52 +326,49 @@ const InsuranceScreen = () => {
               </Picker>
             </View>
 
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Policy Name:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Policy Name"
+              style={InsuranceStyle.input}
               value={policyName}
               onChangeText={setPolicyName}
             />
+<Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
+<View style={InsuranceStyle.pickerContainer}>
+  <Picker
+    selectedValue={coverageType}  // Check if this is bound to state correctly
+    onValueChange={setCoverageType} // Directly set the state
+    style={InsuranceStyle.picker}
+  >
+    <Picker.Item label="Life Insurance" value="Life Insurance" />
+    <Picker.Item label="Health Insurance" value="Health Insurance" />
+    <Picker.Item label="Car Insurance" value="Car Insurance" />
+  </Picker>
+</View>
 
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
-            <View style={InsuranceStyle.pickerContainer}>
-              <Picker
-                selectedValue={coverageType}
-                onValueChange={(itemValue) => setCoverageType(itemValue)}
-                style={InsuranceStyle.picker}
-              >
-                <Picker.Item label="Life Insurance" value="Life Insurance" />
-                <Picker.Item label="Health Insurance" value="Health Insurance" />
-                <Picker.Item label="Car Insurance" value="Car Insurance" />
-              </Picker>
-            </View>
-
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Premium Amount:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Premium Amount"
+              style={InsuranceStyle.input}
               keyboardType="numeric"
               value={premiumAmount}
               onChangeText={setPremiumAmount}
             />
-
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Interest Rate:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Interest Rate"
+              style={InsuranceStyle.input}
               keyboardType="numeric"
               value={interestRate}
               onChangeText={setInterestRate}
             />
-
+            <Text style={[InsuranceStyle.label, { color: textColor }]}>Potential Benefits:</Text>
             <TextInput
-              style={[InsuranceStyle.input, { color: textColor }]}
-              placeholder="Enter Potential Benefits"
+              style={InsuranceStyle.input}
               value={potentialBenefits}
               onChangeText={setPotentialBenefits}
             />
 
             <View style={InsuranceStyle.buttonContainer}>
               <TouchableOpacity style={InsuranceStyle.button} onPress={handleAddSave}>
-                <Text style={InsuranceStyle.buttonText}>Save</Text>
+                <Text style={InsuranceStyle.buttonText}>Add Insurance</Text>
               </TouchableOpacity>
               <TouchableOpacity style={InsuranceStyle.button} onPress={handleCancel}>
                 <Text style={InsuranceStyle.buttonText}>Cancel</Text>

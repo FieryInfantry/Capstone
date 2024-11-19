@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, ScrollView, TextInput } from 'react-native';
 import axios from 'axios'; // Import Axios for API calls
 import { useUser } from '../Context/UserContext'; // Import UserContext
 import styles from '../Styles/styles'; // Adjust the import according to your file structure
 import { LineChart } from 'react-native-chart-kit';
+import Picker from 'react-native-picker-select'; // Import the Picker component
 
 const CalculatorScreen = () => {
   const { theme } = useUser(); // Access theme from context
 
   const [investmentAmount, setInvestmentAmount] = useState('');
   const [interestRate, setInterestRate] = useState('');
-  const [duration, setDuration] = useState('');
+  const [duration, setDuration] = useState('1'); // Default duration as string
   const [modalVisible, setModalVisible] = useState(false);
   const [predictedValues, setPredictedValues] = useState([]);
 
@@ -32,7 +33,7 @@ const CalculatorScreen = () => {
   const resetInputs = () => {
     setInvestmentAmount('');
     setInterestRate('');
-    setDuration('');
+    setDuration('1'); // Reset to default duration
     setPredictedValues([]);
     setModalVisible(false);
   };
@@ -64,8 +65,6 @@ const CalculatorScreen = () => {
 
   return (
     <View style={containerStyle}>
-      <Text style={{ color: textColor, fontSize: 24, fontWeight: 'bold' }}>Investment Calculator</Text>
-      
       <Text style={{ color: textColor }}>Enter Investment Amount</Text>
       <TextInput
         style={[styles.input, { color: textColor }]}
@@ -73,23 +72,68 @@ const CalculatorScreen = () => {
         onChangeText={setInvestmentAmount}
         keyboardType="numeric"
       />
-      
+
       <Text style={{ color: textColor }}>Enter Interest Rate (%)</Text>
       <TextInput
         style={[styles.input, { color: textColor }]}
         value={interestRate}
-        onChangeText={setInterestRate}
+        onChangeText={(text) => {
+          // Allow clearing the input if text is empty
+          if (text === '') {
+            setInterestRate(''); // Clear the input
+            return;
+          }
+
+          // Remove any non-numeric characters
+          const numericValue = text.replace(/[^0-9]/g, '');
+
+          // Check if the numeric value is less than or equal to 100 and has 3 digits or less
+          if (parseInt(numericValue) <= 100) {
+            setInterestRate(numericValue); // Update the state only if valid
+          }
+        }}
         keyboardType="numeric"
+        maxLength={3} // Ensures only 3 digits can be entered
       />
-      
+
       <Text style={{ color: textColor }}>Enter Duration (Years)</Text>
-      <TextInput
-        style={[styles.input, { color: textColor }]}
-        value={duration}
-        onChangeText={setDuration}
-        keyboardType="numeric"
+      <Picker
+        onValueChange={(value) => setDuration(value)}
+        items={[
+          { label: '1 Year', value: '1' },
+          { label: '3 Years', value: '3' },
+          { label: '5 Years', value: '5' },
+          { label: '10 Years', value: '10' },
+        ]}
+        style={{
+          inputAndroid: {
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            color: textColor,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? '#555' : '#ccc',
+            marginVertical: 5,
+          },
+          inputIOS: {
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            color: textColor,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? '#555' : '#ccc',
+            marginVertical: 5,
+          },
+          iconContainer: {
+            top: 15,
+            right: 10,
+          },
+        }}
+        placeholder={{ label: 'Select Duration', value: null }}
       />
-      
+
       <TouchableOpacity
         style={styles.modalButton}
         onPress={calculateInvestment}
