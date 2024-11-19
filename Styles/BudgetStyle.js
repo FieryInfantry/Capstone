@@ -4,38 +4,38 @@ const BudgetStyle = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#F6FCDF', // Matching background color
   },
   header: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
   subHeader: {
     fontSize: 14,
     marginBottom: 20,
     textAlign: 'center',
     color: '#888',
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
-  // Added monthSelector style
   monthSelector: {
     flexDirection: 'row',
-    justifyContent: 'center', // Center horizontally
-    alignItems: 'center',     // Center vertically
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
   },
-  // Style for the month text
   monthText: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginHorizontal: 15, // Add space around the month text
+    marginHorizontal: 15,
     textAlign: 'center',
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
-  // Style for arrows
   arrow: {
     fontSize: 24,
-    color: '#007AFF',
+    color: '#859F3D', // Updated to match button color
     paddingHorizontal: 10,
   },
   categoryRow: {
@@ -58,24 +58,25 @@ const BudgetStyle = StyleSheet.create({
   },
   categoryText: {
     fontSize: 16,
-
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
   setBudgetButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#859F3D', // Matching button color
     paddingVertical: 10,
     paddingHorizontal: 10,
-    borderRadius: 5,
-    
+    borderRadius: 8,
+    elevation: 2,
   },
   setBudgetButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
   floatingButton: {
     position: 'absolute',
     width: 60,
     height: 60,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#859F3D', // Matching floating button color
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
@@ -90,13 +91,15 @@ const BudgetStyle = StyleSheet.create({
   floatingButtonText: {
     fontSize: 28,
     color: '#fff',
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
   budgetSummary: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#007AFF', // or any color you prefer
+    color: '#859F3D', // Matching theme color
+    fontFamily: 'YourPreferredFont', // Consistent font
   },
 });
 
