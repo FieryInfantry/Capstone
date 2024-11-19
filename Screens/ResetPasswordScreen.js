@@ -20,7 +20,7 @@ const ResetPasswordScreen = () => {
 
     try {
       // Make a request to the backend to reset the password
-      const response = await axios.post('http://192.168.22.220:3000/reset-password', {
+      const response = await axios.post('http://localhost/3000/reset-password', {
         email,                // Send the email
         resetToken: verificationCode, // Renamed to match backend
         newPassword,

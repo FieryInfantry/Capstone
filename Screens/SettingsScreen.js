@@ -21,7 +21,7 @@ const SettingsScreen = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://192.168.1.102:3000/logout', {
+      const response = await fetch('http://localhost/3000/logout', {
         method: 'POST',
       });
 

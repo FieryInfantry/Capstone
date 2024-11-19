@@ -40,7 +40,7 @@ const CalculatorScreen = () => {
 
   const saveInvestment = async () => {
     try {
-      const response = await axios.post('http://192.168.22.220:3000/investments', {
+      const response = await axios.post('http://localhost/3000/investments', {
         investmentAmount: investmentAmount,
         interestRate: interestRate,
         duration: duration,
