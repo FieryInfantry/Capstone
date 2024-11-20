@@ -38,20 +38,6 @@ const CalculatorScreen = () => {
     setModalVisible(false);
   };
 
-  const saveInvestment = async () => {
-    try {
-      const response = await axios.post('http://localhost/3000/investments', {
-        investmentAmount: investmentAmount,
-        interestRate: interestRate,
-        duration: duration,
-      });
-      console.log('Investment saved:', response.data);
-      resetInputs(); // Reset inputs after saving
-    } catch (error) {
-      console.error('Error saving investment:', error);
-      console.error('Response data:', error.response?.data); // Log the error response for more details
-    }
-  };
 
   const containerStyle = {
     flex: 1,
@@ -192,9 +178,6 @@ const CalculatorScreen = () => {
             />
             <TouchableOpacity style={styles.modalButton} onPress={resetInputs}>
               <Text style={styles.buttonText}>Reset</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={saveInvestment}>
-              <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
               <Text style={styles.buttonText}>Close</Text>

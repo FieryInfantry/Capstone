@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import the Icon component
 import ExpenseStyle from '../Styles/ExpenseInput'; // Adjust the path as needed
 import AccountModal from './AccountModal'; // Adjust the path as needed
 import CategoryModal from './CategoryModal'; // Adjust the path as needed
 
-const IncomeInputScreen = ({ navigation }) => {
+const ExpenseInputScreen = ({ navigation }) => {
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
-  const [inputValue, setInputValue] = useState(''); 
+  const [inputValue, setInputValue] = useState('');
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const date = now.toLocaleDateString();
+      const time = now.toLocaleTimeString();
+      setCurrentDate(`${date} | ${time}`);
+    }, 1000);
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
+  }, []);
 
   const handleNumberPress = (number) => {
     setInputValue(inputValue + number);
@@ -38,38 +51,41 @@ const IncomeInputScreen = ({ navigation }) => {
     <View style={ExpenseStyle.container}>
       {/* Main Expense Input Screen */}
       <View style={ExpenseStyle.inputContainer}>
-      <Text style={ExpenseStyle.label}>
-        <TouchableOpacity
-          style={ExpenseStyle.button}
-          onPress={() => navigation.navigate('IncomeInput')}
-        >
-          <Text style={ExpenseStyle.buttonText}>Income</Text>
-        </TouchableOpacity> | 
-        <TouchableOpacity
-          style={ExpenseStyle.button}
-          onPress={() => navigation.navigate('ExpenseInput')}
-        >
-          <Text style={ExpenseStyle.buttonText}>Expense</Text>
-        </TouchableOpacity>| 
-        <TouchableOpacity
-          style={ExpenseStyle.button}
-          onPress={() => navigation.navigate('TransferInput')}
-        >
-          <Text style={ExpenseStyle.buttonText}>Transfer</Text>
-        </TouchableOpacity></Text>
-        <TouchableOpacity
-          style={ExpenseStyle.button}
-          onPress={() => setAccountModalVisible(true)}
-        >
-          <Text style={ExpenseStyle.buttonText}>Account</Text>
-        </TouchableOpacity>
+        <Text style={ExpenseStyle.label}>
+          <TouchableOpacity
+            style={ExpenseStyle.button}
+            onPress={() => navigation.navigate('IncomeInputScreen')}
+          >
+            <Text style={ExpenseStyle.buttonText}>Income</Text>
+          </TouchableOpacity> | 
+          <TouchableOpacity
+            style={ExpenseStyle.button}
+            onPress={() => navigation.navigate('ExpenseInputScreen')}
+          >
+            <Text style={ExpenseStyle.buttonText}>Expense</Text>
+          </TouchableOpacity>
+        </Text>
 
-        <TouchableOpacity
-          style={ExpenseStyle.button}
-          onPress={() => setCategoryModalVisible(true)}
-        >
-          <Text style={ExpenseStyle.buttonText}>Category</Text>
-        </TouchableOpacity>
+        <View style={ExpenseStyle.modalButtonsContainer}>
+          <TouchableOpacity
+            style={ExpenseStyle.button}
+            onPress={() => setAccountModalVisible(true)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Icon name="user" size={20} color="#333" /> {/* Icon for Account */}
+              <Text style={ExpenseStyle.buttonText}>Account</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={ExpenseStyle.button}
+            onPress={() => setCategoryModalVisible(true)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Icon name="tags" size={20} color="#333" /> {/* Icon for Category */}
+              <Text style={ExpenseStyle.buttonText}>Category</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
 
         <View style={ExpenseStyle.calculatorContainer}>
           <View style={ExpenseStyle.displayContainer}>
@@ -79,71 +95,71 @@ const IncomeInputScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
+          {/* Calculator Layout */}
           <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleNumberPress('7')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>7</Text>
+            <TouchableOpacity onPress={() => handleOperatorPress('+')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>+</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('8')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>8</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('7')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>7</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('9')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>9</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('8')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>8</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleNumberPress('9')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>9</Text>
             </TouchableOpacity>
           </View>
 
           <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleNumberPress('4')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>4</Text>
+            <TouchableOpacity onPress={() => handleOperatorPress('-')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>-</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('5')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>5</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('4')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>4</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('6')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>6</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('5')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>5</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleNumberPress('6')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>6</Text>
             </TouchableOpacity>
           </View>
 
           <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleNumberPress('1')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>1</Text>
+            <TouchableOpacity onPress={() => handleOperatorPress('*')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>x</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('2')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>2</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('1')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>1</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('3')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>3</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('2')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>2</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleNumberPress('3')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>3</Text>
             </TouchableOpacity>
           </View>
 
           <View style={[ExpenseStyle.row, ExpenseStyle.rowLast]}>
-            <TouchableOpacity onPress={() => handleNumberPress('0')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>0</Text>
+            <TouchableOpacity onPress={() => handleOperatorPress('/')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>÷</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOperatorPress('.')} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>.</Text>
+            <TouchableOpacity onPress={() => handleNumberPress('0')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>0</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleEqualsPress} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>=</Text>
+            <TouchableOpacity onPress={() => handleOperatorPress('.')} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>.</Text>
             </TouchableOpacity>
-          </View>
-
-          <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('+')} style={[ExpenseStyle.button, ExpenseStyle.operatorButton]}>
-              <Text style={[ExpenseStyle.buttonText, ExpenseStyle.operatorButtonText]}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOperatorPress('-')} style={[ExpenseStyle.button, ExpenseStyle.operatorButton]}>
-              <Text style={[ExpenseStyle.buttonText, ExpenseStyle.operatorButtonText]}>-</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOperatorPress('*')} style={[ExpenseStyle.button, ExpenseStyle.operatorButton]}>
-              <Text style={[ExpenseStyle.buttonText, ExpenseStyle.operatorButtonText]}>x</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOperatorPress('/')} style={[ExpenseStyle.button, ExpenseStyle.operatorButton]}>
-              <Text style={[ExpenseStyle.buttonText, ExpenseStyle.operatorButtonText]}>÷</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleClearPress} style={ExpenseStyle.button}>
-              <Text style={ExpenseStyle.buttonText}>C</Text>
+            <TouchableOpacity onPress={handleEqualsPress} style={ExpenseStyle.operatorButton}>
+              <Text style={ExpenseStyle.operatorButtonText}>=</Text>
             </TouchableOpacity>
           </View>
+        </View>
+        
+        {/* Display current date and time */}
+        <View style={ExpenseStyle.dateContainer}>
+          <Text style={ExpenseStyle.dateText}>{currentDate}</Text>
         </View>
       </View>
 
@@ -172,4 +188,4 @@ const IncomeInputScreen = ({ navigation }) => {
   );
 };
 
-export default IncomeInputScreen;
+export default ExpenseInputScreen;
