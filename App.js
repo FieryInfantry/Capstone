@@ -21,7 +21,6 @@ import ResetPasswordScreen from "./Screens/ResetPasswordScreen";
 import BudgetScreen from "./Screens/BudgetScreen";
 import ExpenseInputScreen from "./Screens/ExpenseInputScreen";
 import IncomeInputScreen from "./Screens/IncomeInputScreen";
-import TransferInputScreen from "./Screens/TransferInput";
 
 // Import context
 import { UserProvider } from './Context/UserContext';
@@ -134,11 +133,6 @@ const App = () => {
             name="IncomeInputScreen"
             component={IncomeInputScreen}
             options={{ title: "Income Input" }}
-          />
-          <Stack.Screen
-            name="TransferInputScreen"
-            component={TransferInputScreen}
-            options={{ title: "Transfer Input" }}
           />
         </Stack.Navigator>
       </NavigationContainer>

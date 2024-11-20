@@ -54,21 +54,15 @@ const ExpenseInputScreen = ({ navigation }) => {
         <Text style={ExpenseStyle.label}>
           <TouchableOpacity
             style={ExpenseStyle.button}
-            onPress={() => navigation.navigate('IncomeInput')}
+            onPress={() => navigation.navigate('IncomeInputScreen')}
           >
             <Text style={ExpenseStyle.buttonText}>Income</Text>
           </TouchableOpacity> | 
           <TouchableOpacity
             style={ExpenseStyle.button}
-            onPress={() => navigation.navigate('ExpenseInput')}
+            onPress={() => navigation.navigate('ExpenseInputScreen')}
           >
             <Text style={ExpenseStyle.buttonText}>Expense</Text>
-          </TouchableOpacity> | 
-          <TouchableOpacity
-            style={ExpenseStyle.button}
-            onPress={() => navigation.navigate('TransferInput')}
-          >
-            <Text style={ExpenseStyle.buttonText}>Transfer</Text>
           </TouchableOpacity>
         </Text>
 
