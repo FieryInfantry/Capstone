@@ -24,7 +24,7 @@ const ExpenseStyle = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 50, // Reduced height for a more compact button
+    height: 40, // Reduced height for a more compact button
     elevation: 2, // Added elevation for consistency
     backgroundColor:"#859F3D"
   },
@@ -34,7 +34,7 @@ const ExpenseStyle = StyleSheet.create({
     marginBottom: 20, // Space between buttons
   },
   buttonText: {
-    fontSize: 18, // Smaller font size for buttons
+    fontSize: 14, // Smaller font size for buttons
     color: '#fff',
     fontFamily: 'YourPreferredFont', // Consistent font
     alignItems: 'center',
@@ -114,7 +114,7 @@ const ExpenseStyle = StyleSheet.create({
     alignItems: 'center', // Centers the content
   },
   dateText: {
-    fontSize: 10, // Smaller font size for date and time
+    fontSize: 20, // Smaller font size for date and time
     color: '#333',
     fontFamily: 'YourPreferredFont', // Consistent font
   },

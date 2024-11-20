@@ -9,8 +9,9 @@ const CategoryModalStyle = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: 25,
     marginBottom: 10,
+    fontWeight: "bold",
   },
   categoriesContainer: {
     flexDirection: 'row',

@@ -21,7 +21,7 @@ const AccountModal = ({ closeModal }) => {
       </TouchableOpacity>
       {/* Close button */}
       <TouchableOpacity onPress={closeModal} style={AccountModalStyle.closeButton}>
-        <Text style={AccountModalStyle}>Close</Text>
+        <Text style={AccountModalStyle.closeButtonText}>Close</Text>
       </TouchableOpacity>
     </View>
   );
