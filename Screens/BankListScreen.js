@@ -6,6 +6,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import InsuranceStyle from '../Styles/InsuranceStyle';
+import Icon from 'react-native-vector-icons/AntDesign';
+
 
 const BankListScreen = () => {
   const { theme } = useUser();
@@ -109,27 +111,37 @@ const BankListScreen = () => {
                     borderRadius: 5,
                     flexDirection: 'row',  // Align text and icon horizontally
                     alignItems: 'center',  // Align the items vertically
+                    justifyContent: 'center',
+                    height: 40, // Reduced height for a more compact button
+                    elevation: 2, // Added elevation for consistency
                   }}
                   onPress={() => handleUpdate(item)}
                 >
                   {/* Image Icon */}
-                  <Image
-                    source={require('../assets/edit.png')}  // Replace with your icon path
-                    style={{ width: 20, height: 20, marginRight: 10 }} // Icon size and margin
-                  />
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="edit" size={20} color="#333" /> {/* Icon for Account */}
                   <Text style={{ color: 'white' }}>Edit</Text>
+                  </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
                     padding: 10,
-                    backgroundColor: theme === 'dark' ? '#B93A3A' : '#FF8C8C',
+                    backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
                     marginVertical: 5,
                     borderRadius: 5,
+                    flexDirection: 'row',  // Align text and icon horizontally
+                    alignItems: 'center',  // Align the items vertically
+                    justifyContent: 'center',
+                    height: 40, // Reduced height for a more compact button
+                    elevation: 2,
                   }}
                   onPress={() => handleDelete(item._id)}
                 >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="delete" size={20} color="#333" /> {/* Icon for Account */}
                   <Text style={{ color: 'white' }}>Delete</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             )}

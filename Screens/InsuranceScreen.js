@@ -8,6 +8,7 @@ import InsuranceStyle from '../Styles/InsuranceStyle'; // Import the styles
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 const InsuranceScreen = () => {
   const { theme } = useUser(); // Access theme from context
@@ -54,7 +55,7 @@ const InsuranceScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.1.102:3000/insurances', {
+      const response = await axios.get('http://localhost:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -99,7 +100,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.put(`http://192.168.1.102:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
+      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
       fetchInsurances();
@@ -123,7 +124,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.delete(`http://192.168.1.102:3000/insurances/${insuranceId}`, config);
+      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`, config);
       Alert.alert('Success', 'Insurance policy deleted successfully');
       fetchInsurances();
     } catch (error) {
@@ -155,7 +156,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.post('http://192.168.1.102:3000/insurances', newInsurance, config);
+      await axios.post('http://localhost:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
       fetchInsurances();
@@ -208,17 +209,18 @@ const InsuranceScreen = () => {
             <Text style={[InsuranceStyle.label, { color: textColor }]}>Potential Benefits: {insurance.potentialBenefits}</Text>
             <View style={InsuranceStyle.buttonContainer}>
               <TouchableOpacity style={InsuranceStyle.button} onPress={() => handleUpdate(insurance)}>
-                <Image
-                  source={require('../assets/edit.png')}  // Replace with your icon path
-                  style={{ width: 20, height: 20, marginRight: 10 }} // Icon size and margin
-                />
-                <Text style={InsuranceStyle.buttonText}>Edit</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Icon name="edit" size={20} color="#333" /> {/* Icon for Account */}
+              <Text style={InsuranceStyle.buttonText}>Edit</Text>
+            </View>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={[InsuranceStyle.button, { backgroundColor: 'red' }]} 
-                onPress={() => handleDelete(insurance._id)}
-              >  
+                style={[InsuranceStyle.button]} 
+                onPress={() => handleDelete(insurance._id)}>  
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="delete" size={20} color="#333" /> {/* Icon for Account */}
                 <Text style={[InsuranceStyle.buttonText, { color: 'white' }]}>Delete</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>

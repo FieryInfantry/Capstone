@@ -118,7 +118,7 @@ const handleBankChange = (bankName) => {
         await axios.put(`http://localhost/3000/banks/${bankId}`, bankDetails, config);
       } else {
         // Add new bank
-        await axios.post('http://localhost/3000//banks', bankDetails, config);
+        await axios.post('http://localhost/3000/banks', bankDetails, config);
       }
 
       navigation.goBack(); // Go back to the bank list screen after saving
