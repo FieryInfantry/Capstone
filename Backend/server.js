@@ -89,11 +89,22 @@ const InvestmentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const budgetSchema = new mongoose.Schema({
+  category: { type: String, required: true },
+  month: { type: Number, required: true },
+  year: { type: Number, required: true },
+  amount: { type: Number, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the budget to a specific user
+});
 
+
+  const Budget = mongoose.model('Budget', budgetSchema);
   const Investment = mongoose.model('Investment', InvestmentSchema);
   const Bank = mongoose.model('Bank', bankSchema);
   const User = mongoose.model('User', userSchema);
   const Insurance = mongoose.model('Insurance', insuranceSchema);
+
+
   // Registration Route
   app.post('/register', async (req, res) => {
     const { fullName, email, password } = req.body;
@@ -131,7 +142,6 @@ const InvestmentSchema = new mongoose.Schema({
   });
 
 
-  // Login Route
   // Login Route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -303,6 +313,18 @@ app.get('/profile', authenticateUser, async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   });
+  
+// Get all bank account balances
+app.get('/banks/balances', authenticateUser, async (req, res) => {
+  try {
+    const banks = await Bank.find({ userId: req.userId });
+    const totalBalance = banks.reduce((sum, bank) => sum + (bank.balance || 0), 0);
+    res.status(200).json({ totalBalance });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 
   // Update Bank
   app.put('/banks/:id', authenticateUser, async (req, res) => {
@@ -459,5 +481,77 @@ app.get('/investments', authenticateUser, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Failed to fetch investment data' });
+  }
+});
+
+
+app.post('/budget', authenticateUser, async (req, res) => {
+  const { category, amount, month, year } = req.body;
+  const userId = req.userId;  // Assuming user ID is attached to the request
+
+  // Validate input fields
+  if (!category || !amount || !month || !year) {
+    return res.status(400).json({ error: 'All fields (category, amount, month, year) are required.' });
+  }
+
+  try {
+
+    const newBudget = new Budget({
+      userId,
+      category,
+      amount,
+      month,
+      year,
+    });
+
+    await newBudget.save();
+
+    // Respond with the newly saved budget
+    res.status(201).json(newBudget);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while saving the budget.' });
+  }
+});
+
+app.get('/budget', authenticateUser, async (req, res) => {
+  const { month, year } = req.query;
+  const userId = req.userId; // Assuming user ID is attached to the request
+
+  // Validate input fields
+  if (!month || !year) {
+    return res.status(400).json({ error: 'Month and year are required.' });
+  }
+
+  try {
+    // Query the database for budgets that match the given month, year, and userId
+    const budgets = await Budget.find({ userId, month, year });
+
+    // Respond with the fetched budgets
+    res.status(200).json(budgets);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while fetching the budgets.' });
+  }
+});
+
+
+app.delete('/budget', authenticateUser, async (req, res) => {
+  const { category, month, year } = req.query;  // Read from query params
+
+  if (!category || !month || !year) {
+    return res.status(400).json({ error: 'Missing required parameters: category, month, year' });
+  }
+
+  try {
+    // Find and delete the budget for the given category, month, and year
+    const budget = await Budget.findOneAndDelete({ category, month: parseInt(month), year: parseInt(year) });
+
+    if (!budget) {
+      return res.status(404).json({ error: 'Budget not found' });
+    }
+
+    res.status(200).json({ message: 'Budget deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while deleting the budget' });
   }
 });

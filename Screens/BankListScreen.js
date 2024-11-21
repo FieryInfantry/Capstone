@@ -23,7 +23,7 @@ const BankListScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.1.104:3000/banks', {
+      const response = await axios.get('http://192.168.1.101:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -49,7 +49,7 @@ const BankListScreen = () => {
         return;
       }
 
-      await axios.delete(`http://192.168.1.104:3000/banks/${id}`, {
+      await axios.delete(`http://192.168.1.101:3000/banks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
