@@ -190,7 +190,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.1.101:3000/budget?month=${month + 1}&year=${year}`,
+        `http://192.168.1.101:3000/budget/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {

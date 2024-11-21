@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import the Icon component
 import ExpenseStyle from '../Styles/ExpenseInput'; // Adjust the path as needed
 import AccountModal from './AccountModal'; // Adjust the path as needed
 import CategoryModal from './CategoryModal'; // Adjust the path as needed
+import axios from 'axios'; // To send HTTP requests
 
 const ExpenseInputScreen = ({ navigation }) => {
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [currentDate, setCurrentDate] = useState('');
+  const [category, setCategory] = useState(''); // Category to be selected
+  const [amount, setAmount] = useState(''); // Amount input
+  const [selectedAccount, setSelectedAccount] = useState(null); // Selected account
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -42,14 +46,41 @@ const ExpenseInputScreen = ({ navigation }) => {
     try {
       const result = eval(inputValue);
       setInputValue(result.toString());
+      setAmount(result.toString()); // Set the result as amount
     } catch (error) {
       setInputValue('Error');
     }
   };
 
+  const handleSubmitExpense = async () => {
+    if (!category || !amount || !selectedAccount) {
+      Alert.alert('Error', 'Category, amount, and account are required.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:3000/expense', {
+        category,
+        amount: parseFloat(amount),
+        accountId: selectedAccount.id, // Include the selected account
+        date: new Date().toISOString(), // Send current date
+      });
+
+      if (response.status === 201) {
+        Alert.alert('Success', 'Expense added successfully');
+        setAmount('');
+        setCategory('');
+        setSelectedAccount(null);
+        setInputValue('');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'An error occurred while saving the expense.');
+    }
+  };
+
   return (
     <View style={ExpenseStyle.container}>
-      {/* Main Expense Input Screen */}
       <View style={ExpenseStyle.inputContainer}>
         <Text style={ExpenseStyle.label}>
           <TouchableOpacity
@@ -57,7 +88,8 @@ const ExpenseInputScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('IncomeInputScreen')}
           >
             <Text style={ExpenseStyle.buttonText}>Income</Text>
-          </TouchableOpacity> | 
+          </TouchableOpacity>{' '}
+          |
           <TouchableOpacity
             style={ExpenseStyle.button}
             onPress={() => navigation.navigate('ExpenseInputScreen')}
@@ -67,23 +99,33 @@ const ExpenseInputScreen = ({ navigation }) => {
         </Text>
 
         <View style={ExpenseStyle.modalButtonsContainer}>
-          <TouchableOpacity
-            style={ExpenseStyle.button}
-            onPress={() => setAccountModalVisible(true)}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="user" size={20} color="#333" /> {/* Icon for Account */}
-              <Text style={ExpenseStyle.buttonText}>Account</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={ExpenseStyle.button}
-            onPress={() => setCategoryModalVisible(true)}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="tags" size={20} color="#333" /> {/* Icon for Category */}
-              <Text style={ExpenseStyle.buttonText}>Category</Text>
-            </View>
+        <TouchableOpacity
+  style={ExpenseStyle.button}
+  onPress={() => setAccountModalVisible(true)}
+>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text style={ExpenseStyle.buttonText}>
+      <Icon name="user" size={20} color="#333" /> {selectedAccount ? selectedAccount.name : 'Account'}
+    </Text>
+  </View>
+</TouchableOpacity>
+
+<TouchableOpacity
+  style={ExpenseStyle.button}
+  onPress={() => setCategoryModalVisible(true)}
+>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text style={ExpenseStyle.buttonText}>
+      <Icon name="tags" size={20} color="#333" /> {category || 'Category'}
+    </Text>
+  </View>
+</TouchableOpacity>
+
+        </View>
+
+        <View>
+          <TouchableOpacity onPress={handleSubmitExpense} style={ExpenseStyle.submitButton}>
+            <Text style={ExpenseStyle.buttonText}>Submit Expense</Text>
           </TouchableOpacity>
         </View>
 
@@ -156,7 +198,7 @@ const ExpenseInputScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-        
+
         {/* Display current date and time */}
         <View style={ExpenseStyle.dateContainer}>
           <Text style={ExpenseStyle.dateText}>{currentDate}</Text>
@@ -164,25 +206,22 @@ const ExpenseInputScreen = ({ navigation }) => {
       </View>
 
       {/* Account Modal */}
-      <Modal
-        transparent={true}
-        visible={isAccountModalVisible}
-        animationType="slide"
-      >
-        <AccountModal 
-          closeModal={() => setAccountModalVisible(false)} 
+      <Modal transparent={true} visible={isAccountModalVisible} animationType="slide">
+        <AccountModal
+          closeModal={() => setAccountModalVisible(false)}
+          onSelectAccount={(account) => setSelectedAccount(account)}
         />
       </Modal>
 
       {/* Category Modal */}
-      <Modal
-        transparent={true}
-        visible={isCategoryModalVisible}
-        animationType="slide"
-      >
-        <CategoryModal 
-          closeModal={() => setCategoryModalVisible(false)} 
-        />
+      <Modal transparent={true} visible={isCategoryModalVisible} animationType="slide">
+      <CategoryModal
+  closeModal={() => setCategoryModalVisible(false)}
+  onCategorySelect={(selectedCategory) => {
+    setCategory(selectedCategory.name); // Save the selected category name
+    console.log('Category Selected:', selectedCategory); // Debugging
+  }}
+/>
       </Modal>
     </View>
   );

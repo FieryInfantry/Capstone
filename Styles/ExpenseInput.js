@@ -45,7 +45,7 @@ const ExpenseStyle = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     height: 50,                 // Make operator buttons the same size
-    width: 80,
+    width: 50,
     alignItems: 'center',
     paddingTop: 12,
   },
@@ -59,7 +59,7 @@ const ExpenseStyle = StyleSheet.create({
     backgroundColor: '#e57373', // Red background for delete
     borderColor: '#d32f2f',     // Darker red border
     borderWidth: 1,
-    width: 70,                  // Slightly wider delete button
+    width: 50,                  // Slightly wider delete button
     height: 50,                 // Reduced height for consistency
     alignItems: 'center',
     justifyContent: 'center',
@@ -122,6 +122,20 @@ const ExpenseStyle = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between', // Align buttons horizontally
     marginBottom: 20,
+  },
+  submitButton: {
+    flex: 1,
+    padding: 12,
+    margin: 5,
+    backgroundColor: '#F6FCDF', // Button color as requested
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40, // Reduced height for a more compact button
+    elevation: 2, // Added elevation for consistency
+    backgroundColor:"#859F3D",
+    width: 70,
+    marginLeft: 130
   },
 });
 

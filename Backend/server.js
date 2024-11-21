@@ -97,7 +97,15 @@ const budgetSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the budget to a specific user
 });
 
+const expenseSchema = new mongoose.Schema({
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Budget', required: true }, // Reference to Budget schema
+  amount: { type: mongoose.Schema.Types.Decimal128, required: true }, // Amount for the expense
+  date: { type: Date, default: Date.now }, // Date when the expense occurred
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the expense to a specific user
+});
 
+
+  const Expense = mongoose.model('Expense', expenseSchema);
   const Budget = mongoose.model('Budget', budgetSchema);
   const Investment = mongoose.model('Investment', InvestmentSchema);
   const Bank = mongoose.model('Bank', bankSchema);
@@ -513,7 +521,7 @@ app.post('/budget', authenticateUser, async (req, res) => {
   }
 });
 
-app.get('/budget', authenticateUser, async (req, res) => {
+app.get('/budget/monthly', authenticateUser, async (req, res) => {
   const { month, year } = req.query;
   const userId = req.userId; // Assuming user ID is attached to the request
 
@@ -567,5 +575,56 @@ app.get('/budget/total', authenticateUser, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch total budget' });
+  }
+});
+
+app.post('/expense', authenticateUser, async (req, res) => {
+  const { category, amount, date } = req.body;
+  const userId = req.userId;  // Assuming userId is attached to the request after authentication
+
+  // Validate input fields
+  if (!category || !amount) {
+    return res.status(400).json({ error: 'Category and amount are required.' });
+  }
+
+  try {
+    // Check if the category exists in the Budget collection
+    const budget = await Budget.findById(category);
+    if (!budget) {
+      return res.status(404).json({ error: 'Budget category not found.' });
+    }
+
+    // Create new Expense document
+    const newExpense = new Expense({
+      category,  // Reference to Budget category
+      amount,
+      date: date || Date.now(), // Default to current date if not provided
+      userId,
+    });
+
+    await newExpense.save();
+
+    // Optionally, update the budget amount to reflect the expense
+    budget.amount -= amount;
+    await budget.save();
+
+    // Respond with the newly saved expense
+    res.status(201).json(newExpense);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while saving the expense.' });
+  }
+});
+
+
+app.get('/budgets', authenticateUser, async (req, res) => {
+  try {
+    // Find all budgets for the authenticated user
+    const budgets = await Budget.find({ userId: req.userId }).populate('category');
+    
+    // Respond with the budgets
+    res.status(200).json(budgets);
+  } catch (error) {
+    console.error('Error fetching budgets:', error);
+    res.status(500).json({ error: 'Error retrieving budgets' });
   }
 });
