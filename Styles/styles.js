@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 15,
   },
-  
   // Input and Button Styles
   input: {
     width: '100%',

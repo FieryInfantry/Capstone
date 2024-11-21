@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios'; // Import axios for API requests
 import styles from '../Styles/styles';
+import ErrorMessage from './ErrorMessage';
+
 
 
 const ResetPasswordScreen = () => {
@@ -10,17 +12,18 @@ const ResetPasswordScreen = () => {
   const [verificationCode, setVerificationCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const navigation = useNavigation();
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleResetPassword = async () => {
     // Validate input fields
     if (!email || !verificationCode || !newPassword) {
-      Alert.alert('Error', 'Please fill in all fields.');
+      setErrorMessage('All fields are required. Please provide the following.');
       return;
     }
 
     try {
       // Make a request to the backend to reset the password
-      const response = await axios.post('http://localhost/3000/reset-password', {
+      const response = await axios.post('http://localhost:3000/reset-password', {
         email,                // Send the email
         resetToken: verificationCode, // Renamed to match backend
         newPassword,
@@ -29,14 +32,15 @@ const ResetPasswordScreen = () => {
       if (response.status === 200) {
         Alert.alert('Success', 'Your password has been reset successfully!');
         navigation.navigate('Login');
+        setErrorMessage('');
         // Redirect to login after password reset
       }
     } catch (error) {
       // Handle reset password errors
       if (error.response) {
-        Alert.alert('Error', error.response.data.error || 'Invalid code or something went wrong');
+        setErrorMessage(error.response.data.error);
       } else {
-        Alert.alert('Error', 'Something went wrong. Please try again later.');
+        setErrorMessage(error.response.data.error);
       }
     }
   };
@@ -66,7 +70,7 @@ const ResetPasswordScreen = () => {
         value={newPassword}
         onChangeText={setNewPassword}
       />
-
+<ErrorMessage message={errorMessage} /> 
       <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
         <Text style={styles.buttonText}>Reset Password</Text>
       </TouchableOpacity>

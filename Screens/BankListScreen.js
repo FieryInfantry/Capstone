@@ -7,12 +7,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import InsuranceStyle from '../Styles/InsuranceStyle';
 import Icon from 'react-native-vector-icons/AntDesign';
+import ReusableModal from './AlertModal';
 
 
 const BankListScreen = () => {
   const { theme } = useUser();
   const [banks, setBanks] = useState([]);
   const navigation = useNavigation();
+  const [isModalVisible, setModalVisible] = useState(false);
+
+
 
   // Fetch banks data
   const fetchBanks = async () => {
@@ -23,7 +27,7 @@ const BankListScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.1.101:3000/banks', {
+      const response = await axios.get('http://localhost:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -49,11 +53,12 @@ const BankListScreen = () => {
         return;
       }
 
-      await axios.delete(`http://192.168.1.101:3000/banks/${id}`, {
+      await axios.delete(`http://localhost:3000/banks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setBanks((prevBanks) => prevBanks.filter((bank) => bank._id !== id));
+      setModalVisible(false);
     } catch (error) {
       console.error('Error deleting bank:', error);
       Alert.alert('Error', 'Failed to delete bank. Please try again later.');
@@ -136,11 +141,21 @@ const BankListScreen = () => {
                     elevation: 2,
                     flex: 1, // Makes buttons take equal space
                   }}
-                  onPress={() => handleDelete(item._id)}
+                  onPress={() => setModalVisible(true)}
+                 
                 >
                   <Icon name="delete" size={20} color="#333" /> {/* Icon for Delete */}
                   <Text style={{ color: 'white', marginLeft: 5 }}>Delete</Text>
                 </TouchableOpacity>
+                <ReusableModal
+        visible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        title="Confirm Delete"
+        message="Are you sure you want to delete this item? This action cannot be undone."
+        onConfirm={() => handleDelete(item._id) }
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
               </View>
             </View>
             
