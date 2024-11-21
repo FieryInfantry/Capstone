@@ -10,6 +10,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#F6FCDF', // Updated background color
   },
+  container2: {
+    
+    justifyContent: 'center', 
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#F6FCDF', // Updated background color
+    width: "100%",
+    height: "100%",
+  },
   logo: {
     paddingTop: 100,
     paddingBottom: 50,
@@ -47,12 +57,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'YourPreferredFont', // Updated font
     marginBottom: 8,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    fontFamily: 'YourPreferredFont', // Updated font
-    marginBottom: 15,
   },
   
   // Input and Button Styles
@@ -128,23 +132,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor:'rgba(255, 255, 255, 0.8)', // Adjusted to make the background slightly visible
   },
   modalView: {
-    width: '85%',
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', // Matching background color
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#4CAF50', // Matching text color
   },
   modalButton: {
-    backgroundColor: '#859F3D', // Updated button color
-    padding: 12,
+    backgroundColor: '#859F3D', // Matching theme button color
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 20,
+    marginBottom: 10,
   },
+  
   cancelButton: {
     backgroundColor: '#859F3D', // Updated button color
   },

@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   categoryRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   categoryIcon: { fontSize: 30, marginRight: 15 },
   categoryName: { fontSize: 16, flex: 1 },
-  setBudgetButton: { paddingVertical: 5, paddingHorizontal: 15, backgroundColor: "#4caf50", borderRadius: 5 },
+  setBudgetButton: { paddingVertical: 5, paddingHorizontal: 15, backgroundColor: "#859F3D", borderRadius: 5 },
   setBudgetButtonText: { color: "#fff", fontSize: 14 },
   incomeExpenseContainer: { padding: 20 },
   incomeExpenseText: { fontSize: 16 },

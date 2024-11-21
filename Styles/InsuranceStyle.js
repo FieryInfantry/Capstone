@@ -70,6 +70,13 @@ const InsuranceStyle = StyleSheet.create({
     textAlign: 'center',
     color: '#4CAF50', // Matching text color
   },
+  modalButton: {
+    backgroundColor: '#4CAF50', // Matching theme button color
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
   pickerContainer: {
     borderWidth: 1,
     borderColor: '#4CAF50', // Matching border color
@@ -87,13 +94,8 @@ const InsuranceStyle = StyleSheet.create({
     marginBottom: 15,
     paddingLeft: 10,
   },
-  modalButton: {
-    backgroundColor: '#4CAF50', // Matching theme button color
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
+  
+
   addButton: {
     position: 'absolute',
     bottom: 20,

@@ -1,12 +1,34 @@
 import { StyleSheet } from 'react-native';
 
 const CategoryModalStyle = StyleSheet.create({
+  modalBackground:{
+    backgroundColor: '#F6FCDF', // Matching background color
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+
+  },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#F6FCDF', // Background color
-    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Adjusted to make the background slightly visible
+  },
+ 
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#4CAF50', // Matching text color
+  },
+  modalButton: {
+    backgroundColor: '#4CAF50', // Matching theme button color
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+    
   },
   title: {
     fontSize: 25,
@@ -38,9 +60,10 @@ const CategoryModalStyle = StyleSheet.create({
   closeButton: {
     padding: 10,
     marginTop: 20,
-    backgroundColor: '#859F3D',
+    backgroundColor: 'red',
     alignItems: 'center',
-    borderRadius: 10,
+      borderRadius: 10,
+      
 
     
   },

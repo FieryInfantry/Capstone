@@ -2,13 +2,14 @@ import { StyleSheet } from 'react-native';
 
 const GovernmentStyles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#F6FCDF', // Updated background color
+    flex: 1, // Takes up the full available space
+    justifyContent: "center", // Centers children vertically
+    alignItems: "center", // Centers children horizontally
+    backgroundColor: "#F6FCDF",
   },
   schemeContainer: {
     marginBottom: 20,
-    padding: 15,
+    padding: 20,
     backgroundColor: '#fff',
     borderRadius: 10,
     shadowColor: '#000',
@@ -16,6 +17,9 @@ const GovernmentStyles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    width: "90%",
+    justifyContent: "center",
+    alignContent: "center",
   },
   schemeTitle: {
     fontSize: 18,

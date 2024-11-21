@@ -4,8 +4,12 @@ import Icon from 'react-native-vector-icons/FontAwesome'; // Import the Icon com
 import ExpenseStyle from '../Styles/ExpenseInput'; // Adjust the path as needed
 import AccountModal from './AccountModal'; // Adjust the path as needed
 import CategoryModal from './CategoryModal'; // Adjust the path as needed
+import { useUser } from '../Context/UserContext'; // Use UserContext for theme
 
 const ExpenseInputScreen = ({ navigation }) => {
+  const { theme } = useUser(); // Retrieve theme from context
+  const isDarkMode = theme === 'dark';
+
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -48,118 +52,122 @@ const ExpenseInputScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={ExpenseStyle.container}>
-      {/* Main Expense Input Screen */}
+    <View
+      style={[
+        ExpenseStyle.container,
+        { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' },
+      ]}
+    >
       <View style={ExpenseStyle.inputContainer}>
+        {/* Income and Expense Buttons */}
         <Text style={ExpenseStyle.label}>
           <TouchableOpacity
-            style={ExpenseStyle.button}
+            style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]}
             onPress={() => navigation.navigate('IncomeInputScreen')}
           >
-            <Text style={ExpenseStyle.buttonText}>Income</Text>
-          </TouchableOpacity> | 
+            <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+              Income
+            </Text>
+          </TouchableOpacity>
+          |
           <TouchableOpacity
-            style={ExpenseStyle.button}
+            style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]}
             onPress={() => navigation.navigate('ExpenseInputScreen')}
           >
-            <Text style={ExpenseStyle.buttonText}>Expense</Text>
+            <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+              Expense
+            </Text>
           </TouchableOpacity>
         </Text>
 
+        {/* Modals for Account and Category */}
         <View style={ExpenseStyle.modalButtonsContainer}>
           <TouchableOpacity
-            style={ExpenseStyle.button}
+            style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}
             onPress={() => setAccountModalVisible(true)}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="user" size={20} color="#333" /> {/* Icon for Account */}
-              <Text style={ExpenseStyle.buttonText}>Account</Text>
+              <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} />
+              <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+                Account
+              </Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={ExpenseStyle.button}
+            style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}
             onPress={() => setCategoryModalVisible(true)}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="tags" size={20} color="#333" /> {/* Icon for Category */}
-              <Text style={ExpenseStyle.buttonText}>Category</Text>
+              <Icon name="tags" size={20} color={isDarkMode ? '#FFF' : '#fff'} />
+              <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+                Category
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
 
-        <View style={ExpenseStyle.calculatorContainer}>
-          <View style={ExpenseStyle.displayContainer}>
-            <Text style={ExpenseStyle.display}>{inputValue}</Text>
+        {/* Calculator */}
+        <View style={[ExpenseStyle.calculatorContainer, {backgroundColor: isDarkMode ? '#444' : '#FFF'}]}>
+          <View
+            style={[
+              ExpenseStyle.displayContainer,
+              {
+                backgroundColor: isDarkMode ? '#333' : '#EEE', borderColor: "#fff", borderWidth:2
+              },
+            ]}
+          >
+            <Text style={[ExpenseStyle.display, { color: isDarkMode ? '#FFF' : '#000' }]}>
+              {inputValue}
+            </Text>
             <TouchableOpacity onPress={handleDeletePress} style={ExpenseStyle.deleteButton}>
-              <Text style={ExpenseStyle.deleteButtonText}>x</Text>
+              <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>x</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Calculator Layout */}
-          <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('+')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('7')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>7</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('8')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>8</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('9')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>9</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('-')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>-</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('4')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>4</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('5')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>5</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('6')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>6</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('*')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>x</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('1')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>1</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('2')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>2</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('3')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>3</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={[ExpenseStyle.row, ExpenseStyle.rowLast]}>
-            <TouchableOpacity onPress={() => handleOperatorPress('/')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>÷</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('0')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>0</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOperatorPress('.')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>.</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleEqualsPress} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>=</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Buttons */}
+          {[
+            ['+', '7', '8', '9'],
+            ['-', '4', '5', '6'],
+            ['*', '1', '2', '3'],
+            ['/', '0', '.', '='],
+          ].map((row, index) => (
+            <View key={index} style={ExpenseStyle.row}>
+              {row.map((button) => (
+                <TouchableOpacity
+                  key={button}
+                  style={[
+                    ExpenseStyle.operatorButton,
+                    { backgroundColor: isDarkMode ? '#333' : '#F6FCDF',
+                      borderColor: isDarkMode ? '#fff': '#859F3D', // Add the borderColor
+                      borderWidth: 2, },
+                  ]}
+                  onPress={
+                    button === '='
+                      ? handleEqualsPress
+                      : button === 'C'
+                      ? handleClearPress
+                      : () => handleNumberPress(button)
+                  }
+                >
+                  <Text
+                    style={[
+                      ExpenseStyle.operatorButtonText,
+                      { color: isDarkMode ? '#FFF' : '#000' },
+                    ]}
+                  >
+                    {button}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
         </View>
-        
-        {/* Display current date and time */}
-        <View style={ExpenseStyle.dateContainer}>
-          <Text style={ExpenseStyle.dateText}>{currentDate}</Text>
+
+        {/* Current Date */}
+        <View style={[ExpenseStyle.dateContainer, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
+          <Text style={[ExpenseStyle.dateText, { color: isDarkMode ? '#FFF' : '#000' }]}>
+            {currentDate}
+          </Text>
         </View>
       </View>
 
@@ -169,9 +177,7 @@ const ExpenseInputScreen = ({ navigation }) => {
         visible={isAccountModalVisible}
         animationType="slide"
       >
-        <AccountModal 
-          closeModal={() => setAccountModalVisible(false)} 
-        />
+        <AccountModal closeModal={() => setAccountModalVisible(false)} />
       </Modal>
 
       {/* Category Modal */}
@@ -180,9 +186,7 @@ const ExpenseInputScreen = ({ navigation }) => {
         visible={isCategoryModalVisible}
         animationType="slide"
       >
-        <CategoryModal 
-          closeModal={() => setCategoryModalVisible(false)} 
-        />
+        <CategoryModal closeModal={() => setCategoryModalVisible(false)} />
       </Modal>
     </View>
   );

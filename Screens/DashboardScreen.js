@@ -91,7 +91,7 @@ const DashboardScreen = ({ navigation }) => {
           style={[DashboardStyles.settingsButton, { backgroundColor: theme === 'dark' ? '#2F3B2D' : '#fff' }]} 
           onPress={() => navigation.navigate('SettingsScreen')}
         >
-          <Text style={[DashboardStyles.settingsButtonText, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>Settings</Text>
+          <Text style={[DashboardStyles.settingsButtonText, { color: theme === 'dark' ? '#fff' : '#000' }]}>Settings</Text>
         </TouchableOpacity>
       </ScrollView>
 
