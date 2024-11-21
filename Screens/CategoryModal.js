@@ -1,43 +1,102 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // You can use any icon set you prefer
+import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryModalStyle from '../Styles/CategoryModalStyle';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // For fetching the token
 
-const categories = [
-  { name: 'Baby', icon: 'baby' },
-  { name: 'Beauty', icon: 'female' },
-  { name: 'Bills', icon: 'money' },
-  { name: 'Car', icon: 'car' },
-  { name: 'Clothing', icon: 'shirt' },
-  { name: 'Education', icon: 'graduation-cap' },
-  { name: 'Electronics', icon: 'laptop' },
-  { name: 'Entertainment', icon: 'film' },
-  { name: 'Food', icon: 'cutlery' },
-  { name: 'Health', icon: 'heartbeat' },
-  { name: 'Home', icon: 'home' },
-  { name: 'Insurance', icon: 'shield' },
-  { name: 'Shopping', icon: 'shopping-cart' },
-  { name: 'Social', icon: 'users' },
-  { name: 'Sports', icon: 'soccer-ball-o' },
-  { name: 'Tax', icon: 'money' },
-  { name: 'Telephone', icon: 'phone' },
-  { name: 'Transportation', icon: 'bus' },
-];
 
-const CategoryModal = ({ closeModal }) => {
+const categoryIconMapping = {
+  'Baby': '🍼',
+  'Beauty': '💄',
+  'Bills': '🧾',
+  'Car': '🚗',
+  'Clothing': '👗',
+  'Education': '🎓',
+  // Add more mappings here as needed
+};
+
+
+const CategoryModal = ({ closeModal, onCategorySelect }) => {
+  const [categories, setCategories] = useState([]); // State to store categories data
+  const [loading, setLoading] = useState(true); // State to manage loading status
+
+  useEffect(() => {
+    const getCategories = async () => {
+      const token = await AsyncStorage.getItem('authToken'); // Get the token from AsyncStorage
+      
+      try {
+        const response = await fetch('http://localhost:3000/budgets', { // Use the correct /budgets endpoint
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch budgets');
+        }
+
+        const data = await response.json();
+        console.log('Budgets:', data);
+
+        // Process budgets to create a list of unique categories
+        const categoryData = data.reduce((acc, budget) => {
+          if (!acc.find(item => item.name === budget.category)) {
+            acc.push({
+              name: budget.category,
+              budget: budget.amount,
+              icon: categoryIconMapping[budget.category] || '❓',
+            });
+          }
+          return acc;
+        }, []);
+        setCategories(categoryData);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setLoading(false);
+      }
+    };
+
+    getCategories(); // Fetch categories on component mount
+  }, []);
+
+  const handleCategorySelect = (category) => {
+    console.log('Selected Category:', category); // Debug the selected category
+    if (onCategorySelect) {
+      onCategorySelect(category); // Call the callback with selected category
+    }
+    closeModal(); // Close the modal
+  };
+
+  if (loading) {
+    return (
+      <View style={CategoryModalStyle.modalContainer}>
+        <Text style={CategoryModalStyle.title}>Loading categories...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={CategoryModalStyle.modalContainer}>
       <Text style={CategoryModalStyle.title}>Select a category</Text>
-      {/* Scrollable list of categories */}
-      <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
-        {categories.map((category) => (
-          <TouchableOpacity key={category.name} style={CategoryModalStyle.categoryButton}>
-            <Icon name={category.icon} size={30} color="#fff" />
-            <Text style={CategoryModalStyle.categoryLabel}>{category.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      {/* Close button */}
+      {categories.length === 0 ? (
+        <Text>No categories available</Text>
+      ) : (
+        <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
+          {categories.map((category, index) => (
+            <TouchableOpacity
+              key={index} // Use index if no unique ID is available
+              style={CategoryModalStyle.categoryButton}
+              onPress={() => handleCategorySelect(category)}
+            >
+              <Text style={CategoryModalStyle.categoryLabel}>
+                {category.icon} {category.name} - ₱{category.budget.toFixed(2)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
       <TouchableOpacity onPress={closeModal} style={CategoryModalStyle.closeButton}>
         <Text style={CategoryModalStyle.closeButtonText}>Close</Text>
       </TouchableOpacity>

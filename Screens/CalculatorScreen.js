@@ -83,42 +83,42 @@ const CalculatorScreen = () => {
       />
 
       <Text style={{ color: textColor }}>Enter Duration (Years)</Text>
-      <Picker
-        onValueChange={(value) => setDuration(value)}
-        items={[
-          { label: '1 Year', value: '1' },
-          { label: '3 Years', value: '3' },
-          { label: '5 Years', value: '5' },
-          { label: '10 Years', value: '10' },
-        ]}
-        style={{
-          inputAndroid: {
-            backgroundColor: theme === 'dark' ? '#333' : '#fff',
-            color: textColor,
-            paddingHorizontal: 10,
-            paddingVertical: 8,
-            borderRadius: 5,
-            borderWidth: 1,
-            borderColor: theme === 'dark' ? '#555' : '#ccc',
-            marginVertical: 5,
-          },
-          inputIOS: {
-            backgroundColor: theme === 'dark' ? '#333' : '#fff',
-            color: textColor,
-            paddingHorizontal: 10,
-            paddingVertical: 8,
-            borderRadius: 5,
-            borderWidth: 1,
-            borderColor: theme === 'dark' ? '#555' : '#ccc',
-            marginVertical: 5,
-          },
-          iconContainer: {
-            top: 15,
-            right: 10,
-          },
-        }}
-        placeholder={{ label: 'Select Duration', value: null }}
-      />
+     <Picker
+  onValueChange={(value) => setDuration(value)}
+  items={[
+    { label: '1 Year', value: '1' },
+    { label: '3 Years', value: '3' },
+    { label: '5 Years', value: '5' },
+    { label: '10 Years', value: '10' },
+  ]}
+  style={{
+    inputAndroid: {
+      backgroundColor: theme === 'dark' ? '#333' : '#fff',
+      color: textColor,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: theme === 'dark' ? '#555' : '#ccc',
+      marginVertical: 5,
+    },
+    inputIOS: {
+      backgroundColor: theme === 'dark' ? '#333' : '#fff',
+      color: textColor,
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: theme === 'dark' ? '#555' : '#ccc',
+      marginVertical: 5,
+    },
+    iconContainer: {
+      top: 15,
+      right: 10,
+    },
+  }}
+  placeholder={{ label: 'Select Duration', value: '' }} // Use empty string as value instead of null
+/>
 
       <TouchableOpacity
         style={styles.modalButton}
