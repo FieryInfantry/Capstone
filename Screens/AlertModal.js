@@ -1,7 +1,25 @@
 import React from 'react';
 import { Modal, View, Text, Button, StyleSheet } from 'react-native';
+import { useUser } from '../Context/UserContext'; // Import the UserContext
+import AlertModal from '../Styles/AlertModal';
 
 const ReusableModal = ({ visible, onClose, title, message, onConfirm, confirmText, cancelText }) => {
+  const {theme } = useUser();
+  const modalContainerStyle = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+  };
+
+  const modalBackground = {
+    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  };
+  const textColor = theme === 'dark' ? '#FFF' : '#000';
+
   if (!visible) return null;
 
   return (
@@ -11,13 +29,13 @@ const ReusableModal = ({ visible, onClose, title, message, onConfirm, confirmTex
       visible={visible}
       onRequestClose={onClose} // Handle back button press
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContent}>
-          {title && <Text style={styles.title}>{title}</Text>}
-          {message && <Text style={styles.message}>{message}</Text>}
-          <View style={styles.buttonContainer}>
-            <Button title={cancelText || 'No'} onPress={onClose} />
-            <Button title={confirmText || 'Yes'} onPress={onConfirm} />
+      <View style={modalContainerStyle}>
+        <View style={modalBackground}>
+          {title && <Text style={[AlertModal.title, {color: theme === 'dark' ? '#fff' : '#000'}]}>{title}</Text>}
+          {message && <Text style={[AlertModal.message, {color: theme === 'dark' ? '#fff' : '#000'}]}>{message}</Text>}
+          <View style={AlertModal.buttonContainer}>
+            <Button title={cancelText || 'No'} onPress={onClose} style={AlertModal.cancelButton}/>
+            <Button title={confirmText || 'Yes'} onPress={onConfirm} style={AlertModal.deleteButton}/>
           </View>
         </View>
       </View>
@@ -25,36 +43,6 @@ const ReusableModal = ({ visible, onClose, title, message, onConfirm, confirmTex
   );
 };
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    padding: 16,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  message: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%',
-    gap: 10,
-  },
-});
+
 
 export default ReusableModal;

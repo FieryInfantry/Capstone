@@ -97,7 +97,7 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
   return (
     <View style={modalContainerStyle}>
       <View style={modalBackground}>
-      <Text style={CategoryModalStyle.title}>Select a category</Text>
+      <Text style={[CategoryModalStyle.title, {color: theme === 'dark' ? '#fff' : '#000'}]}>Select a category</Text>
       {categories.length === 0 ? (
         <Text>No categories available</Text>
       ) : (

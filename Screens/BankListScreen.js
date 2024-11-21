@@ -5,7 +5,6 @@ import { useUser } from '../Context/UserContext';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
-import InsuranceStyle from '../Styles/InsuranceStyle';
 import Icon from 'react-native-vector-icons/AntDesign';
 import ReusableModal from './AlertModal';
 
@@ -155,6 +154,7 @@ const BankListScreen = () => {
         onConfirm={() => handleDelete(item._id) }
         confirmText="Delete"
         cancelText="Cancel"
+        
       />
               </View>
             </View>

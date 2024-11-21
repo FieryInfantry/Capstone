@@ -64,7 +64,7 @@ const AccountModal = ({ closeModal, onSelectAccount }) => {
   return (
     <View style={modalContainerStyle}>
       <View style={modalBackground}>
-      <Text style={AccountModalStyle.title}>Select an Account</Text>
+      <Text style={[AccountModalStyle.title, {color: theme === 'dark' ? '#fff' : '#000'}]}>Select an Account</Text>
 
       {/* Dynamically display accounts */}
       {accounts.length === 0 ? (
