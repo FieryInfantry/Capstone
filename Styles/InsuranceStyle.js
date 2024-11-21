@@ -36,10 +36,16 @@ const InsuranceStyle = StyleSheet.create({
     marginTop: 10,
   },
   button: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+    flex: 1,
+    padding: 12,
+    margin: 5,
+    backgroundColor: '#F6FCDF', // Button color as requested
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40, // Reduced height for a more compact button
+    elevation: 2, // Added elevation for consistency
+    backgroundColor:"#859F3D"
   },
   buttonText: {
     color: '#fff',

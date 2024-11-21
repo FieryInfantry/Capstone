@@ -6,6 +6,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import InsuranceStyle from '../Styles/InsuranceStyle';
+import Icon from 'react-native-vector-icons/AntDesign';
+
 
 const BankListScreen = () => {
   const { theme } = useUser();
@@ -95,43 +97,53 @@ const BankListScreen = () => {
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <View style={{ marginVertical: 10, padding: 15, borderRadius: 8, backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF' }}>
-                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
-                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Type: {item.type}</Text>
-                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Balance: {item.balance}</Text>
-                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate: {item.interestRate}</Text>
-                <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Rewards: {item.rewards}</Text>
-
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Type: {item.type}</Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Balance: {item.balance}</Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate: {item.interestRate}</Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Rewards: {item.rewards}</Text>
+            
+              {/* Container for buttons */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
                 <TouchableOpacity
                   style={{
                     padding: 10,
                     backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
-                    marginVertical: 5,
                     borderRadius: 5,
-                    flexDirection: 'row',  // Align text and icon horizontally
-                    alignItems: 'center',  // Align the items vertically
+                    flexDirection: 'row', // Align text and icon horizontally
+                    alignItems: 'center', // Align the items vertically
+                    justifyContent: 'center',
+                    height: 40, // Reduced height for a more compact button
+                    elevation: 2, // Added elevation for consistency
+                    flex: 1, // Makes buttons take equal space
+                    marginRight: 10, // Space between buttons
                   }}
                   onPress={() => handleUpdate(item)}
                 >
-                  {/* Image Icon */}
-                  <Image
-                    source={require('../assets/edit.png')}  // Replace with your icon path
-                    style={{ width: 20, height: 20, marginRight: 10 }} // Icon size and margin
-                  />
-                  <Text style={{ color: 'white' }}>Edit</Text>
+                  <Icon name="edit" size={20} color="#333" /> {/* Icon for Edit */}
+                  <Text style={{ color: 'white', marginLeft: 5 }}>Edit</Text>
                 </TouchableOpacity>
-
+            
                 <TouchableOpacity
                   style={{
                     padding: 10,
-                    backgroundColor: theme === 'dark' ? '#B93A3A' : '#FF8C8C',
-                    marginVertical: 5,
+                    backgroundColor: 'red',
                     borderRadius: 5,
+                    flexDirection: 'row', // Align text and icon horizontally
+                    alignItems: 'center', // Align the items vertically
+                    justifyContent: 'center',
+                    height: 40, // Reduced height for a more compact button
+                    elevation: 2,
+                    flex: 1, // Makes buttons take equal space
                   }}
                   onPress={() => handleDelete(item._id)}
                 >
-                  <Text style={{ color: 'white' }}>Delete</Text>
+                  <Icon name="delete" size={20} color="#333" /> {/* Icon for Delete */}
+                  <Text style={{ color: 'white', marginLeft: 5 }}>Delete</Text>
                 </TouchableOpacity>
               </View>
+            </View>
+            
             )}
           />
         )}

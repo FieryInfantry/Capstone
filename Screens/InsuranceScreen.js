@@ -8,6 +8,8 @@ import InsuranceStyle from '../Styles/InsuranceStyle'; // Import the styles
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/AntDesign';
+import { FlatList } from 'react-native';
 
 const InsuranceScreen = () => {
   const { theme } = useUser(); // Access theme from context
@@ -54,7 +56,7 @@ const InsuranceScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.1.102:3000/insurances', {
+      const response = await axios.get('http://localhost:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -99,7 +101,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.put(`http://192.168.1.102:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
+      await axios.put(`http://localhost:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
       fetchInsurances();
@@ -123,7 +125,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.delete(`http://192.168.1.102:3000/insurances/${insuranceId}`, config);
+      await axios.delete(`http://localhost:3000/insurances/${insuranceId}`, config);
       Alert.alert('Success', 'Insurance policy deleted successfully');
       fetchInsurances();
     } catch (error) {
@@ -155,7 +157,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.post('http://192.168.1.102:3000/insurances', newInsurance, config);
+      await axios.post('http://localhost:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
       fetchInsurances();
@@ -196,34 +198,89 @@ const InsuranceScreen = () => {
 
   return (
     <View style={containerStyle}>
-      <View style={InsuranceStyle.detailsContainer}>
+     <View style={{ padding: 20 }}>
+  {insuranceList.length === 0 ? (
+    <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16 }}>
+      No insurance policies available. Please add an insurance policy.
+    </Text>
+  ) : (
+    <FlatList
+      data={insuranceList}
+      keyExtractor={(item) => item._id}
+      renderItem={({ item }) => (
+        <View
+          style={{
+            marginVertical: 10,
+            padding: 15,
+            borderRadius: 8,
+            backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+          }}
+        >
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Provider: {item.provider}
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Policy Name: {item.policyName}
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Coverage Type: {item.coverageType}
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Premium: {item.premium} annually
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Interest Rate: {item.interestRate}
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Potential Benefits: {item.potentialBenefits}
+          </Text>
 
-        {insuranceList.map((insurance) => (
-          <View key={insurance._id} style={[InsuranceStyle.card, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF' }]}>
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Provider: {insurance.provider}</Text>
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Policy Name: {insurance.policyName}</Text>
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Details: {insurance.coverageType}</Text>
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Premium Payment: {insurance.premium} annually</Text>
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Interest Rate: {insurance.interestRate}</Text>
-            <Text style={[InsuranceStyle.label, { color: textColor }]}>Potential Benefits: {insurance.potentialBenefits}</Text>
-            <View style={InsuranceStyle.buttonContainer}>
-              <TouchableOpacity style={InsuranceStyle.button} onPress={() => handleUpdate(insurance)}>
-                <Image
-                  source={require('../assets/edit.png')}  // Replace with your icon path
-                  style={{ width: 20, height: 20, marginRight: 10 }} // Icon size and margin
-                />
-                <Text style={InsuranceStyle.buttonText}>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[InsuranceStyle.button, { backgroundColor: 'red' }]} 
-                onPress={() => handleDelete(insurance._id)}
-              >  
-                <Text style={[InsuranceStyle.buttonText, { color: 'white' }]}>Delete</Text>
-              </TouchableOpacity>
-            </View>
+          {/* Container for buttons */}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
+                borderRadius: 5,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 40,
+                elevation: 2,
+                flex: 1,
+                marginRight: 10,
+              }}
+              onPress={() => handleUpdate(item)}
+            >
+              <Icon name="edit" size={20} color="#333" />
+              <Text style={{ color: 'white', marginLeft: 5 }}>Edit</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                backgroundColor: 'red',
+                borderRadius: 5,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 40,
+                elevation: 2,
+                flex: 1,
+                color: 'red'
+              }}
+              onPress={() => handleDelete(item._id)}
+            >
+              <Icon name="delete" size={20} color="#333" />
+              <Text style={{ color: 'white', marginLeft: 5 }}>Delete</Text>
+            </TouchableOpacity>
           </View>
-        ))}
-      </View>
+        </View>
+      )}
+    />
+  )}
+</View>
+
 
       {/* Modal for updating insurance details */}
       <Modal
