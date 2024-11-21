@@ -262,7 +262,7 @@ const BudgetScreen = () => {
       headerRight: () => (
         <TouchableOpacity
           style={{ paddingRight: 15 }} // Add padding to the right
-          onPress={() => navigation.navigate('AddUpdateBank')}
+          onPress={() => navigation.navigate('ExpenseInputScreen')}
         >
           <MaterialIcons 
             name="add" 
