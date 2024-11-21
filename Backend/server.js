@@ -555,3 +555,17 @@ app.delete('/budget', authenticateUser, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while deleting the budget' });
   }
 });
+
+app.get('/budget/total', authenticateUser, async (req, res) => {
+  try {
+    // Calculate the total sum of all budgets
+    const total = await Budget.aggregate([
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+
+    res.json({ total: total[0]?.total || 0 });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch total budget' });
+  }
+});

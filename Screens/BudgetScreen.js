@@ -92,7 +92,7 @@ const BudgetScreen = () => {
 
   const handleSaveBudget = async (categoryName, amount, currentDate) => {
     const amountFloat = parseFloat(amount); // Convert to float
-    
+  
     if (isNaN(amountFloat) || amountFloat <= 0) {
       Alert.alert('Error', 'Invalid amount entered');
       return;
@@ -103,6 +103,50 @@ const BudgetScreen = () => {
   
     try {
       const token = await AsyncStorage.getItem('authToken');
+      
+      // Fetch the total bank balance from the backend
+      const bankBalanceResponse = await fetch('http://192.168.1.101:3000/banks/balances', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!bankBalanceResponse.ok) {
+        Alert.alert('Error', 'Failed to fetch bank balance');
+        return;
+      }
+  
+      const bankBalanceData = await bankBalanceResponse.json();
+      const bankBalance = bankBalanceData.totalBalance;
+  
+      // Calculate the total amount of all budgets
+      const totalBudgetResponse = await fetch('http://192.168.1.101:3000/budget/total', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      if (!totalBudgetResponse.ok) {
+        Alert.alert('Error', 'Failed to fetch total budget');
+        return;
+      }
+  
+      const totalBudgetData = await totalBudgetResponse.json();
+      const totalBudget = totalBudgetData.total;
+  
+      // Check if the new budget exceeds the bank balance or the total budget
+      if (amountFloat + totalBudget > bankBalance) {
+        Alert.alert('Error', 'The total budget exceeds the bank balance');
+        return;
+      }
+  
+      // Check if the individual budget exceeds the bank balance
+      if (amountFloat > bankBalance) {
+        Alert.alert('Error', 'The individual budget exceeds the bank balance');
+        return;
+      }
+  
+      // If all checks pass, save the budget
       const response = await fetch('http://192.168.1.101:3000/budget', {
         method: 'POST',
         headers: {
@@ -124,15 +168,17 @@ const BudgetScreen = () => {
           [categoryName]: { limit: data.amount, spent: 0 },
         }));
         setModalVisible(false); // Close the modal on success
+        Alert.alert('Success', 'Budget saved successfully');
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData.error || 'Failed to save the budget');
       }
     } catch (error) {
-      console.error("Error saving budget:", error);
+      console.error('Error saving budget:', error);
       Alert.alert('Error', 'An error occurred while saving the budget');
     }
   };
+  
   
   const fetchBudgets = async () => {
     try {
