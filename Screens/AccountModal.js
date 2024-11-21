@@ -14,7 +14,7 @@ const AccountModal = ({ closeModal }) => {
   };
 
   const modalBackground = {
-    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+    backgroundColor: theme === 'dark' ? '#3333' : '#FFF',
     padding: 20,
     borderRadius: 10,
     width: '80%',
