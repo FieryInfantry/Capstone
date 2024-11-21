@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryModalStyle from '../Styles/CategoryModalStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For fetching the token
+import { useUser } from '../Context/UserContext'; // Import the UserContext
 
 
 const categoryIconMapping = {
@@ -76,9 +77,26 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
       </View>
     );
   }
+  const {theme } = useUser();
+  const modalContainerStyle = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+  };
+
+  const modalBackground = {
+    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  };
+
+  const textColor = theme === 'dark' ? '#FFF' : '#000';
 
   return (
-    <View style={CategoryModalStyle.modalContainer}>
+    <View style={modalContainerStyle}>
+      <View style={modalBackground}>
       <Text style={CategoryModalStyle.title}>Select a category</Text>
       {categories.length === 0 ? (
         <Text>No categories available</Text>
@@ -87,7 +105,7 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
           {categories.map((category, index) => (
             <TouchableOpacity
               key={index} // Use index if no unique ID is available
-              style={CategoryModalStyle.categoryButton}
+              style={[CategoryModalStyle.categoryButton, {backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D'}]}
               onPress={() => handleCategorySelect(category)}
             >
               <Text style={CategoryModalStyle.categoryLabel}>
@@ -100,6 +118,7 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
       <TouchableOpacity onPress={closeModal} style={CategoryModalStyle.closeButton}>
         <Text style={CategoryModalStyle.closeButtonText}>Close</Text>
       </TouchableOpacity>
+      </View>
     </View>
   );
 };

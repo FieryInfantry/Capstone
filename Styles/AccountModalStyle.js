@@ -8,12 +8,17 @@ const AccountModalStyle = StyleSheet.create({
       justifyContent: 'center',
       textAlign: "center"
     },
+    text1:{
+      color: "white",
+      fontSize: 15
+    },
     title: {
       fontSize: 25,
       marginBottom: 10,
       justifyContent: "center",
       textAlign:"center",
-      fontWeight:"bold"
+      fontWeight:"bold",
+      color:"#fff"
     },
     accountButton: {
       padding: 10,
@@ -25,7 +30,7 @@ const AccountModalStyle = StyleSheet.create({
     closeButton: {
       padding: 10,
       marginTop: 20,
-      backgroundColor: '#859F3D',
+      backgroundColor: 'red',
       alignItems: 'center',
       borderRadius: 10,
 

@@ -42,16 +42,26 @@ const CalculatorScreen = () => {
   const containerStyle = {
     flex: 1,
     backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',
+    padding: 20,
   };
 
-  const textColor = theme === 'dark' ? '#FFF' : '#000';
+  const textColor = { 
+    color: theme === 'dark' ? '#FFF' : '#000',
+    fontSize: 15,
+    fontWeight: 'bold',
+  };
   const modalBackground = {
-    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
   };
 
   return (
+    
     <View style={containerStyle}>
-      <Text style={{ color: textColor }}>Enter Investment Amount</Text>
+      <Text style={textColor}>Enter Investment Amount</Text>
       <TextInput
         style={[styles.input, { color: textColor }]}
         value={investmentAmount}
@@ -59,7 +69,7 @@ const CalculatorScreen = () => {
         keyboardType="numeric"
       />
 
-      <Text style={{ color: textColor }}>Enter Interest Rate (%)</Text>
+      <Text style={textColor }>Enter Interest Rate (%)</Text>
       <TextInput
         style={[styles.input, { color: textColor }]}
         value={interestRate}
@@ -82,57 +92,58 @@ const CalculatorScreen = () => {
         maxLength={3} // Ensures only 3 digits can be entered
       />
 
-      <Text style={{ color: textColor }}>Enter Duration (Years)</Text>
-     <Picker
-  onValueChange={(value) => setDuration(value)}
-  items={[
-    { label: '1 Year', value: '1' },
-    { label: '3 Years', value: '3' },
-    { label: '5 Years', value: '5' },
-    { label: '10 Years', value: '10' },
-  ]}
-  style={{
-    inputAndroid: {
-      backgroundColor: theme === 'dark' ? '#333' : '#fff',
-      color: textColor,
-      paddingHorizontal: 10,
-      paddingVertical: 8,
-      borderRadius: 5,
-      borderWidth: 1,
-      borderColor: theme === 'dark' ? '#555' : '#ccc',
-      marginVertical: 5,
-    },
-    inputIOS: {
-      backgroundColor: theme === 'dark' ? '#333' : '#fff',
-      color: textColor,
-      paddingHorizontal: 10,
-      paddingVertical: 8,
-      borderRadius: 5,
-      borderWidth: 1,
-      borderColor: theme === 'dark' ? '#555' : '#ccc',
-      marginVertical: 5,
-    },
-    iconContainer: {
-      top: 15,
-      right: 10,
-    },
-  }}
-  placeholder={{ label: 'Select Duration', value: '' }} // Use empty string as value instead of null
-/>
-
+      <Text style={textColor}>Enter Duration (Years)</Text>
+      <Picker
+        onValueChange={(value) => setDuration(value)}
+        items={[
+          { label: '1 Year', value: '1' },
+          { label: '3 Years', value: '3' },
+          { label: '5 Years', value: '5' },
+          { label: '10 Years', value: '10' },
+        ]}
+        style={{
+          inputAndroid: {
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            color: textColor,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? '#555' : '#ccc',
+            marginVertical: 5,
+          },
+          inputIOS: {
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            color: textColor,
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? '#555' : '#ccc',
+            marginVertical: 5,
+          },
+          iconContainer: {
+            top: 15,
+            right: 10,
+          },
+        }}
+        placeholder={{ label: 'Select Duration', value: null }}
+      />
+<br></br><br></br>
       <TouchableOpacity
-        style={styles.modalButton}
+        style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={calculateInvestment}
       >
+        
         <Text style={styles.buttonText}>Calculate</Text>
       </TouchableOpacity>
-
+     
       <Modal
         transparent={true}
         visible={modalVisible}
         animationType="slide"
       >
-        <View style={[styles.modalContainer, modalBackground]}>
+        <View style={[modalBackground]}>
           <View style={styles.modalView}>
             <Text style={{ color: textColor, fontSize: 20, fontWeight: 'bold' }}>Investment Predictions</Text>
             <ScrollView>
@@ -176,16 +187,17 @@ const CalculatorScreen = () => {
                 borderRadius: 16,
               }}
             />
-            <TouchableOpacity style={styles.modalButton} onPress={resetInputs}>
+            <TouchableOpacity style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} onPress={resetInputs}>
               <Text style={styles.buttonText}>Reset</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity style={[styles.modalButton, { backgroundColor: theme === 'dark' ? 'red' : 'red' }]} onPress={() => setModalVisible(false)}>
               <Text style={styles.buttonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
     </View>
+    
   );
 };
 
