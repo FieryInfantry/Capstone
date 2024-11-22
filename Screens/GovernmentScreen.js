@@ -9,32 +9,32 @@ const GovernmentScreen = () => {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
       {/* PhilHealth Insurance Section */}
-      <br></br>
+      <View style={{ height: 20 }}></View> {/* Spacer instead of <br> */}
       <View style={[GovernmentStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A1A' : '#F6FCDF' }]}>
-      <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
-        <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Scheme Name: PhilHealth Insurance</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Description:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>PhilHealth provides health insurance coverage for medical expenses.</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Eligibility Criteria:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Available to all registered members and their dependents.</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Benefits:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Coverage includes hospitalization, outpatient care, and other medical services.</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Application Process:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Register online or visit the nearest PhilHealth office.</Text>
-      </View>
+        <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
+          <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Scheme Name: PhilHealth Insurance</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Description:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>PhilHealth provides health insurance coverage for medical expenses.</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Eligibility Criteria:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Available to all registered members and their dependents.</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Benefits:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Coverage includes hospitalization, outpatient care, and other medical services.</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Application Process:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Register online or visit the nearest PhilHealth office.</Text>
+        </View>
 
-      {/* SSS Retirement Benefit Section */}
-      <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
-        <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Policy Name: SSS Retirement Benefit</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Description:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Provides monthly pension for retired SSS members.</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Coverage Details:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Includes pension amount based on contributions and years of service.</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Premium Rates:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Contributions vary based on salary and employment status.</Text>
-        <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Contact Information:</Text>
-        <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Visit the nearest SSS office or call the SSS hotline for assistance.</Text>
-      </View>
+        {/* SSS Retirement Benefit Section */}
+        <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
+          <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Policy Name: SSS Retirement Benefit</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Description:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Provides monthly pension for retired SSS members.</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Coverage Details:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Includes pension amount based on contributions and years of service.</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Premium Rates:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Contributions vary based on salary and employment status.</Text>
+          <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Contact Information:</Text>
+          <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Visit the nearest SSS office or call the SSS hotline for assistance.</Text>
+        </View>
       </View>
     </ScrollView>
   );

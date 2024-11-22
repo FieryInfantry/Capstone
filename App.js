@@ -34,7 +34,7 @@ const App = () => {
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Login"
+          initialRouteName="Splash"
           screenOptions={{
             gestureEnabled: true,  // Enable swipe gestures across all screens
             gestureDirection: 'horizontal',  // Swipe direction for back gesture

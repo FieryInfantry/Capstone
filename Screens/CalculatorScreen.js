@@ -55,7 +55,7 @@ const CalculatorScreen = () => {
   
       console.log('Payload:', payload);
   
-      const response = await axios.post('http://localhost:3000/expense', payload, {
+      const response = await axios.post('http://192.168.1.100:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ const CalculatorScreen = () => {
         }}
         placeholder={{ label: 'Select Duration', value: ''}}
       />
-<br></br><br></br>
+<View style={{ height: 20 }} />
       <TouchableOpacity
         style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={calculateInvestment}
