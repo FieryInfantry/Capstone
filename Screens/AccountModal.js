@@ -13,7 +13,7 @@ const AccountModal = ({ closeModal, onSelectAccount }) => {
     const getBanks = async () => {
       const token = await AsyncStorage.getItem('authToken'); // Use AsyncStorage to get the token
       try {
-        const response = await fetch('http://192.168.1.100:3000/banks', {
+        const response = await fetch('http://localhost:3000/banks', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
