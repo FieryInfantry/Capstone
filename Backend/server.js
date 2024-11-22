@@ -96,15 +96,20 @@ const budgetSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the budget to a specific user
 });
-
 const expenseSchema = new mongoose.Schema({
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Budget', required: true }, // Reference to Budget schema
-  amount: { type: mongoose.Schema.Types.Decimal128, required: true }, // Amount for the expense
+  category: { type: String, required: true }, // Store category as a string instead of ObjectId
+  amount: { type: Number, required: true },// Amount for the expense
   date: { type: Date, default: Date.now }, // Date when the expense occurred
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the expense to a specific user
 });
+const incomeSchema = new mongoose.Schema({
+  category: { type: String, required: true },  // Category for the income
+  amount: { type: mongoose.Schema.Types.Decimal128, required: true },  // Amount of income
+  date: { type: Date, default: Date.now },  // Date of income
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Relates the income to a specific user
+});
 
-
+  const Income = mongoose.model('Income', incomeSchema);
   const Expense = mongoose.model('Expense', expenseSchema);
   const Budget = mongoose.model('Budget', budgetSchema);
   const Investment = mongoose.model('Investment', InvestmentSchema);
@@ -580,40 +585,30 @@ app.get('/budget/total', authenticateUser, async (req, res) => {
 
 app.post('/expense', authenticateUser, async (req, res) => {
   const { category, amount, date } = req.body;
-  const userId = req.userId;  // Assuming userId is attached to the request after authentication
+  const userId = req.userId;
 
-  // Validate input fields
   if (!category || !amount) {
     return res.status(400).json({ error: 'Category and amount are required.' });
   }
 
   try {
-    // Check if the category exists in the Budget collection
-    const budget = await Budget.findById(category);
-    if (!budget) {
-      return res.status(404).json({ error: 'Budget category not found.' });
-    }
-
-    // Create new Expense document
     const newExpense = new Expense({
-      category,  // Reference to Budget category
-      amount,
-      date: date || Date.now(), // Default to current date if not provided
+      category,  // Store category directly as a string
+      amount: parseFloat(amount),
+      date: date || Date.now(),
       userId,
     });
 
     await newExpense.save();
 
-    // Optionally, update the budget amount to reflect the expense
-    budget.amount -= amount;
-    await budget.save();
-
-    // Respond with the newly saved expense
     res.status(201).json(newExpense);
   } catch (error) {
+    console.error('Saving Error:', error);
     res.status(500).json({ error: 'An error occurred while saving the expense.' });
   }
 });
+
+
 
 
 app.get('/budgets', authenticateUser, async (req, res) => {
@@ -626,5 +621,36 @@ app.get('/budgets', authenticateUser, async (req, res) => {
   } catch (error) {
     console.error('Error fetching budgets:', error);
     res.status(500).json({ error: 'Error retrieving budgets' });
+  }
+});
+
+app.get('/expenses/monthly', authenticateUser, async (req, res) => {
+  const { month, year } = req.query;
+  const userId = req.userId; // Assuming user ID is attached to the request
+
+  // Validate input fields
+  if (!month || !year) {
+    return res.status(400).json({ error: 'Month and year are required.' });
+  }
+
+  // Parse month and year to integers
+  const parsedMonth = parseInt(month);
+  const parsedYear = parseInt(year);
+
+  // Create date range: First day of the month to the last day of the month
+  const startDate = new Date(parsedYear, parsedMonth - 1, 1); // First day of the month
+  const endDate = new Date(parsedYear, parsedMonth, 0); // Last day of the month
+
+  try {
+    // Query the database for expenses that fall within the month and year
+    const expenses = await Expense.find({
+      userId,
+      date: { $gte: startDate, $lt: endDate },
+    });
+
+    res.status(200).json(expenses);
+  } catch (error) {
+    console.error('Error fetching expenses:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the expenses.' });
   }
 });

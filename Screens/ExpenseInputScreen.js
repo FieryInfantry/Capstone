@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the Icon component
-import ExpenseStyle from '../Styles/ExpenseInput'; // Adjust the path as needed
-import AccountModal from './AccountModal'; // Adjust the path as needed
-import CategoryModal from './CategoryModal'; // Adjust the path as needed
-import axios from 'axios'; // To send HTTP requests
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ExpenseStyle from '../Styles/ExpenseInput';
+import AccountModal from './AccountModal';
+import CategoryModal from './CategoryModal';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ExpenseInputScreen = ({ navigation }) => {
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [currentDate, setCurrentDate] = useState('');
-  const [category, setCategory] = useState(''); // Category to be selected
-  const [amount, setAmount] = useState(''); // Amount input
-  const [selectedAccount, setSelectedAccount] = useState(null); // Selected account
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,111 +24,120 @@ const ExpenseInputScreen = ({ navigation }) => {
       setCurrentDate(`${date} | ${time}`);
     }, 1000);
 
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleNumberPress = (number) => {
-    setInputValue(inputValue + number);
+    setInputValue((prev) => prev + number);
+    setAmount((prev) => prev + number);
   };
 
   const handleClearPress = () => {
     setInputValue('');
+    setAmount('');
   };
 
   const handleDeletePress = () => {
-    setInputValue(inputValue.slice(0, -1)); // Remove last character
+    setInputValue((prev) => prev.slice(0, -1));
+    setAmount((prev) => prev.slice(0, -1));
   };
 
   const handleOperatorPress = (operator) => {
-    setInputValue(inputValue + operator);
+    setInputValue((prev) => prev + operator);
   };
 
   const handleEqualsPress = () => {
     try {
       const result = eval(inputValue);
       setInputValue(result.toString());
-      setAmount(result.toString()); // Set the result as amount
+      setAmount(result.toString());
     } catch (error) {
       setInputValue('Error');
+      setAmount('');
     }
   };
 
   const handleSubmitExpense = async () => {
-    if (!category || !amount || !selectedAccount) {
-      Alert.alert('Error', 'Category, amount, and account are required.');
+    if (!selectedAccount || !selectedCategory) {
+      Alert.alert('Error', 'Please select an account and category.');
       return;
     }
-
+    if (!amount || isNaN(parseFloat(amount))) {
+      Alert.alert('Error', 'Please enter a valid numeric amount.');
+      return;
+    }
+  
     try {
-      const response = await axios.post('http://localhost:3000/expense', {
-        category,
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated.');
+        return;
+      }
+  
+      // Constructing the payload with category as a simple string
+      const payload = {
+        category: selectedCategory.name, // Send the category name as a string
         amount: parseFloat(amount),
-        accountId: selectedAccount.id, // Include the selected account
-        date: new Date().toISOString(), // Send current date
+        accountId: selectedAccount.id,
+        date: new Date().toISOString(),
+      };
+  
+      const response = await axios.post('http://192.168.1.100:3000/expense', payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-
+  
       if (response.status === 201) {
         Alert.alert('Success', 'Expense added successfully');
-        setAmount('');
-        setCategory('');
-        setSelectedAccount(null);
         setInputValue('');
+        setAmount('');
+        setSelectedCategory(null);
+        setSelectedAccount(null);
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'An error occurred while saving the expense.');
+      console.error('Error:', error.response?.data || error.message);
+      Alert.alert('Error', error.response?.data?.error || 'Server Error');
     }
   };
-
+  
   return (
     <View style={ExpenseStyle.container}>
       <View style={ExpenseStyle.inputContainer}>
         <Text style={ExpenseStyle.label}>
-          <TouchableOpacity
-            style={ExpenseStyle.button}
-            onPress={() => navigation.navigate('IncomeInputScreen')}
-          >
+          <TouchableOpacity style={ExpenseStyle.button} onPress={() => navigation.navigate('IncomeInputScreen')}>
             <Text style={ExpenseStyle.buttonText}>Income</Text>
-          </TouchableOpacity>{' '}
-          |
-          <TouchableOpacity
-            style={ExpenseStyle.button}
-            onPress={() => navigation.navigate('ExpenseInputScreen')}
-          >
+          </TouchableOpacity>
+          {' | '}
+          <TouchableOpacity style={ExpenseStyle.button} onPress={() => navigation.navigate('ExpenseInputScreen')}>
             <Text style={ExpenseStyle.buttonText}>Expense</Text>
           </TouchableOpacity>
         </Text>
 
         <View style={ExpenseStyle.modalButtonsContainer}>
-        <TouchableOpacity
-  style={ExpenseStyle.button}
-  onPress={() => setAccountModalVisible(true)}
->
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={ExpenseStyle.buttonText}>
-      <Icon name="user" size={20} color="#333" /> {selectedAccount ? selectedAccount.name : 'Account'}
-    </Text>
-  </View>
-</TouchableOpacity>
+          <TouchableOpacity style={ExpenseStyle.button} onPress={() => setAccountModalVisible(true)}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={ExpenseStyle.buttonText}>
+                <Icon name="user" size={20} color="#333" />{' '}
+                {selectedAccount ? selectedAccount.name : 'Select Account'}
+              </Text>
+            </View>
+          </TouchableOpacity>
 
-<TouchableOpacity
-  style={ExpenseStyle.button}
-  onPress={() => setCategoryModalVisible(true)}
->
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={ExpenseStyle.buttonText}>
-      <Icon name="tags" size={20} color="#333" /> {category || 'Category'}
-    </Text>
-  </View>
-</TouchableOpacity>
-
-        </View>
-
-        <View>
-          <TouchableOpacity onPress={handleSubmitExpense} style={ExpenseStyle.submitButton}>
-            <Text style={ExpenseStyle.buttonText}>Submit Expense</Text>
+          <TouchableOpacity style={ExpenseStyle.button} onPress={() => setCategoryModalVisible(true)}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={ExpenseStyle.buttonText}>
+                <Icon name="tags" size={20} color="#333" />{' '}
+                {selectedCategory ? selectedCategory.name : 'Select Category'}
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity onPress={handleSubmitExpense} style={ExpenseStyle.submitButton}>
+          <Text style={ExpenseStyle.buttonText}>Submit Expense</Text>
+        </TouchableOpacity>
 
         <View style={ExpenseStyle.calculatorContainer}>
           <View style={ExpenseStyle.displayContainer}>
@@ -136,9 +146,8 @@ const ExpenseInputScreen = ({ navigation }) => {
               <Text style={ExpenseStyle.deleteButtonText}>x</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Calculator Layout */}
-          <View style={ExpenseStyle.row}>
+ {/* Calculator Layout */}
+ <View style={ExpenseStyle.row}>
             <TouchableOpacity onPress={() => handleOperatorPress('+')} style={ExpenseStyle.operatorButton}>
               <Text style={ExpenseStyle.operatorButtonText}>+</Text>
             </TouchableOpacity>
@@ -199,7 +208,6 @@ const ExpenseInputScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Display current date and time */}
         <View style={ExpenseStyle.dateContainer}>
           <Text style={ExpenseStyle.dateText}>{currentDate}</Text>
         </View>
@@ -215,13 +223,10 @@ const ExpenseInputScreen = ({ navigation }) => {
 
       {/* Category Modal */}
       <Modal transparent={true} visible={isCategoryModalVisible} animationType="slide">
-      <CategoryModal
-  closeModal={() => setCategoryModalVisible(false)}
-  onCategorySelect={(selectedCategory) => {
-    setCategory(selectedCategory.name); // Save the selected category name
-    console.log('Category Selected:', selectedCategory); // Debugging
-  }}
-/>
+        <CategoryModal
+          closeModal={() => setCategoryModalVisible(false)}
+          onCategorySelect={(category) => setSelectedCategory(category)}
+        />
       </Modal>
     </View>
   );

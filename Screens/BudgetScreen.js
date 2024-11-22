@@ -24,6 +24,7 @@ const BudgetScreen = () => {
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
   const [bankBalance, setBankBalance] = useState(0); // Add state for bank balance
+  const [expenses, setExpenses] = useState([]); 
   
   // Fetch bank balance (simulated function)
   const fetchBankBalance = async () => {
@@ -35,7 +36,7 @@ const BudgetScreen = () => {
         return;
       }
   
-      const response = await fetch('http://192.168.1.101:3000/banks/balances', {
+      const response = await fetch('http://192.168.1.100:3000/banks/balances', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -58,6 +59,41 @@ const BudgetScreen = () => {
       Alert.alert('Error', 'An error occurred while fetching the bank balance');
     }
   };
+
+  const fetchExpenses = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await fetch(
+        `http://192.168.1.100:3000/expenses/monthly?month=${month + 1}&year=${year}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Fetched expenses:', data);
+        setExpenses(data); // Store the expenses in the state
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to fetch expenses.');
+      }
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+      Alert.alert('Error', 'An error occurred while fetching expenses.');
+    }
+  };
+  
   
   const handlePrevMonth = () => {
     if (month === 0) {
@@ -105,7 +141,7 @@ const BudgetScreen = () => {
       const token = await AsyncStorage.getItem('authToken');
       
       // Fetch the total bank balance from the backend
-      const bankBalanceResponse = await fetch('http://192.168.1.101:3000/banks/balances', {
+      const bankBalanceResponse = await fetch('http://192.168.1.100:3000/banks/balances', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -120,7 +156,7 @@ const BudgetScreen = () => {
       const bankBalance = bankBalanceData.totalBalance;
   
       // Calculate the total amount of all budgets
-      const totalBudgetResponse = await fetch('http://192.168.1.101:3000/budget/total', {
+      const totalBudgetResponse = await fetch('http://192.168.1.100:3000/budget/total', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -147,7 +183,7 @@ const BudgetScreen = () => {
       }
   
       // If all checks pass, save the budget
-      const response = await fetch('http://192.168.1.101:3000/budget', {
+      const response = await fetch('http://192.168.1.100:3000/budget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -190,7 +226,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.1.101:3000/budget/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.1.100:3000/budget/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -227,7 +263,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.1.101:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
+        `http://192.168.1.100:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
         {
           method: 'DELETE',
           headers: {
@@ -280,6 +316,9 @@ const BudgetScreen = () => {
     fetchBudgets(); // Fetch the budgets when the month or year changes
   }, [month, year]);
   
+  useLayoutEffect(() => {
+    fetchExpenses(); // Fetch expenses when the month or year changes
+  }, [month, year]);
 
   const calculateRemaining = (limit, spent) => Math.max(limit - spent, 0);
 
@@ -359,10 +398,34 @@ const BudgetScreen = () => {
 
   const renderIncomeExpenseContent = () => (
     <View style={styles.incomeExpenseContainer}>
-      <Text style={styles.incomeExpenseText}>Income & Expense content will go here!</Text>
+      <Text style={styles.incomeExpenseText}>Income & Expense:</Text>
+      {expenses.length > 0 ? (
+        <FlatList
+          data={expenses}
+          keyExtractor={(item) => item._id.toString()} // Ensure you're using the correct key
+          renderItem={({ item }) => {
+            const amount = item.amount; // No need to convert it anymore
+  
+            return (
+              <View style={styles.expenseCard}>
+                <Text style={styles.expenseName}>{item.name}</Text>
+                <Text style={styles.expenseAmount}>
+                  ₱{isNaN(amount) ? 'Invalid amount' : amount.toFixed(2)} {/* Display formatted amount */}
+                </Text>
+                <Text style={styles.expenseCategory}>Category: {item.category}</Text>
+                <Text style={styles.expenseDate}>
+                  Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
+                </Text>
+              </View>
+            );
+          }}
+        />
+      ) : (
+        <Text>No expenses for this month.</Text>
+      )}
     </View>
   );
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.monthSelector}>

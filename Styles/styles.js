@@ -236,6 +236,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+  incomeExpenseContainer: {
+    padding: 20,
+    backgroundColor: "#f1f8e9",
+    borderRadius: 5,
+  },
+  incomeExpenseText: {
+    fontSize: 16,
+  },
+  expenseCard: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  expenseName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  expenseAmount: {
+    fontSize: 16,
+    color: "#388e3c",
+  },
+  expenseCategory: {
+    fontSize: 14,
+    color: "gray",
+  },
+  expenseDate: {
+    fontSize: 12,
+    color: "gray",
+  },
+  noExpenseText: {
+    fontSize: 16,
+    color: "gray",
+  },
 });
 
 export default styles;

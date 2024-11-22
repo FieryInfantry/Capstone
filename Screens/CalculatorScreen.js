@@ -38,6 +38,40 @@ const CalculatorScreen = () => {
     setModalVisible(false);
   };
 
+  const handleSubmitExpense = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated.');
+        return;
+      }
+  
+      const payload = {
+        category: selectedCategory.id, // Use the ObjectId of the selected category
+        amount: parseFloat(amount),
+        accountId: selectedAccount?.id,
+        date: new Date().toISOString(),
+      };
+  
+      console.log('Payload:', payload);
+  
+      const response = await axios.post('http://192.168.1.100:3000/expense', payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      console.log('Response:', response.data);
+  
+      if (response.status === 201) {
+        Alert.alert('Success', 'Expense added successfully');
+      }
+    } catch (error) {
+      console.error('Error:', error.response?.data || error.message);
+      Alert.alert('Error', error.response?.data?.error || 'Server Error');
+    }
+  };
 
   const containerStyle = {
     flex: 1,
