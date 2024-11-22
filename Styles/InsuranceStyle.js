@@ -55,7 +55,7 @@ const InsuranceStyle = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Adjusted to make the background slightly visible
+    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Adjusted to make the background slightly visible
   },
   modalView: {
     backgroundColor: '#F6FCDF', // Matching background color

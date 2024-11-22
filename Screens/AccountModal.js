@@ -49,11 +49,11 @@ const AccountModal = ({ closeModal, onSelectAccount }) => {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
   };
 
   const modalBackground = {
-    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+    backgroundColor: theme === 'dark' ? '#1A1A19' : '#FFF',
     padding: 20,
     borderRadius: 10,
     width: '80%',

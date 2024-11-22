@@ -35,14 +35,13 @@ const AlertModal = StyleSheet.create({
       gap: 10,
     },
     deleteButton:{
-      backgroundColor: '#859F3D',
+      backgroundColor: 'red',
       paddingVertical: 10,
       paddingHorizontal: 20,
       borderRadius: 5,
     },
     cancelButton:{
-      
-        backgroundColor: 'red',
+        backgroundColor: '#859F3D',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,

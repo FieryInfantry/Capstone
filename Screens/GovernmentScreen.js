@@ -10,7 +10,7 @@ const GovernmentScreen = () => {
     <ScrollView style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
       {/* PhilHealth Insurance Section */}
       <br></br>
-      <View style={[GovernmentStyles.container, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#F6FCDF' }]}>
+      <View style={[GovernmentStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A1A' : '#F6FCDF' }]}>
       <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
         <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Scheme Name: PhilHealth Insurance</Text>
         <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Description:</Text>

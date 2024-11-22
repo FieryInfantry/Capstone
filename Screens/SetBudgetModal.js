@@ -21,15 +21,17 @@ const BudgetModal = ({ visible, onClose, budgetItem, onSaveBudget }) => {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
   };
 
   const modalBackground = {
-    backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+    backgroundColor: theme === 'dark' ? '#1A1A19' : '#FFF',
     padding: 20,
     borderRadius: 10,
     width: '80%',
   };
+  const inputBackground = theme === 'dark' ? '#333' : '#FFF';
+
   const textColor = theme === 'dark' ? '#FFF' : '#000';
 
 
@@ -44,7 +46,9 @@ const BudgetModal = ({ visible, onClose, budgetItem, onSaveBudget }) => {
         <View style={modalBackground}>
           <Text style={SetBudgetModalStyle.modalTitle}>Set Budget for {budgetItem}</Text>
           <TextInput
-            style={SetBudgetModalStyle.input}
+            style={[SetBudgetModalStyle.input,
+              {color: textColor, backgroundColor: inputBackground}
+            ]}
             placeholder="Enter your budget"
             keyboardType="numeric"
             value={budget}
