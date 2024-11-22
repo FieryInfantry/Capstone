@@ -64,13 +64,22 @@ const ChangePasswordScreen = () => {
     backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',
     padding: 20,
   };
+  const textColor = theme === 'dark' ? '#FFF' : '#000';
+  const inputBackground = theme === 'dark' ? '#333' : '#FFF';
+
 
   return (
     <View style={containerStyle}>
       {/* Current Password */}
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>Current Password</Text>
       <TextInput
-        style={styles.input}
+        style={{
+          backgroundColor: inputBackground,
+          color: textColor,
+          borderRadius: 5,
+          padding: 10,
+          marginBottom: 20,
+        }}
         value={currentPassword}
         onChangeText={setCurrentPassword}
         secureTextEntry={!showCurrentPassword}
@@ -80,7 +89,13 @@ const ChangePasswordScreen = () => {
       {/* New Password */}
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>New Password</Text>
       <TextInput
-        style={styles.input}
+        style={{
+          backgroundColor: inputBackground,
+          color: textColor,
+          borderRadius: 5,
+          padding: 10,
+          marginBottom: 20,
+        }}        
         value={newPassword}
         onChangeText={setNewPassword}
         secureTextEntry={!showNewPassword}
@@ -90,7 +105,13 @@ const ChangePasswordScreen = () => {
       {/* Confirm Password */}
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000', marginBottom: 5 }}>Confirm Password</Text>
       <TextInput
-        style={styles.input}
+        style={{
+          backgroundColor: inputBackground,
+          color: textColor,
+          borderRadius: 5,
+          padding: 10,
+          marginBottom: 20,
+        }}
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry={!showConfirmPassword}

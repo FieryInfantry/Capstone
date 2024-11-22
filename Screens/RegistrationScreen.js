@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';  // Import axios
+import ErrorMessage from './ErrorMessage';
 import styles from '../Styles/styles';
 
 const RegistrationScreen = () => {
@@ -10,10 +11,17 @@ const RegistrationScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigation = useNavigation();
+  const [errorMessage, setErrorMessage] = useState('');
+
 
   const handleRegistration = async () => {
     if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+      setErrorMessage('Passwords do not match!');
+      return;
+    }
+
+    if (!fullName || !email || !password || !confirmPassword){
+      setErrorMessage('All fields are required. Please provide the following.');
       return;
     }
 
@@ -27,8 +35,9 @@ const RegistrationScreen = () => {
 
       console.log('Registration successful', response.data);
       navigation.navigate('Login');
+      setErrorMessage('');
     } catch (error) {
-      console.error('Registration error', error);
+      setErrorMessage('Registration error');
       alert('Registration failed');
     }
   };
@@ -66,7 +75,7 @@ const RegistrationScreen = () => {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
-
+<ErrorMessage message={errorMessage} /> 
       <TouchableOpacity style={styles.button} onPress={handleRegistration}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>

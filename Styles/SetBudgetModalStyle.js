@@ -5,7 +5,7 @@ const SetBudgetModalStyle = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
   modalContainer: {
     width: 300,
@@ -15,9 +15,12 @@ const SetBudgetModalStyle = StyleSheet.create({
     alignItems: "center",
   },
   modalTitle: {
-    fontSize: 18,
-    marginBottom: 15,
-    textAlign: "center",
+    fontSize: 25,
+      marginBottom: 10,
+      justifyContent: "center",
+      textAlign:"center",
+      fontWeight:"bold",
+      color:"#fff"
   },
   input: {
     width: "100%",
@@ -26,7 +29,9 @@ const SetBudgetModalStyle = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
+    
   },
+  
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -51,5 +56,14 @@ const SetBudgetModalStyle = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  buttonclose: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5,
+    backgroundColor: "red"
+  }
 });
 export default SetBudgetModalStyle;

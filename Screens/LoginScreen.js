@@ -6,6 +6,7 @@ import axios from 'axios'; // Import axios for API requests
 import { useUser } from '../Context/UserContext'; // Import context to set user data and token
 import styles from '../Styles/styles';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For token storage
+import ErrorMessage from './ErrorMessage';
 
 
 const LoginScreen = () => {
@@ -13,25 +14,29 @@ const LoginScreen = () => {
   const [password, setPassword] = useState(''); // For login
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState(''); // For forgot password
   const [isModalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { setUserData, setToken } = useUser(); // Access setUserData and setToken from context to save user data and token
   const navigation = useNavigation();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+    setErrorMessage('');
   };
 
   const navigateToRegistration = () => {
     navigation.navigate('Registration');
+    setErrorMessage('');
   };
 
   const navigateToResetPassword = () => {
     navigation.navigate('ResetPassword'); // Navigate to Reset Password Screen
+    setErrorMessage('');
   };
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in both email and password.');
+      setErrorMessage('Please fill in both email and password.');
       return;
     }
 
@@ -42,6 +47,7 @@ const LoginScreen = () => {
         console.log('Login successful', response.data);
         setEmail('');  // Clear email and password fields
         setPassword('');
+        setErrorMessage('');
 
         // Store user data and token using the useUser context
         setUserData(response.data.user); // Set the user data in the context
@@ -58,18 +64,16 @@ const LoginScreen = () => {
       }
     } catch (error) {
       if (error.response) {
-        console.error('Login error', error.response.data);
-        Alert.alert('Login Failed', error.response.data.error || 'Invalid email or password');
+        setErrorMessage(error.response.data.error || 'Invalid email or password');
       } else {
-        console.error('Login error', error);
-        Alert.alert('Error', 'Something went wrong. Please try again later.');
+        setErrorMessage(error.response.data.error || 'Invalid email or password');
       }
     }
   };
 
   const handleForgotPassword = async () => {
     if (!forgotPasswordEmail) {
-      Alert.alert('Error', 'Please enter your email address.');
+      setErrorMessage(error.response.data.error || 'Please enter your email address.');
       return;
     }
 
@@ -79,11 +83,12 @@ const LoginScreen = () => {
       toggleModal(); // Close the modal after successful submission
       setForgotPasswordEmail(''); // Clear the email input for forgot password
       navigateToResetPassword(); // Navigate to reset password screen
+      setErrorMessage('');
     } catch (error) {
       if (error.response) {
-        Alert.alert('Error', error.response.data.error || 'Something went wrong');
+        setErrorMessage(error.response.data.error || 'Something went wrong. Please try again later.');
       } else {
-        Alert.alert('Error', 'Something went wrong. Please try again later.');
+        setErrorMessage(error.response.data.error || 'Something went wrong. Please try again later.');
       }
     }
   };
@@ -113,6 +118,7 @@ const LoginScreen = () => {
       <TouchableOpacity onPress={toggleModal}>
         <Text style={styles.forgotPassword}>Forgot your password?</Text>
       </TouchableOpacity>
+      {!isModalVisible && <ErrorMessage message={errorMessage} />}
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Sign In</Text>
@@ -128,6 +134,7 @@ const LoginScreen = () => {
         transparent={true}
         animationType="slide"
         onRequestClose={toggleModal}
+        
       >
         <TouchableWithoutFeedback onPress={toggleModal}>
           <View style={styles.modalContainer}>
@@ -142,6 +149,7 @@ const LoginScreen = () => {
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
+                 <ErrorMessage message={errorMessage} /> 
                 <TouchableOpacity style={styles.modalButton} onPress={handleForgotPassword}>
                   <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryModalStyle from '../Styles/CategoryModalStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For fetching the token
+import { useUser } from '../Context/UserContext'; // Import the UserContext
 
 
 const categoryIconMapping = {
@@ -19,6 +20,8 @@ const categoryIconMapping = {
 const CategoryModal = ({ closeModal, onCategorySelect }) => {
   const [categories, setCategories] = useState([]); // State to store categories data
   const [loading, setLoading] = useState(true); // State to manage loading status
+
+  const { theme } = useUser(); // Now useContext is called before any effect
 
   useEffect(() => {
     const getCategories = async () => {
@@ -49,7 +52,7 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
             });
           }
           return acc;
-        }, []);
+        }, []); 
         setCategories(categoryData);
         setLoading(false);
       } catch (error) {
@@ -59,7 +62,7 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
     };
 
     getCategories(); // Fetch categories on component mount
-  }, []);
+  }, []); // Empty dependency array ensures this effect runs only once
 
   const handleCategorySelect = (category) => {
     console.log('Selected Category:', category); // Debug the selected category
@@ -77,29 +80,47 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
     );
   }
 
+  const modalContainerStyle = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+  };
+
+  const modalBackground = {
+    backgroundColor: theme === 'dark' ? '#1A1A19' : '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  };
+
+  const textColor = theme === 'dark' ? '#FFF' : '#000';
+
   return (
-    <View style={CategoryModalStyle.modalContainer}>
-      <Text style={CategoryModalStyle.title}>Select a category</Text>
-      {categories.length === 0 ? (
-        <Text>No categories available</Text>
-      ) : (
-        <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
-          {categories.map((category, index) => (
-            <TouchableOpacity
-              key={index} // Use index if no unique ID is available
-              style={CategoryModalStyle.categoryButton}
-              onPress={() => handleCategorySelect(category)}
-            >
-              <Text style={CategoryModalStyle.categoryLabel}>
-                {category.icon} {category.name} - ₱{category.budget.toFixed(2)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
-      <TouchableOpacity onPress={closeModal} style={CategoryModalStyle.closeButton}>
-        <Text style={CategoryModalStyle.closeButtonText}>Close</Text>
-      </TouchableOpacity>
+    <View style={modalContainerStyle}>
+      <View style={modalBackground}>
+        <Text style={[CategoryModalStyle.title, {color: theme === 'dark' ? '#fff' : '#000'}]}>Select a category</Text>
+        {categories.length === 0 ? (
+          <Text>No categories available</Text>
+        ) : (
+          <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
+            {categories.map((category, index) => (
+              <TouchableOpacity
+                key={index} // Use index if no unique ID is available
+                style={[CategoryModalStyle.categoryButton, {backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D'}]}
+                onPress={() => handleCategorySelect(category)}
+              >
+                <Text style={CategoryModalStyle.categoryLabel}>
+                  {category.icon} {category.name} - ₱{category.budget.toFixed(2)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+        <TouchableOpacity onPress={closeModal} style={CategoryModalStyle.closeButton}>
+          <Text style={CategoryModalStyle.closeButtonText}>Close</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

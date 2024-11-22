@@ -95,6 +95,7 @@ const BudgetScreen = () => {
   };
   
   
+  
   const handlePrevMonth = () => {
     if (month === 0) {
       setMonth(11);

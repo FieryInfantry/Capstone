@@ -6,6 +6,7 @@ import AccountModal from './AccountModal';
 import CategoryModal from './CategoryModal';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../Context/UserContext'; // Use UserContext for theme
 
 const ExpenseInputScreen = ({ navigation }) => {
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
@@ -15,6 +16,8 @@ const ExpenseInputScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [amount, setAmount] = useState('');
   const [selectedAccount, setSelectedAccount] = useState(null);
+  const { theme } = useUser(); // Retrieve theme from context
+  const isDarkMode = theme === 'dark';
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -106,12 +109,12 @@ const ExpenseInputScreen = ({ navigation }) => {
     <View style={ExpenseStyle.container}>
       <View style={ExpenseStyle.inputContainer}>
         <Text style={ExpenseStyle.label}>
-          <TouchableOpacity style={ExpenseStyle.button} onPress={() => navigation.navigate('IncomeInputScreen')}>
-            <Text style={ExpenseStyle.buttonText}>Income</Text>
+          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('IncomeInputScreen')}>
+            <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Income</Text>
           </TouchableOpacity>
           {' | '}
-          <TouchableOpacity style={ExpenseStyle.button} onPress={() => navigation.navigate('ExpenseInputScreen')}>
-            <Text style={ExpenseStyle.buttonText}>Expense</Text>
+          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('ExpenseInputScreen')}>
+            <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Expense</Text>
           </TouchableOpacity>
         </Text>
 
@@ -125,10 +128,10 @@ const ExpenseInputScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={ExpenseStyle.button} onPress={() => setCategoryModalVisible(true)}>
+          <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]} onPress={() => setCategoryModalVisible(true)}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={ExpenseStyle.buttonText}>
-                <Icon name="tags" size={20} color="#333" />{' '}
+            <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+              <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} />{' '}
                 {selectedCategory ? selectedCategory.name : 'Select Category'}
               </Text>
             </View>
@@ -207,9 +210,15 @@ const ExpenseInputScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+        </View>
 
         <View style={ExpenseStyle.dateContainer}>
           <Text style={ExpenseStyle.dateText}>{currentDate}</Text>
+        {/* Current Date */}
+        <View style={[ExpenseStyle.dateContainer, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
+          <Text style={[ExpenseStyle.dateText, { color: isDarkMode ? '#FFF' : '#000' }]}>
+            {currentDate}
+          </Text>
         </View>
       </View>
 

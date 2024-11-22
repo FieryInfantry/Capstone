@@ -44,8 +44,8 @@ const ExpenseStyle = StyleSheet.create({
     borderColor: '#738c32',     // Slightly darker green for the border
     borderWidth: 1,
     borderRadius: 10,
-    height: 50,                 // Make operator buttons the same size
-    width: 50,
+    height: 62,                 // Make operator buttons the same size
+    width: 62,
     alignItems: 'center',
     paddingTop: 12,
   },

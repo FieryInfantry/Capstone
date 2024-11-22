@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import axios from 'axios';
+import { View, Text, TextInput, TouchableOpacity, Alert, Modal, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../Context/UserContext';
-import AddUpdateStyle from '../Styles/AddUpdateStyle';
+
 
 const banksData = {
-"GM Bank": [
+  "GM Bank": [
     { label: 'Easy Savings Account', rate: '0.20%' },
     { label: 'Regular Savings Account', rate: '0.20%' },
     { label: 'Silver Savings Account', rate: 'Subject to evaluation' },
@@ -47,42 +47,38 @@ const banksData = {
   ],
 };
 
-const AddUpdateBank = ({ route, navigation }) => {
-  const { bank } = route.params || {}; // Expecting the full bank object if updating
-  const bankId = bank ? bank._id : null; // Getting bank ID if it's an update
+const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
+  const bankId = bank ? bank._id : null;
   const [selectedBank, setSelectedBank] = useState(bank ? bank.name : 'GM Bank');
   const [accountNumber, setAccountNumber] = useState(bank ? bank.accountNumber : '');
-  const [accountType, setAccountType] = useState(bank ? bank.type : 'Easy Savings Account'); // Initialize account type
-  const [interestRate, setInterestRate] = useState(bank ? bank.interestRate : '0.20%'); // Initialize interest rate
+  const [accountType, setAccountType] = useState(bank ? bank.type : 'Easy Savings Account');
+  const [interestRate, setInterestRate] = useState(bank ? bank.interestRate : '0.20%');
   const [accountBalance, setAccountBalance] = useState(bank ? bank.balance : '');
   const [reward, setReward] = useState(bank ? bank.rewards : '');
 
   const { token, theme } = useUser();
 
-  // Ensure interest rate is updated on bank and account type change
   useEffect(() => {
     if (bank) {
       const selectedAccount = banksData[selectedBank].find(account => account.label === bank.type);
       setInterestRate(selectedAccount ? selectedAccount.rate : '');
     }
   }, [bank, selectedBank]);
-const handleBankChange = (bankName) => {
-  setSelectedBank(bankName);
 
-  // Automatically select the first account type and its interest rate
-  const firstAccount = banksData[bankName]?.[0];
-  if (firstAccount) {
-    setAccountType(firstAccount.label);
-    setInterestRate(firstAccount.rate);
-  }
+  const handleBankChange = (bankName) => {
+    setSelectedBank(bankName);
+    const firstAccount = banksData[bankName]?.[0];
+    if (firstAccount) {
+      setAccountType(firstAccount.label);
+      setInterestRate(firstAccount.rate);
+    }
 
-  if (!bank) { // Reset other fields only when adding a new bank
-    setAccountNumber('');
-    setAccountBalance('');
-    setReward('');
-  }
-};
-
+    if (!bank) {
+      setAccountNumber('');
+      setAccountBalance('');
+      setReward('');
+    }
+  };
 
   const handleAccountTypeChange = (itemValue) => {
     setAccountType(itemValue);
@@ -90,7 +86,7 @@ const handleBankChange = (bankName) => {
     setInterestRate(selectedAccount ? selectedAccount.rate : '');
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     const bankDetails = {
       name: selectedBank,
       accountNumber,
@@ -99,95 +95,188 @@ const handleBankChange = (bankName) => {
       balance: accountBalance,
       rewards: reward,
     };
-
-    let userToken = token || await AsyncStorage.getItem('authToken');
-    if (!userToken) {
-      Alert.alert('Error', 'User is not authenticated.');
-      return;
-    }
-
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      };
-
-      if (bankId) {
-        // Update bank
-        await axios.put(`http://192.168.1.100:3000/banks/${bankId}`, bankDetails, config);
-      } else {
-        // Add new bank
-        await axios.post('http://192.168.1.100:3000/banks', bankDetails, config);
-      }
-
-      navigation.goBack(); // Go back to the bank list screen after saving
-    } catch (error) {
-      console.error('Error saving bank:', error);
-      Alert.alert('Error saving bank', error.response?.data?.error || error.message);
-    }
+    onSave(bankDetails);
+  };
+  const containerStyle = { 
+    flex: 1, 
+    backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' 
   };
 
+  const modalBackground = {
+    backgroundColor: theme === 'dark' ? '#1A1A19' : '#FFF',
+    borderRadius: 10,
+    width: '75%',
+  };
+
+  const textColor = theme === 'dark' ? '#FFF' : '#000';
+
+  const modalContainerStyle = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)', // Adjusted opacity for modal background
+    
+  };
+  const inputBackground = theme === 'dark' ? '#333' : '#FFF';
+  const border = theme === 'dark' ? "1a1a19" : "#859F3D";
+
   return (
-    <View style={[AddUpdateStyle.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
-      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Select Bank</Text>
-      <Picker
-        selectedValue={selectedBank}
-        onValueChange={handleBankChange}
-        style={[AddUpdateStyle.picker, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-      >
-        {Object.keys(banksData).map((bank) => (
-          <Picker.Item key={bank} label={bank} value={bank} />
-        ))}
-      </Picker>
+    <Modal visible={visible} animationType="slide" transparent={true}>
+      <View style={modalContainerStyle}>
+      <View style={modalBackground}>
+        <Text style={[styles.title, {color : textColor}]}>{bankId ? 'Update' : 'Add'}</Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Select Bank</Text>
+          <Picker
+            selectedValue={selectedBank}
+            onValueChange={handleBankChange}
+            style={styles.picker}
+          >
+            {Object.keys(banksData).map((bank) => (
+              <Picker.Item key={bank} label={bank} value={bank} />
+            ))}
+          </Picker>
 
-      <TextInput
-        placeholder="Account Number"
-        value={accountNumber}
-        onChangeText={setAccountNumber}
-        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-      />
+          <TextInput
+            placeholder="Account Number"
+            value={accountNumber}
+            onChangeText={setAccountNumber}
+            style={{
+              backgroundColor: inputBackground,
+              color: textColor,
+              borderRadius: 5, // Or set it to your desired value
+              padding: 10,
+              marginBottom: 20,
+              borderColor: '#000',
+            }}             
+        />
 
-      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Account Type</Text>
-      <Picker
-        selectedValue={accountType}
-        onValueChange={handleAccountTypeChange}
-        style={[AddUpdateStyle.picker, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-      >
-        {banksData[selectedBank].map((account) => (
-          <Picker.Item key={account.label} label={account.label} value={account.label} />
-        ))}
-      </Picker>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Account Type</Text>
+          <Picker
+            selectedValue={accountType}
+            onValueChange={handleAccountTypeChange}
+            style={styles.picker}
+          >
+            {banksData[selectedBank].map((account) => (
+              <Picker.Item key={account.label} label={account.label} value={account.label} />
+            ))}
+          </Picker>
 
-      <TextInput
-        placeholder="Interest Rate"
-        value={interestRate}
-        editable={false}
-        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-      />
+          <TextInput
+            placeholder="Interest Rate"
+            value={interestRate}
+            editable={false}
+            style={{
+              backgroundColor: inputBackground,
+              color: textColor,
+              borderRadius: 5, // Or set it to your desired value
+              padding: 10,
+              marginBottom: 20,
+              borderColor: '#000',
+            }}             
+        />
+          
+          <TextInput
+            placeholder="Account Balance"
+            value={accountBalance}
+            onChangeText={setAccountBalance}
+            keyboardType="numeric"
+            style={{
+              backgroundColor: inputBackground,
+              color: textColor,
+              borderRadius: 5, // Or set it to your desired value
+              padding: 10,
+              marginBottom: 20,
+              borderColor: '#000',
+            }}             
+        />
+       
 
-      <TextInput
-        placeholder="Account Balance"
-        value={accountBalance}
-        onChangeText={setAccountBalance}
-        keyboardType="numeric"
-        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-      />
+          <TextInput
+            placeholder="Reward"
+            value={reward}
+            onChangeText={setReward}
+            style={{
+              backgroundColor: inputBackground,
+              color: textColor,
+              borderRadius: 5, // Or set it to your desired value
+              padding: 10,
+              marginBottom: 20,
+              borderColor: '#000',
+            }}             
+        />
 
-      <TextInput
-        placeholder="Reward"
-        value={reward}
-        onChangeText={setReward}
-        style={[AddUpdateStyle.input, { backgroundColor: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#000' }]}
-      />
-
-      <TouchableOpacity style={[AddUpdateStyle.button, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} onPress={handleSave}>
-        <Text style={AddUpdateStyle.buttonText}>
-          {bankId ? 'Update' : 'Add'} Bank
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <Text style={styles.buttonText}>{bankId ? 'Update' : 'Add'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonCancel} onPress={onClose}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+            
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  modalContent: {
+    backgroundColor: '#F6FCDF', // Matching background color
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  input: {
+    borderBottomWidth: 1,
+    marginBottom: 16,
+    padding: 8,
+    borderColor: '#ccc',
+  },
+  picker: {
+    height: 50,
+    marginBottom: 16,
+    borderColor: '#4CAF50', // Matching border color
+    borderRadius: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  button: {
+    flex: 1,
+    backgroundColor: '#859F3D',
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+   
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  buttonCancel: {
+    backgroundColor :"red",
+    flex: 1,
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  title:{
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+    color: '#4CAF50',
+  },
+});
 
 export default AddUpdateBank;
