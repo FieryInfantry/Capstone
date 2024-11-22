@@ -106,9 +106,9 @@ const ExpenseInputScreen = ({ navigation }) => {
   };
   
   return (
-    <View style={ExpenseStyle.container}>
+    <View style={[ExpenseStyle.container, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
       <View style={ExpenseStyle.inputContainer}>
-        <Text style={ExpenseStyle.label}>
+      <Text style={[ExpenseStyle.label, { color: isDarkMode ? '#FFF' : '#000' }]}>
           <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('IncomeInputScreen')}>
             <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Income</Text>
           </TouchableOpacity>
@@ -119,14 +119,15 @@ const ExpenseInputScreen = ({ navigation }) => {
         </Text>
 
         <View style={ExpenseStyle.modalButtonsContainer}>
-          <TouchableOpacity style={ExpenseStyle.button} onPress={() => setAccountModalVisible(true)}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={ExpenseStyle.buttonText}>
-                <Icon name="user" size={20} color="#333" />{' '}
-                {selectedAccount ? selectedAccount.name : 'Select Account'}
-              </Text>
-            </View>
-          </TouchableOpacity>
+        <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => setAccountModalVisible(true)}>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#000' }]}>
+      <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#333'} />{' '}
+      {selectedAccount ? selectedAccount.name : 'Select Account'}
+    </Text>
+  </View>
+</TouchableOpacity>
+
 
           <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]} onPress={() => setCategoryModalVisible(true)}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -138,78 +139,212 @@ const ExpenseInputScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={handleSubmitExpense} style={ExpenseStyle.submitButton}>
-          <Text style={ExpenseStyle.buttonText}>Submit Expense</Text>
-        </TouchableOpacity>
+        <TouchableOpacity
+  onPress={handleSubmitExpense}
+  style={[
+    ExpenseStyle.submitButton,
+    { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }, // Change background color based on dark mode
+  ]}
+>
+  <Text
+    style={[
+      ExpenseStyle.buttonText,
+      { color: isDarkMode ? '#FFF' : '#000' }, // Text color based on dark mode
+    ]}
+  >
+    Submit Expense
+  </Text>
+</TouchableOpacity>
 
-        <View style={ExpenseStyle.calculatorContainer}>
-          <View style={ExpenseStyle.displayContainer}>
-            <Text style={ExpenseStyle.display}>{inputValue}</Text>
-            <TouchableOpacity onPress={handleDeletePress} style={ExpenseStyle.deleteButton}>
-              <Text style={ExpenseStyle.deleteButtonText}>x</Text>
-            </TouchableOpacity>
-          </View>
- {/* Calculator Layout */}
- <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('+')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('7')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>7</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('8')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>8</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('9')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>9</Text>
-            </TouchableOpacity>
-          </View>
 
-          <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('-')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>-</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('4')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>4</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('5')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>5</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('6')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>6</Text>
-            </TouchableOpacity>
-          </View>
+        <View
+  style={[
+    ExpenseStyle.calculatorContainer,
+    {
+      backgroundColor: isDarkMode ? '#333' : '#FFF', // Background color for the container
+    },
+  ]}
+>
+  <View style={ExpenseStyle.displayContainer}>
+    <Text
+      style={[
+        ExpenseStyle.display,
+        { color: isDarkMode ? '#FFF' : '#000' }, // Text color for input value
+      ]}
+    >
+      {inputValue}
+    </Text>
+    <TouchableOpacity
+      onPress={handleDeletePress}
+      style={[
+        ExpenseStyle.deleteButton,
+        { backgroundColor: isDarkMode ? '#444' : '#F4F4F4' }, // Button color change
+      ]}
+    >
+      <Text style={[ExpenseStyle.deleteButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>x</Text>
+    </TouchableOpacity>
+  </View>
 
-          <View style={ExpenseStyle.row}>
-            <TouchableOpacity onPress={() => handleOperatorPress('*')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>x</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('1')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>1</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('2')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>2</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('3')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>3</Text>
-            </TouchableOpacity>
-          </View>
+  {/* Calculator Layout */}
+  <View style={[ExpenseStyle.row, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
+    <TouchableOpacity
+      onPress={() => handleOperatorPress('+')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>+</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('7')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>7</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('8')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>8</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('9')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>9</Text>
+    </TouchableOpacity>
+  </View>
 
-          <View style={[ExpenseStyle.row, ExpenseStyle.rowLast]}>
-            <TouchableOpacity onPress={() => handleOperatorPress('/')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>÷</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleNumberPress('0')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>0</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleOperatorPress('.')} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>.</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleEqualsPress} style={ExpenseStyle.operatorButton}>
-              <Text style={ExpenseStyle.operatorButtonText}>=</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+  <View style={[ExpenseStyle.row, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
+    <TouchableOpacity
+      onPress={() => handleOperatorPress('-')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>-</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('4')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>4</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('5')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>5</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('6')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>6</Text>
+    </TouchableOpacity>
+  </View>
+
+  <View style={[ExpenseStyle.row, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
+    <TouchableOpacity
+      onPress={() => handleOperatorPress('*')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>x</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('1')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>1</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('2')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>2</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('3')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>3</Text>
+    </TouchableOpacity>
+  </View>
+
+  <View style={[ExpenseStyle.row, ExpenseStyle.rowLast, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
+    <TouchableOpacity
+      onPress={() => handleOperatorPress('/')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>÷</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleNumberPress('0')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>0</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => handleOperatorPress('.')}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>.</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      onPress={handleEqualsPress}
+      style={[
+        ExpenseStyle.operatorButton,
+        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
+      ]}
+    >
+      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>
+        =
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
         </View>
 
         <View style={ExpenseStyle.dateContainer}>
