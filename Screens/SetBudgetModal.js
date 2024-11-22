@@ -44,7 +44,7 @@ const BudgetModal = ({ visible, onClose, budgetItem, onSaveBudget }) => {
     >
       <View style={modalContainerStyle}>
         <View style={modalBackground}>
-          <Text style={SetBudgetModalStyle.modalTitle}>Set Budget for {budgetItem}</Text>
+          <Text style={[SetBudgetModalStyle.modalTitle, {color: textColor}]}>Set Budget for {budgetItem}</Text>
           <TextInput
             style={[SetBudgetModalStyle.input,
               {color: textColor, backgroundColor: inputBackground}

@@ -201,6 +201,7 @@ const InsuranceScreen = () => {
     backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)', // Adjusted opacity for modal background
   };
   const inputBackground = theme === 'dark' ? '#333' : '#FFF';
+  const border = theme === 'dark' ? "1a1a19" : "#859F3D";
 
   return (
     <View style={containerStyle}>
@@ -330,10 +331,12 @@ const InsuranceScreen = () => {
               style={{
                 backgroundColor: inputBackground,
                 color: textColor,
-                borderRadius: 5,
+                borderRadius: 5, // Or set it to your desired value
                 padding: 10,
                 marginBottom: 20,
-              }}              value={policyName}
+                borderColor: '#000',
+              }}             
+               value={policyName}
               onChangeText={setPolicyName}
             />
 <Text style={[InsuranceStyle.label, { color: textColor }]}>Coverage Type:</Text>
@@ -361,6 +364,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}              keyboardType="numeric"
               value={premiumAmount}
               onChangeText={setPremiumAmount}
@@ -373,6 +379,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}              keyboardType="numeric"
               value={interestRate}
               onChangeText={setInterestRate}
@@ -385,6 +394,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}              value={potentialBenefits}
               onChangeText={setPotentialBenefits}
             />
@@ -435,6 +447,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}
               value={policyName}
               onChangeText={setPolicyName}
@@ -462,6 +477,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}
               keyboardType="numeric"
               value={premiumAmount}
@@ -475,6 +493,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}
               keyboardType="numeric"
               value={interestRate}
@@ -488,6 +509,9 @@ const InsuranceScreen = () => {
                 borderRadius: 5,
                 padding: 10,
                 marginBottom: 20,
+                borderColor : border,
+                borderRadius: 2
+
               }}
               value={potentialBenefits}
               onChangeText={setPotentialBenefits}
