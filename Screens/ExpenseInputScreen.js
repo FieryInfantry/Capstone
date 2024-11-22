@@ -85,7 +85,7 @@ const ExpenseInputScreen = ({ navigation }) => {
         date: new Date().toISOString(),
       };
   
-      const response = await axios.post('http://192.168.1.100:3000/expense', payload, {
+      const response = await axios.post('http://localhost:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -139,223 +139,80 @@ const ExpenseInputScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-  onPress={handleSubmitExpense}
-  style={[
-    ExpenseStyle.submitButton,
-    { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }, // Change background color based on dark mode
-  ]}
->
-  <Text
-    style={[
-      ExpenseStyle.buttonText,
-      { color: isDarkMode ? '#FFF' : '#000' }, // Text color based on dark mode
-    ]}
-  >
-    Submit Expense
-  </Text>
-</TouchableOpacity>
+        <View>
+        <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}>
+        <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Submit Income</Text>
+          </TouchableOpacity>
+        </View>
 
 
-        <View
-  style={[
-    ExpenseStyle.calculatorContainer,
-    {
-      backgroundColor: isDarkMode ? '#333' : '#FFF', // Background color for the container
-    },
-  ]}
->
-  <View style={ExpenseStyle.displayContainer}>
-    <Text
-      style={[
-        ExpenseStyle.display,
-        { color: isDarkMode ? '#FFF' : '#000' }, // Text color for input value
-      ]}
-    >
-      {inputValue}
-    </Text>
-    <TouchableOpacity
-      onPress={handleDeletePress}
-      style={[
-        ExpenseStyle.deleteButton,
-        { backgroundColor: isDarkMode ? '#444' : '#F4F4F4' }, // Button color change
-      ]}
-    >
-      <Text style={[ExpenseStyle.deleteButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>x</Text>
-    </TouchableOpacity>
+        <View style={[ExpenseStyle.calculatorContainer, {backgroundColor: isDarkMode ? '#444' : '#FFF'}]}>
+          <View
+            style={[
+              ExpenseStyle.displayContainer,
+              {
+                backgroundColor: isDarkMode ? '#333' : '#EEE', borderColor: "#fff", borderWidth:2
+              },
+            ]}
+          >
+            <Text style={[ExpenseStyle.display, { color: isDarkMode ? '#FFF' : '#000' }]}>
+              {inputValue}
+            </Text>
+            <TouchableOpacity onPress={handleDeletePress} style={ExpenseStyle.deleteButton}>
+              <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>x</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Buttons */}
+          {[
+            ['+', '7', '8', '9'],
+            ['-', '4', '5', '6'],
+            ['*', '1', '2', '3'],
+            ['/', '0', '.', '='],
+          ].map((row, index) => (
+            <View key={index} style={ExpenseStyle.row}>
+              {row.map((button) => (
+                <TouchableOpacity
+                  key={button}
+                  style={[
+                    ExpenseStyle.operatorButton,
+                    { backgroundColor: isDarkMode ? '#333' : '#F6FCDF',
+                      borderColor: isDarkMode ? '#fff': '#859F3D', // Add the borderColor
+                      borderWidth: 2, },
+                  ]}
+                  onPress={
+                    button === '='
+                      ? handleEqualsPress
+                      : button === 'C'
+                      ? handleClearPress
+                      : () => handleNumberPress(button)
+                  }
+                >
+                  <Text
+                    style={[
+                      ExpenseStyle.operatorButtonText,
+                      { color: isDarkMode ? '#FFF' : '#000' },
+                    ]}
+                  >
+                    {button}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
   </View>
-
-  {/* Calculator Layout */}
-  <View style={[ExpenseStyle.row, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
-    <TouchableOpacity
-      onPress={() => handleOperatorPress('+')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>+</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('7')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>7</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('8')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>8</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('9')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>9</Text>
-    </TouchableOpacity>
-  </View>
-
-  <View style={[ExpenseStyle.row, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
-    <TouchableOpacity
-      onPress={() => handleOperatorPress('-')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>-</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('4')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>4</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('5')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>5</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('6')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>6</Text>
-    </TouchableOpacity>
-  </View>
-
-  <View style={[ExpenseStyle.row, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
-    <TouchableOpacity
-      onPress={() => handleOperatorPress('*')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>x</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('1')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>1</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('2')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>2</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('3')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>3</Text>
-    </TouchableOpacity>
-  </View>
-
-  <View style={[ExpenseStyle.row, ExpenseStyle.rowLast, { backgroundColor: isDarkMode ? '#444' : '#EEE' }]}>
-    <TouchableOpacity
-      onPress={() => handleOperatorPress('/')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>÷</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleNumberPress('0')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>0</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleOperatorPress('.')}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>.</Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      onPress={handleEqualsPress}
-      style={[
-        ExpenseStyle.operatorButton,
-        { backgroundColor: isDarkMode ? '#555' : '#D9D9D9' },
-      ]}
-    >
-      <Text style={[ExpenseStyle.operatorButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>
-        =
-      </Text>
-    </TouchableOpacity>
-  </View>
-</View>
 
         </View>
 
-        <View style={ExpenseStyle.dateContainer}>
-          <Text style={ExpenseStyle.dateText}>{currentDate}</Text>
+       
+          
         {/* Current Date */}
         <View style={[ExpenseStyle.dateContainer, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
           <Text style={[ExpenseStyle.dateText, { color: isDarkMode ? '#FFF' : '#000' }]}>
             {currentDate}
           </Text>
         </View>
-      </View>
+      
 
       {/* Account Modal */}
       <Modal transparent={true} visible={isAccountModalVisible} animationType="slide">
