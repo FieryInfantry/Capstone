@@ -122,6 +122,13 @@ const DashboardStyles = StyleSheet.create({
     color: '#000000',
     fontFamily: 'YourPreferredFont', // Updated font
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  
 });
 
 export default DashboardStyles;

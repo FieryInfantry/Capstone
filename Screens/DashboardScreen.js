@@ -1,12 +1,19 @@
 // DashboardScreen.js
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
 import { useUser } from '../Context/UserContext'; // Import the UserContext
+import AddUpdateBank from './AddUpdateBank';
 
 const DashboardScreen = ({ navigation }) => {
   const { userData, theme } = useUser();  // Access user data and theme from context
+  const [isBankModalVisible, setBankModalVisible] = useState(false);
 
+  const handleSaveBank = (bankDetails) => {
+    // Logic to save the bank details (optional: send to API or update context)
+    console.log('Saved Bank Details:', bankDetails);
+    setBankModalVisible(false);
+  };
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={[DashboardStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
@@ -73,12 +80,13 @@ const DashboardScreen = ({ navigation }) => {
         </View>
 
         <View style={DashboardStyles.actionButtonsContainer}>
-          <TouchableOpacity 
-            style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} 
-            onPress={() => navigation.navigate('AddUpdateBank')}
+          <TouchableOpacity
+            style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
+            onPress={() => setBankModalVisible(true)} // Open the modal
           >
             <Text style={{ color: 'white' }}>Add new savings</Text>
           </TouchableOpacity>
+
           <TouchableOpacity 
             style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]} 
             onPress={() => navigation.navigate('CalculatorScreen')}
@@ -127,6 +135,12 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </View>
+      <AddUpdateBank
+        visible={isBankModalVisible}
+        onClose={() => setBankModalVisible(false)}
+        onSave={handleSaveBank} // Save the bank details
+        bank={null} // Pass null for adding a new bank
+      />
     </View>
   );
 };

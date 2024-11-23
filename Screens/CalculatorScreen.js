@@ -55,7 +55,7 @@ const CalculatorScreen = () => {
   
       console.log('Payload:', payload);
   
-      const response = await axios.post('http://192.168.1.100:3000/expense', payload, {
+      const response = await axios.post('http://localhost:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

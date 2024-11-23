@@ -124,7 +124,7 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View style={modalContainerStyle}>
       <View style={modalBackground}>
-        <Text style={[styles.title, {color : textColor}]}>{bankId ? 'Update' : 'Add'}</Text>
+        <Text style={[styles.title, {color : textColor}]}>{bankId ? 'Update Bank Details' : 'Add Bank Account'}</Text>
           <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Select Bank</Text>
           <Picker
             selectedValue={selectedBank}

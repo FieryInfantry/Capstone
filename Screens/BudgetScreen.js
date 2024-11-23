@@ -36,7 +36,7 @@ const BudgetScreen = () => {
         return;
       }
   
-      const response = await fetch('http://192.168.1.100:3000/banks/balances', {
+      const response = await fetch('http://localhost:3000/banks/balances', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -70,7 +70,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.1.100:3000/expenses/monthly?month=${month + 1}&year=${year}`,
+        `http://localhost:3000/expenses/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -177,7 +177,7 @@ const BudgetScreen = () => {
       const token = await AsyncStorage.getItem('authToken');
       
       // Fetch the total bank balance from the backend
-      const bankBalanceResponse = await fetch('http://192.168.1.100:3000/banks/balances', {
+      const bankBalanceResponse = await fetch('http://localhost:3000/banks/balances', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -192,7 +192,7 @@ const BudgetScreen = () => {
       const bankBalance = bankBalanceData.totalBalance;
   
       // Calculate the total amount of all budgets
-      const totalBudgetResponse = await fetch('http://192.168.1.100:3000/budget/total', {
+      const totalBudgetResponse = await fetch('http://localhost:3000/budget/total', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -219,7 +219,7 @@ const BudgetScreen = () => {
       }
   
       // If all checks pass, save the budget
-      const response = await fetch('http://192.168.1.100:3000/budget', {
+      const response = await fetch('http://localhost:3000/budget', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.1.100:3000/budget/monthly?month=${month + 1}&year=${year}`,
+        `http://localhost:3000/budget/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -299,7 +299,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.1.100:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
+        `http://localhost:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
         {
           method: 'DELETE',
           headers: {
