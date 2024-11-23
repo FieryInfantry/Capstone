@@ -8,8 +8,8 @@ const GovernmentScreen = () => {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }}>
-      {/* PhilHealth Insurance Section */}
-      <View style={{ height: 20 }}></View> {/* Spacer instead of <br> */}
+
+<View style={{ height: 20 }} /> 
       <View style={[GovernmentStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A1A' : '#F6FCDF' }]}>
         <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
           <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Scheme Name: PhilHealth Insurance</Text>
@@ -23,7 +23,6 @@ const GovernmentScreen = () => {
           <Text style={[GovernmentStyles.value, { color: theme === 'dark' ? '#fff' : '#000' }]}>Register online or visit the nearest PhilHealth office.</Text>
         </View>
 
-        {/* SSS Retirement Benefit Section */}
         <View style={[GovernmentStyles.schemeContainer, { backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
           <Text style={[GovernmentStyles.schemeTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Policy Name: SSS Retirement Benefit</Text>
           <Text style={[GovernmentStyles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Description:</Text>

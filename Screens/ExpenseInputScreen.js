@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Alert,TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ExpenseStyle from '../Styles/ExpenseInput';
 import AccountModal from './AccountModal';
@@ -70,6 +70,14 @@ const ExpenseInputScreen = ({ navigation }) => {
       return;
     }
   
+    // Log the payload to debug
+    console.log("Submitting Expense with Payload:", {
+      category: selectedCategory.name,
+      amount: parseFloat(amount),
+      account: selectedAccount.name,
+      date: new Date().toISOString(),
+    });
+  
     try {
       const token = await AsyncStorage.getItem('authToken');
       if (!token) {
@@ -77,11 +85,10 @@ const ExpenseInputScreen = ({ navigation }) => {
         return;
       }
   
-      // Constructing the payload with category as a simple string
       const payload = {
-        category: selectedCategory.name, // Send the category name as a string
+        category: selectedCategory.name,  // Send the category name as a string
         amount: parseFloat(amount),
-        accountId: selectedAccount.id,
+        account: selectedAccount.name,  // Send the selected account name
         date: new Date().toISOString(),
       };
   
@@ -94,6 +101,7 @@ const ExpenseInputScreen = ({ navigation }) => {
   
       if (response.status === 201) {
         Alert.alert('Success', 'Expense added successfully');
+        // Reset form state after successful submission
         setInputValue('');
         setAmount('');
         setSelectedCategory(null);
@@ -104,6 +112,8 @@ const ExpenseInputScreen = ({ navigation }) => {
       Alert.alert('Error', error.response?.data?.error || 'Server Error');
     }
   };
+  
+  
   
   return (
     <View style={[ExpenseStyle.container, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
@@ -119,14 +129,18 @@ const ExpenseInputScreen = ({ navigation }) => {
         </Text>
 
         <View style={ExpenseStyle.modalButtonsContainer}>
-        <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => setAccountModalVisible(true)}>
+        <TouchableOpacity
+  style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}
+  onPress={() => setAccountModalVisible(true)} // Open the Account Modal
+>
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#000' }]}>
-      <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#333'} />{' '}
+    <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+      <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} />{' '}
       {selectedAccount ? selectedAccount.name : 'Select Account'}
     </Text>
   </View>
 </TouchableOpacity>
+
 
 
           <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]} onPress={() => setCategoryModalVisible(true)}>
@@ -140,67 +154,33 @@ const ExpenseInputScreen = ({ navigation }) => {
         </View>
 
         <View>
-        <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}>
-        <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Submit Income</Text>
+        <TouchableOpacity onPress={handleSubmitExpense} style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}>
+        <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Submit Expense</Text>
           </TouchableOpacity>
         </View>
 
 
-        <View style={[ExpenseStyle.calculatorContainer, {backgroundColor: isDarkMode ? '#444' : '#FFF'}]}>
-          <View
-            style={[
-              ExpenseStyle.displayContainer,
-              {
-                backgroundColor: isDarkMode ? '#333' : '#EEE', borderColor: "#fff", borderWidth:2
-              },
-            ]}
-          >
-            <Text style={[ExpenseStyle.display, { color: isDarkMode ? '#FFF' : '#000' }]}>
-              {inputValue}
-            </Text>
-            <TouchableOpacity onPress={handleDeletePress} style={ExpenseStyle.deleteButton}>
-              <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>x</Text>
-            </TouchableOpacity>
-          </View>
+    
+      
 
-          {/* Buttons */}
-          {[
-            ['+', '7', '8', '9'],
-            ['-', '4', '5', '6'],
-            ['*', '1', '2', '3'],
-            ['/', '0', '.', '='],
-          ].map((row, index) => (
-            <View key={index} style={ExpenseStyle.row}>
-              {row.map((button) => (
-                <TouchableOpacity
-                  key={button}
-                  style={[
-                    ExpenseStyle.operatorButton,
-                    { backgroundColor: isDarkMode ? '#333' : '#F6FCDF',
-                      borderColor: isDarkMode ? '#fff': '#859F3D', // Add the borderColor
-                      borderWidth: 2, },
-                  ]}
-                  onPress={
-                    button === '='
-                      ? handleEqualsPress
-                      : button === 'C'
-                      ? handleClearPress
-                      : () => handleNumberPress(button)
-                  }
-                >
-                  <Text
-                    style={[
-                      ExpenseStyle.operatorButtonText,
-                      { color: isDarkMode ? '#FFF' : '#000' },
-                    ]}
-                  >
-                    {button}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-  </View>
+
+        <View style={[ExpenseStyle.calculatorContainer, { backgroundColor: isDarkMode ? '#444' : '#FFF' }]}>
+  {/* Input Field */}
+  <TextInput
+    style={[
+      ExpenseStyle.inputField,
+      { backgroundColor: isDarkMode ? '#333' : '#FFF', borderColor: '#859F3D', borderWidth: 2 },
+    ]}
+    onChangeText={(value) => setAmount(value)} // Directly set the value as `amount`
+    value={amount} // Bind the value of the TextInput to the amount state
+    keyboardType="numeric" // Numeric input only
+    placeholder="Enter a number"
+    placeholderTextColor={isDarkMode ? '#BBB' : '#777'}
+  />
+</View>
+
+
+
 
         </View>
 
@@ -216,10 +196,11 @@ const ExpenseInputScreen = ({ navigation }) => {
 
       {/* Account Modal */}
       <Modal transparent={true} visible={isAccountModalVisible} animationType="slide">
-        <AccountModal
-          closeModal={() => setAccountModalVisible(false)}
-          onSelectAccount={(account) => setSelectedAccount(account)}
-        />
+      <AccountModal
+        closeModal={() => setAccountModalVisible(false)}
+        onSelectAccount={(account) => setSelectedAccount(account)} // Set selected account
+        modalType="expense"
+      />
       </Modal>
 
       {/* Category Modal */}
@@ -227,7 +208,8 @@ const ExpenseInputScreen = ({ navigation }) => {
         <CategoryModal
           closeModal={() => setCategoryModalVisible(false)}
           onCategorySelect={(category) => setSelectedCategory(category)}
-        />
+          modalType="expense"
+       />
       </Modal>
     </View>
   );

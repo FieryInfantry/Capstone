@@ -97,15 +97,17 @@ const budgetSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the budget to a specific user
 });
 const expenseSchema = new mongoose.Schema({
-  category: { type: String, required: true }, // Store category as a string instead of ObjectId
-  amount: { type: Number, required: true },// Amount for the expense
-  date: { type: Date, default: Date.now }, // Date when the expense occurred
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Relates the expense to a specific user
+  category: { type: String, required: true },
+  amount: { type: Number, required: true },
+  date: { type: Date, default: Date.now },
+  bank: { type: String, default: null },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 });
 const incomeSchema = new mongoose.Schema({
   category: { type: String, required: true },  // Category for the income
-  amount: { type: mongoose.Schema.Types.Decimal128, required: true },  // Amount of income
+  amount: { type: Number, required: true  },  // Amount of income
   date: { type: Date, default: Date.now },  // Date of income
+  bank: { type: String, default: null },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Relates the income to a specific user
 });
 
@@ -583,34 +585,6 @@ app.get('/budget/total', authenticateUser, async (req, res) => {
   }
 });
 
-app.post('/expense', authenticateUser, async (req, res) => {
-  const { category, amount, date } = req.body;
-  const userId = req.userId;
-
-  if (!category || !amount) {
-    return res.status(400).json({ error: 'Category and amount are required.' });
-  }
-
-  try {
-    const newExpense = new Expense({
-      category,  // Store category directly as a string
-      amount: parseFloat(amount),
-      date: date || Date.now(),
-      userId,
-    });
-
-    await newExpense.save();
-
-    res.status(201).json(newExpense);
-  } catch (error) {
-    console.error('Saving Error:', error);
-    res.status(500).json({ error: 'An error occurred while saving the expense.' });
-  }
-});
-
-
-
-
 app.get('/budgets', authenticateUser, async (req, res) => {
   try {
     // Find all budgets for the authenticated user
@@ -623,6 +597,46 @@ app.get('/budgets', authenticateUser, async (req, res) => {
     res.status(500).json({ error: 'Error retrieving budgets' });
   }
 });
+
+app.post('/expense', authenticateUser, async (req, res) => {
+  console.log('Received expense data:', req.body);
+
+  const { category, amount, date, account } = req.body;  // Change `bank` to `account`
+  const userId = req.userId;
+
+  if (!category || !amount || !account) {  // Change `bank` to `account`
+    return res.status(400).json({ error: 'Category, amount, and account are required.' });
+  }
+
+  try {
+    const newExpense = new Expense({
+      category,
+      amount: parseFloat(amount),
+      date: date || Date.now(),
+      bank: account || null,  // Use `account` instead of `bank`
+      userId,
+    });
+
+    await newExpense.save();
+
+    const selectedBank = await Bank.findOne({ name: account, userId: req.userId });  // Adjusted to find the bank by name
+
+    if (!selectedBank) {
+      return res.status(404).json({ error: 'Bank not found.' });
+    }
+
+    selectedBank.balance -= parseFloat(amount);
+    await selectedBank.save();
+
+    res.status(201).json(newExpense);
+  } catch (error) {
+    console.error('Error saving expense or updating bank balance:', error);
+    res.status(500).json({ error: 'An error occurred while saving the expense or updating the bank balance.' });
+  }
+});
+
+
+
 
 app.get('/expenses/monthly', authenticateUser, async (req, res) => {
   const { month, year } = req.query;
@@ -652,5 +666,103 @@ app.get('/expenses/monthly', authenticateUser, async (req, res) => {
   } catch (error) {
     console.error('Error fetching expenses:', error);
     res.status(500).json({ error: 'An error occurred while fetching the expenses.' });
+  }
+});
+
+app.post('/income', authenticateUser, async (req, res) => {
+  const { category, amount, date, account } = req.body;  // Get 'account' instead of 'bank'
+  const userId = req.userId;
+
+  if (!category || !amount || !account) {
+    return res.status(400).json({ error: 'Category, amount, and account are required.' });
+  }
+
+  try {
+    // Try to find the selected bank using the 'account' name
+    let bank = await Bank.findOne({ name: account, userId });
+
+    if (!bank) {
+      // If the bank does not exist, create a new bank record with hardcoded values
+      bank = new Bank({
+        userId,
+        name: account,             // Bank name (from request)
+        accountNumber: 'None',     // Hardcoded value
+        type: 'Income',            // Hardcoded value
+        interestRate: 'None',      // Hardcoded value
+        rewards: '',               // Optional: Empty or set to default
+        balance: parseFloat(amount), // Set the balance to the income amount
+      });
+
+      // Save the new bank record
+      await bank.save();
+    } else {
+      // If the bank exists, check if it has a balance
+      if (bank.balance === undefined || bank.balance === null) {
+        // If no balance, initialize it with the income amount
+        bank.balance = parseFloat(amount);
+        await bank.save();
+      } else {
+        // Otherwise, add the income amount to the existing balance
+        bank.balance += parseFloat(amount);
+        await bank.save();
+      }
+    }
+
+    // Create new income record
+    const newIncome = new Income({
+      category,
+      amount: parseFloat(amount),
+      date: date || Date.now(),
+      bank: account,  // Store 'account' as 'bank'
+      userId,
+    });
+
+    // Save the income record
+    await newIncome.save();
+
+    // Send the response with the new income and updated bank balance
+    res.status(201).json({ newIncome, updatedBank: bank });
+  } catch (error) {
+    console.error('Saving Error:', error);
+    res.status(500).json({ error: 'An error occurred while saving the income.' });
+  }
+});
+
+
+
+
+app.get('/incomes/monthly', authenticateUser, async (req, res) => {
+  const { month, year } = req.query;
+  const userId = req.userId; // Assuming user ID is attached to the request
+
+  // Validate input fields
+  if (!month || !year) {
+    return res.status(400).json({ error: 'Month and year are required.' });
+  }
+
+  // Parse month and year to integers
+  const parsedMonth = parseInt(month);
+  const parsedYear = parseInt(year);
+
+  // Validate parsed values
+  if (isNaN(parsedMonth) || isNaN(parsedYear) || parsedMonth < 1 || parsedMonth > 12) {
+    return res.status(400).json({ error: 'Invalid month or year provided.' });
+  }
+
+  // Create date range: First day of the month to the last day of the month
+  const startDate = new Date(parsedYear, parsedMonth - 1, 1); // First day of the month
+  const endDate = new Date(parsedYear, parsedMonth, 0);
+
+  try {
+    // Query the database for incomes that fall within the month and year
+    const incomes = await Income.find({
+      userId,
+      date: { $gte: startDate, $lt: endDate }, // Use $gte (>=) and $lt (<) for range
+    });
+
+    res.status(200).json(incomes);
+  } catch (error) {
+    console.error('Error fetching incomes:', error);
+    res.status(500).json({ error: 'An error occurred while fetching the incomes.' });
   }
 });

@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import the Icon component
-import ExpenseStyle from '../Styles/ExpenseInput'; // Adjust the path as needed
-import AccountModal from './AccountModal'; // Adjust the path as needed
-import CategoryModal from './CategoryModal'; // Adjust the path as needed
-import axios from 'axios'; // To send HTTP requests
+import { View, Text, TouchableOpacity, Modal, Alert,TextInput } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import ExpenseStyle from '../Styles/ExpenseInput';
+import AccountModal from './AccountModal';
+import CategoryModal from './CategoryModal';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../Context/UserContext'; // Use UserContext for theme
-
 
 const IncomeInputScreen = ({ navigation }) => {
   const [isAccountModalVisible, setAccountModalVisible] = useState(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [currentDate, setCurrentDate] = useState('');
-  const [category, setCategory] = useState(''); // Category to be selected
-  const [amount, setAmount] = useState(''); // Amount input
-  const [selectedAccount, setSelectedAccount] = useState(null); // Selected account
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [amount, setAmount] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const { theme } = useUser(); // Retrieve theme from context
   const isDarkMode = theme === 'dark';
 
@@ -27,56 +27,104 @@ const IncomeInputScreen = ({ navigation }) => {
       setCurrentDate(`${date} | ${time}`);
     }, 1000);
 
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const handleNumberPress = (number) => {
-    setInputValue(inputValue + number);
+    setInputValue((prev) => prev + number);
+    setAmount((prev) => prev + number);
   };
 
   const handleClearPress = () => {
     setInputValue('');
+    setAmount('');
   };
 
   const handleDeletePress = () => {
-    setInputValue(inputValue.slice(0, -1)); // Remove last character
+    setInputValue((prev) => prev.slice(0, -1));
+    setAmount((prev) => prev.slice(0, -1));
   };
 
   const handleOperatorPress = (operator) => {
-    setInputValue(inputValue + operator);
+    setInputValue((prev) => prev + operator);
   };
 
   const handleEqualsPress = () => {
     try {
       const result = eval(inputValue);
       setInputValue(result.toString());
-      setAmount(result.toString()); // Set the result as amount
+      setAmount(result.toString());
     } catch (error) {
       setInputValue('Error');
+      setAmount('');
     }
   };
 
+  const handleSubmitIncome = async () => {
+    if (!selectedAccount || !selectedCategory) {
+      Alert.alert('Error', 'Please select an account and category.');
+      return;
+    }
+    if (!amount || isNaN(parseFloat(amount))) {
+      Alert.alert('Error', 'Please enter a valid numeric amount.');
+      return;
+    }
   
+    // Log the payload to debug
+    console.log("Submitting Income with Payload:", {
+      category: selectedCategory.name,
+      amount: parseFloat(amount),
+      account: selectedAccount.name,
+      date: new Date().toISOString(),
+    });
+  
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated.');
+        return;
+      }
+  
+      const payload = {
+        category: selectedCategory.name,  // Send the category name as a string
+        amount: parseFloat(amount),
+        account: selectedAccount.name,  // Send the selected account name
+        date: new Date().toISOString(),
+      };
+  
+      const response = await axios.post('http://192.168.1.100:3000/income', payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.status === 201) {
+        Alert.alert('Success', 'Income added successfully');
+        // Reset form state after successful submission
+        setInputValue('');
+        setAmount('');
+        setSelectedCategory(null);
+        setSelectedAccount(null);
+      }
+    } catch (error) {
+      console.error('Error:', error.response?.data || error.message);
+      Alert.alert('Error', error.response?.data?.error || 'Server Error');
+    }
+  };
+
+
   return (
-    <View style={[
-      ExpenseStyle.container,
-      { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }
-    ]}>
+    <View style={[ExpenseStyle.container, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
       <View style={ExpenseStyle.inputContainer}>
-        <Text style={ExpenseStyle.label}>
-          <TouchableOpacity
-            style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]}
-            onPress={() => navigation.navigate('IncomeInputScreen')}
-          >
+      <Text style={[ExpenseStyle.label, { color: isDarkMode ? '#FFF' : '#000' }]}>
+          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('IncomeInputScreen')}>
             <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Income</Text>
-            </TouchableOpacity>{' '}
-          |
-          <TouchableOpacity
-            style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]}
-            onPress={() => navigation.navigate('ExpenseInputScreen')}
-          >
+          </TouchableOpacity>
+          {' | '}
+          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('ExpenseInputScreen')}>
             <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Expense</Text>
-            </TouchableOpacity>
+          </TouchableOpacity>
         </Text>
 
         <View style={ExpenseStyle.modalButtonsContainer}>
@@ -85,112 +133,73 @@ const IncomeInputScreen = ({ navigation }) => {
   onPress={() => setAccountModalVisible(true)}
 >
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-  <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
-    <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} /> {selectedAccount ? selectedAccount.name : 'Account'}
+    <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+      <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} />{' '}
+      {selectedAccount ? selectedAccount.name : 'Select Account'}
     </Text>
   </View>
 </TouchableOpacity>
 
-<TouchableOpacity
-  style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}
-  onPress={() => setCategoryModalVisible(true)}
->
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-  <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
-    <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} /> {category || 'Category'}
-    </Text>
-  </View>
-</TouchableOpacity>
 
+          <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]} onPress={() => setCategoryModalVisible(true)}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>
+              <Icon name="user" size={20} color={isDarkMode ? '#FFF' : '#fff'} />{' '}
+                {selectedCategory ? selectedCategory.name : 'Select Category'}
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         <View>
-        <TouchableOpacity style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}>
+        <TouchableOpacity onPress={handleSubmitIncome} style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}>
         <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Submit Income</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={[ExpenseStyle.calculatorContainer, {backgroundColor: isDarkMode ? '#444' : '#FFF'}]}>
-          <View
-            style={[
-              ExpenseStyle.displayContainer,
-              {
-                backgroundColor: isDarkMode ? '#333' : '#EEE', borderColor: "#fff", borderWidth:2
-              },
-            ]}
-          >
-            <Text style={[ExpenseStyle.display, { color: isDarkMode ? '#FFF' : '#000' }]}>
-              {inputValue}
-            </Text>
-            <TouchableOpacity onPress={handleDeletePress} style={ExpenseStyle.deleteButton}>
-              <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>x</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={[ExpenseStyle.calculatorContainer, { backgroundColor: isDarkMode ? '#444' : '#FFF' }]}>
+  {/* Input Field */}
+  <TextInput
+    style={[
+      ExpenseStyle.inputField,
+      { backgroundColor: isDarkMode ? '#333' : '#FFF', borderColor: '#859F3D', borderWidth: 2 },
+    ]}
+    onChangeText={(value) => setAmount(value)} // Directly set the value as `amount`
+    value={amount} // Bind the value of the TextInput to the amount state
+    keyboardType="numeric" // Numeric input only
+    placeholder="Enter a number"
+    placeholderTextColor={isDarkMode ? '#BBB' : '#777'}
+  />
+</View>
 
-          {/* Buttons */}
-          {[
-            ['+', '7', '8', '9'],
-            ['-', '4', '5', '6'],
-            ['*', '1', '2', '3'],
-            ['/', '0', '.', '='],
-          ].map((row, index) => (
-            <View key={index} style={ExpenseStyle.row}>
-              {row.map((button) => (
-                <TouchableOpacity
-                  key={button}
-                  style={[
-                    ExpenseStyle.operatorButton,
-                    { backgroundColor: isDarkMode ? '#333' : '#F6FCDF',
-                      borderColor: isDarkMode ? '#fff': '#859F3D', // Add the borderColor
-                      borderWidth: 2, },
-                  ]}
-                  onPress={
-                    button === '='
-                      ? handleEqualsPress
-                      : button === 'C'
-                      ? handleClearPress
-                      : () => handleNumberPress(button)
-                  }
-                >
-                  <Text
-                    style={[
-                      ExpenseStyle.operatorButtonText,
-                      { color: isDarkMode ? '#FFF' : '#000' },
-                    ]}
-                  >
-                    {button}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
         </View>
 
+       
+          
         {/* Current Date */}
         <View style={[ExpenseStyle.dateContainer, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
           <Text style={[ExpenseStyle.dateText, { color: isDarkMode ? '#FFF' : '#000' }]}>
             {currentDate}
           </Text>
         </View>
-      </View>
+      
 
       {/* Account Modal */}
       <Modal transparent={true} visible={isAccountModalVisible} animationType="slide">
-        <AccountModal
-          closeModal={() => setAccountModalVisible(false)}
-          onSelectAccount={(account) => setSelectedAccount(account)}
-        />
+      <AccountModal
+        closeModal={() => setAccountModalVisible(false)}
+        onSelectAccount={(account) => setSelectedAccount(account)} // Set selected account
+        modalType="income"
+      />
       </Modal>
 
       {/* Category Modal */}
       <Modal transparent={true} visible={isCategoryModalVisible} animationType="slide">
-      <CategoryModal
-  closeModal={() => setCategoryModalVisible(false)}
-  onCategorySelect={(selectedCategory) => {
-    setCategory(selectedCategory.name); // Save the selected category name
-    console.log('Category Selected:', selectedCategory); // Debugging
-  }}
-/>
+        <CategoryModal
+          closeModal={() => setCategoryModalVisible(false)}
+          onCategorySelect={(category) => setSelectedCategory(category)}
+          modalType="income"
+        />
       </Modal>
     </View>
   );

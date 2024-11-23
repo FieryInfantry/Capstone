@@ -118,6 +118,81 @@ const BudgetStyles = StyleSheet.create({
       fontSize: 16,
       textAlign: "center",
     },
+    incomeExpenseContainer: {
+      padding: 16,
+    },
+    incomeExpenseText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    sectionHeader: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginTop: 16,
+    },
+    cardContainer: {
+      marginVertical: 8,
+    },
+    incomeCard: {
+      padding: 12,
+      backgroundColor: '#f1f1f1',
+      borderRadius: 8,
+    },
+    expenseCard: {
+      padding: 12,
+      backgroundColor: '#f8d7da',
+      borderRadius: 8,
+    },
+    incomeName: {
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    expenseName: {
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    incomeAmount: {
+      fontSize: 14,
+      color: '#28a745',
+    },
+    expenseAmount: {
+      fontSize: 14,
+      color: '#dc3545',
+    },
+    incomeDetailsContainer: {
+      marginTop: 8,
+    },
+    expenseDetailsContainer: {
+      marginTop: 8,
+    },
+    incomeCategory: {
+      fontSize: 12,
+      color: '#555',
+    },
+    expenseCategory: {
+      fontSize: 12,
+      color: '#555',
+    },
+    incomeDate: {
+      fontSize: 12,
+      color: '#555',
+    },
+    expenseDate: {
+      fontSize: 12,
+      color: '#555',
+    },
+    incomeBank: {
+      fontSize: 12,
+      color: '#007bff', // Adjust color as needed
+    },
+    expenseBank: {
+      fontSize: 12,
+      color: '#007bff', // Adjust color as needed
+    },
+    noDataText: {
+      fontSize: 14,
+      color: '#888',
+    },
   });
   
 

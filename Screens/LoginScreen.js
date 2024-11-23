@@ -97,7 +97,7 @@ const LoginScreen = () => {
     <View style={styles.container}>
       
       <Image source={require('../assets/logo.png')} style={styles.logo} />
-
+      
       <TextInput
         style={styles.input}
         placeholder="Enter your Email"

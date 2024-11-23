@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoryModalStyle from '../Styles/CategoryModalStyle';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // For fetching the token
 import { useUser } from '../Context/UserContext'; // Import the UserContext
-
 
 const categoryIconMapping = {
   'Baby': '🍼',
@@ -16,12 +14,10 @@ const categoryIconMapping = {
   // Add more mappings here as needed
 };
 
-
-const CategoryModal = ({ closeModal, onCategorySelect }) => {
+const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
   const [categories, setCategories] = useState([]); // State to store categories data
   const [loading, setLoading] = useState(true); // State to manage loading status
-
-  const { theme } = useUser(); // Now useContext is called before any effect
+  const { theme } = useUser(); // Always call useContext here (top-level)
 
   useEffect(() => {
     const getCategories = async () => {
@@ -36,13 +32,13 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch budgets');
+          throw new Error('Failed to fetch categories');
         }
 
         const data = await response.json();
-        console.log('Budgets:', data);
+        console.log('Categories:', data);
 
-        // Process budgets to create a list of unique categories
+        // Process categories to create a list
         const categoryData = data.reduce((acc, budget) => {
           if (!acc.find(item => item.name === budget.category)) {
             acc.push({
@@ -63,14 +59,6 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
 
     getCategories(); // Fetch categories on component mount
   }, []); // Empty dependency array ensures this effect runs only once
-
-  const handleCategorySelect = (category) => {
-    console.log('Selected Category:', category); // Debug the selected category
-    if (onCategorySelect) {
-      onCategorySelect(category); // Call the callback with selected category
-    }
-    closeModal(); // Close the modal
-  };
 
   if (loading) {
     return (
@@ -99,24 +87,39 @@ const CategoryModal = ({ closeModal, onCategorySelect }) => {
   return (
     <View style={modalContainerStyle}>
       <View style={modalBackground}>
-        <Text style={[CategoryModalStyle.title, {color: theme === 'dark' ? '#fff' : '#000'}]}>Select a category</Text>
-        {categories.length === 0 ? (
-          <Text>No categories available</Text>
+        {/* Conditionally render content based on modalType */}
+        <Text style={[CategoryModalStyle.title, { color: textColor }]}>
+          {modalType === 'expense' ? 'Select Expense Category' : 'Select Income Category'}
+        </Text>
+
+        {/* Dynamically display categories based on modalType */}
+        {modalType === 'expense' ? (
+          categories.length === 0 ? (
+            <Text>No categories available</Text>
+          ) : (
+            <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
+              {categories.map((category, index) => (
+                <TouchableOpacity
+                  key={index} // Use index if no unique ID is available
+                  style={[CategoryModalStyle.categoryButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
+                  onPress={() => {
+                    onCategorySelect(category); // Pass the selected category to the parent
+                    closeModal(); // Close the modal after selection
+                  }}
+                >
+                  <Text style={CategoryModalStyle.categoryLabel}>
+                    <Text>{category.icon}</Text>
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )
         ) : (
-          <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
-            {categories.map((category, index) => (
-              <TouchableOpacity
-                key={index} // Use index if no unique ID is available
-                style={[CategoryModalStyle.categoryButton, {backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D'}]}
-                onPress={() => handleCategorySelect(category)}
-              >
-                <Text style={CategoryModalStyle.categoryLabel}>
-                  {category.icon} {category.name} - ₱{category.budget.toFixed(2)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <Text style={{ color: textColor }}>Income categories are selected differently.</Text>
         )}
+
+        {/* Close button */}
         <TouchableOpacity onPress={closeModal} style={CategoryModalStyle.closeButton}>
           <Text style={CategoryModalStyle.closeButtonText}>Close</Text>
         </TouchableOpacity>

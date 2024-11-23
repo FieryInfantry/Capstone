@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState,useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import BudgetModal from "./SetBudgetModal"; // Ensure this component exists and is properly implemented
 import { useNavigation } from '@react-navigation/native';
@@ -25,7 +25,7 @@ const BudgetScreen = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [bankBalance, setBankBalance] = useState(0); // Add state for bank balance
   const [expenses, setExpenses] = useState([]); 
-  
+  const [incomes, setIncomes] = useState([]);
   // Fetch bank balance (simulated function)
   const fetchBankBalance = async () => {
     try {
@@ -93,6 +93,41 @@ const BudgetScreen = () => {
       Alert.alert('Error', 'An error occurred while fetching expenses.');
     }
   };
+
+  const fetchIncomes = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+  
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await fetch(
+        `http://192.168.1.100:3000/incomes/monthly?month=${month + 1}&year=${year}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Fetched incomes:', data);
+        setIncomes(data); // Store the incomes in the state
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error || 'Failed to fetch incomes.');
+      }
+    } catch (error) {
+      console.error('Error fetching incomes:', error);
+      Alert.alert('Error', 'An error occurred while fetching incomes.');
+    }
+  };
+  
   
   
   
@@ -317,9 +352,11 @@ const BudgetScreen = () => {
     fetchBudgets(); // Fetch the budgets when the month or year changes
   }, [month, year]);
   
-  useLayoutEffect(() => {
-    fetchExpenses(); // Fetch expenses when the month or year changes
+  useEffect(() => {
+    fetchExpenses();
+    fetchIncomes();
   }, [month, year]);
+  
 
   const calculateRemaining = (limit, spent) => Math.max(limit - spent, 0);
 
@@ -397,35 +434,88 @@ const BudgetScreen = () => {
     </View>
   );
 
-  const renderIncomeExpenseContent = () => (
-    <View style={styles.incomeExpenseContainer}>
-      <Text style={styles.incomeExpenseText}>Income & Expense:</Text>
-      {expenses.length > 0 ? (
-        <FlatList
-          data={expenses}
-          keyExtractor={(item) => item._id.toString()} // Ensure you're using the correct key
-          renderItem={({ item }) => {
-            const amount = item.amount; // No need to convert it anymore
+  const renderIncomeExpenseContent = () => {
+    // Helper function to limit the items to 5
+    const getLimitedItems = (items) => {
+      return items.slice(-5); // Slice the last 5 items
+    };
   
-            return (
-              <View style={styles.expenseCard}>
-                <Text style={styles.expenseName}>{item.name}</Text>
-                <Text style={styles.expenseAmount}>
-                  ₱{isNaN(amount) ? 'Invalid amount' : amount.toFixed(2)} {/* Display formatted amount */}
-                </Text>
-                <Text style={styles.expenseCategory}>Category: {item.category}</Text>
-                <Text style={styles.expenseDate}>
-                  Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
-                </Text>
-              </View>
-            );
-          }}
-        />
-      ) : (
-        <Text>No expenses for this month.</Text>
-      )}
-    </View>
-  );
+    return (
+      <View style={styles.incomeExpenseContainer}>
+        <Text style={styles.incomeExpenseText}>Income & Expense:</Text>
+  
+        {/* Income Section */}
+        <Text style={styles.sectionHeader}>Income</Text>
+        {incomes.length > 0 ? (
+          <FlatList
+            data={getLimitedItems(incomes)} // Limit the number of income items to 5
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item }) => {
+              console.log('Income item:', item); // Debug log
+              const amount = parseFloat(item.amount); // Ensure amount is a number
+  
+              return (
+                <View style={styles.cardContainer}>
+                  <View style={styles.incomeCard}>
+                    <Text style={styles.incomeName}>{item.name}</Text>
+                    <Text style={styles.incomeAmount}>
+                      ₱+{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
+                    </Text>
+                    <View style={styles.incomeDetailsContainer}>
+                      <Text style={styles.incomeCategory}>Category: {item.category}</Text>
+                      <Text style={styles.incomeDate}>
+                        Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
+                      </Text>
+                      <Text style={styles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            }}
+          />
+        ) : (
+          <Text style={styles.noDataText}>No income for this month.</Text>
+        )}
+  
+        {/* Expense Section */}
+        <Text style={styles.sectionHeader}>Expenses</Text>
+        {expenses.length > 0 ? (
+          <FlatList
+            data={getLimitedItems(expenses)} // Limit the number of expense items to 5
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item }) => {
+              console.log('Expense item:', item); // Debug log
+              const amount = parseFloat(item.amount); // Ensure amount is a number
+  
+              return (
+                <View style={styles.cardContainer}>
+                  <View style={styles.expenseCard}>
+                    <Text style={styles.expenseName}>{item.name}</Text>
+                    <Text style={styles.expenseAmount}>
+                      ₱-{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
+                    </Text>
+                    <View style={styles.expenseDetailsContainer}>
+                      <Text style={styles.expenseCategory}>Category: {item.category}</Text>
+                      <Text style={styles.expenseDate}>
+                        Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
+                      </Text>
+                      <Text style={styles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
+                    </View>
+                  </View>
+                </View>
+              );
+            }}
+          />
+        ) : (
+          <Text style={styles.noDataText}>No expenses for this month.</Text>
+        )}
+      </View>
+    );
+  };
+  
+  
+  
+  
   
   return (
     <View style={styles.container}>
@@ -439,18 +529,27 @@ const BudgetScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.navBar}>
-        <TouchableOpacity
-          style={[styles.navButton, activeScreen === "Budget" && styles.activeButton]}
-          onPress={() => setActiveScreen("Budget")}
-        >
-          <Text style={styles.navButtonText}>Budget</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.navButton, activeScreen === "IncomeExpense" && styles.activeButton]}
-          onPress={() => setActiveScreen("IncomeExpense")}
-        >
-          <Text style={styles.navButtonText}>Income & Expense</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+  style={[
+    styles.navButton,
+    { backgroundColor: activeScreen === "Budget" ? "#FFFFFF" : "#D3D3D3" }, // White for active, gray for inactive
+    activeScreen === "Budget" && styles.activeButton,
+  ]}
+  onPress={() => setActiveScreen("Budget")}
+>
+  <Text style={styles.navButtonText}>Budget</Text>
+</TouchableOpacity>
+<TouchableOpacity
+  style={[
+    styles.navButton,
+    { backgroundColor: activeScreen === "IncomeExpense" ? "#FFFFFF" : "#D3D3D3" }, // White for active, gray for inactive
+    activeScreen === "IncomeExpense" && styles.activeButton,
+  ]}
+  onPress={() => setActiveScreen("IncomeExpense")}
+>
+  <Text style={styles.navButtonText}>Income & Expense</Text>
+</TouchableOpacity>
+
       </View>
 
       {/* Display the bank balance */}
