@@ -669,6 +669,7 @@ app.get('/expenses/monthly', authenticateUser, async (req, res) => {
   }
 });
 
+
 app.post('/income', authenticateUser, async (req, res) => {
   const { category, amount, date, account } = req.body;  // Get 'account' instead of 'bank'
   const userId = req.userId;
@@ -764,5 +765,55 @@ app.get('/incomes/monthly', authenticateUser, async (req, res) => {
   } catch (error) {
     console.error('Error fetching incomes:', error);
     res.status(500).json({ error: 'An error occurred while fetching the incomes.' });
+  }
+});
+
+app.delete('/api/incomes/:id', async (req, res) => {
+  try {
+    const incomeId = req.params.id;
+    const income = await Income.findByIdAndDelete(incomeId); // Deletes the income by its ID
+
+    if (!income) {
+      console.log(`Income not found with ID: ${incomeId}`);
+      return res.status(404).json({ message: 'Income not found' });
+    }
+
+    console.log(`Income with ID: ${incomeId} deleted successfully`);
+    res.status(200).json({ message: 'Income deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting income:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Route for deleting income with authentication middleware
+app.delete('/api/incomes/:id', authenticateUser, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedIncome = await Income.findOneAndDelete({ _id: id, userId: req.userId }); // Delete income by ID and userId
+    if (!deletedIncome) {
+      return res.status(404).json({ error: 'Income not found or not authorized' });
+    }
+
+    res.status(204).send(); // Successful deletion
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Route for deleting expense with authentication middleware
+app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedExpense = await Expense.findOneAndDelete({ _id: id, userId: req.userId }); // Delete expense by ID and userId
+    if (!deletedExpense) {
+      return res.status(404).json({ error: 'Expense not found or not authorized' });
+    }
+
+    res.status(204).send(); // Successful deletion
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });

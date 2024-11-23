@@ -18,7 +18,7 @@ const ExpenseInputScreen = ({ navigation }) => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const { theme } = useUser(); // Retrieve theme from context
   const isDarkMode = theme === 'dark';
-
+  const { budgets, setBudgets } = useUser();
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -70,7 +70,6 @@ const ExpenseInputScreen = ({ navigation }) => {
       return;
     }
   
-    // Log the payload to debug
     console.log("Submitting Expense with Payload:", {
       category: selectedCategory.name,
       amount: parseFloat(amount),
@@ -100,6 +99,15 @@ const ExpenseInputScreen = ({ navigation }) => {
       });
   
       if (response.status === 201) {
+        // Update the budget spent amount
+        setBudgets((prevBudgets) => {
+          const updatedBudgets = { ...prevBudgets };
+          if (updatedBudgets[selectedCategory.name]) {
+            updatedBudgets[selectedCategory.name].spent += parseFloat(amount);
+          }
+          return updatedBudgets;
+        });
+  
         Alert.alert('Success', 'Expense added successfully');
         // Reset form state after successful submission
         setInputValue('');
@@ -112,6 +120,7 @@ const ExpenseInputScreen = ({ navigation }) => {
       Alert.alert('Error', error.response?.data?.error || 'Server Error');
     }
   };
+  
   
   
   

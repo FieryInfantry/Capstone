@@ -7,7 +7,7 @@ export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [token, setToken] = useState(null); // Store token separately
   const [theme, setTheme] = useState('light'); // Default theme is light
-
+  const [budgets, setBudgets] = useState({});
   // Load the theme from AsyncStorage when the app starts
   useEffect(() => {
     const loadTheme = async () => {
@@ -36,9 +36,9 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ userData, setUserData, token, setToken, theme, toggleTheme }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={{ userData, setUserData, token, setToken, theme, toggleTheme, budgets, setBudgets }}>
+  {children}
+</UserContext.Provider>
   );
 };
 

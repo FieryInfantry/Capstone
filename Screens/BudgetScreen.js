@@ -157,9 +157,9 @@ const BudgetScreen = () => {
     return monthNames[monthIndex];
   };
 
-  const handleOpenModal = (categoryName) => {
-    setSelectedCategory(categoryName);
-    setModalVisible(true);
+  const handleOpenModal = (itemName) => {
+    setSelectedItem(itemName);  // Store the selected item
+    setModalVisible(true);  // Open the modal
   };
 
   const handleSaveBudget = async (categoryName, amount, currentDate) => {
@@ -175,9 +175,14 @@ const BudgetScreen = () => {
   
     try {
       const token = await AsyncStorage.getItem('authToken');
-      
-      // Fetch the total bank balance from the backend
-      const bankBalanceResponse = await fetch('http://localhost:3000/banks/balances', {
+  
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      // Fetch the bank balance from the backend
+      const bankBalanceResponse = await fetch('http://192.168.1.100:3000/banks/balances', { // Replace with your IP
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -189,37 +194,15 @@ const BudgetScreen = () => {
       }
   
       const bankBalanceData = await bankBalanceResponse.json();
-      const bankBalance = bankBalanceData.totalBalance;
+      const bankBalance = bankBalanceData.totalBalance; // Assume bankBalance contains the available balance
   
-      // Calculate the total amount of all budgets
-      const totalBudgetResponse = await fetch('http://localhost:3000/budget/total', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-  
-      if (!totalBudgetResponse.ok) {
-        Alert.alert('Error', 'Failed to fetch total budget');
-        return;
-      }
-  
-      const totalBudgetData = await totalBudgetResponse.json();
-      const totalBudget = totalBudgetData.total;
-  
-      // Check if the new budget exceeds the bank balance or the total budget
-      if (amountFloat + totalBudget > bankBalance) {
-        Alert.alert('Error', 'The total budget exceeds the bank balance');
-        return;
-      }
-  
-      // Check if the individual budget exceeds the bank balance
       if (amountFloat > bankBalance) {
-        Alert.alert('Error', 'The individual budget exceeds the bank balance');
+        Alert.alert('Error', 'The budget exceeds the available bank balance');
         return;
       }
   
-      // If all checks pass, save the budget
-      const response = await fetch('http://localhost:3000/budget', {
+      // Save the budget to the backend
+      const response = await fetch('http://192.168.1.100:3000/budget', { // Replace with your IP
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -250,6 +233,8 @@ const BudgetScreen = () => {
       Alert.alert('Error', 'An error occurred while saving the budget');
     }
   };
+  
+  
   
   
   const fetchBudgets = async () => {
@@ -358,81 +343,156 @@ const BudgetScreen = () => {
   }, [month, year]);
   
 
+  const deleteIncome = async (id) => {
+    const url = `/api/incomes/${id}`;
+    try {
+      // Get the token from AsyncStorage
+      const token = await AsyncStorage.getItem('authToken');
+      
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include token in the request
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Failed to delete income');
+      }
+  
+      alert('Income deleted successfully.');
+      // Update state to remove the deleted income
+      setIncomes((prevIncomes) => prevIncomes.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error('Error deleting income:', error);
+      alert('Error deleting income');
+    }
+  };
+  
+  const deleteExpense = async (id) => {
+    const url = `/api/expenses/${id}`;
+    try {
+      // Get the token from AsyncStorage
+      const token = await AsyncStorage.getItem('authToken');
+      
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include token in the request
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Failed to delete expense');
+      }
+  
+      alert('Expense deleted successfully.');
+      // Update state to remove the deleted expense
+      setExpenses((prevExpenses) => prevExpenses.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      alert('Error deleting expense');
+    }
+  };
+
+  
   const calculateRemaining = (limit, spent) => Math.max(limit - spent, 0);
 
-  const renderBudgetContent = () => (
-    <View>
-      <View style={styles.summary}>
-        <Text style={styles.summaryText}>TOTAL BUDGET</Text>
-        <Text style={styles.summaryAmount}>
-          ₱{Object.values(budgets).reduce((sum, b) => sum + (b.limit || 0), 0).toFixed(2)}
+  const renderBudgetContent = () => {
+    // Calculate spent dynamically based on expenses
+    const updatedBudgets = Object.entries(budgets).reduce((acc, [category, details]) => {
+      const categoryExpenses = expenses.filter((expense) => expense.category === category);
+      const totalSpent = categoryExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+  
+      acc[category] = { ...details, spent: totalSpent }; // Update spent property
+      return acc;
+    }, {});
+  
+    return (
+      <View>
+        {/* Summary Section */}
+        <View style={styles.summary}>
+          <Text style={styles.summaryText}>TOTAL BUDGET</Text>
+          <Text style={styles.summaryAmount}>
+            ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.limit || 0), 0).toFixed(2)}
+          </Text>
+          <Text style={styles.summaryText}>TOTAL SPENT</Text>
+          <Text style={styles.summaryAmountSpent}>
+            ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.spent || 0), 0).toFixed(2)}
+          </Text>
+        </View>
+  
+        {/* Budgeted Categories */}
+        <Text style={styles.sectionHeader}>
+          Budgeted categories: {getMonthName(month)}, {year}
         </Text>
-        <Text style={styles.summaryText}>TOTAL SPENT</Text>
-        <Text style={styles.summaryAmountSpent}>
-          ₱{Object.values(budgets).reduce((sum, b) => sum + (b.spent || 0), 0).toFixed(2)}
-        </Text>
-      </View>
-
-      <Text style={styles.sectionHeader}>Budgeted categories: {getMonthName(month)}, {year}</Text>
-      {Object.keys(budgets).length > 0 ? (
-        <FlatList
-          data={Object.entries(budgets).map(([name, details]) => ({
-            name,
-            ...details,
-          }))}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => (
-            <View style={styles.budgetCard}>
-              <Text style={styles.budgetCardHeader}>{item.name}</Text>
-              <Text style={styles.budgetDetails}>Limit: ₱{item.limit.toFixed(2)}</Text>
-              <Text style={styles.budgetDetails}>Spent: ₱{item.spent.toFixed(2)}</Text>
-              <Text style={styles.budgetDetails}>
-                Remaining: ₱{calculateRemaining(item.limit, item.spent).toFixed(2)}
-              </Text>
-              <View style={styles.progressBar}>
-                <View
-                  style={{
-                    ...styles.progress,
-                    width: `${Math.min((item.spent / item.limit) * 100, 100)}%`,
-                    backgroundColor: item.spent > item.limit ? 'red' : '#4caf50',
-                  }}
-                />
+        {Object.keys(updatedBudgets).length > 0 ? (
+          <FlatList
+            data={Object.entries(updatedBudgets).map(([name, details]) => ({
+              name,
+              ...details,
+            }))}
+            keyExtractor={(item) => item.name}
+            renderItem={({ item }) => (
+              <View style={styles.budgetCard}>
+                <Text style={styles.budgetCardHeader}>{item.name}</Text>
+                <Text style={styles.budgetDetails}>Limit: ₱{item.limit.toFixed(2)}</Text>
+                <Text style={styles.budgetDetails}>Spent: ₱{item.spent.toFixed(2)}</Text>
+                <Text style={styles.budgetDetails}>
+                  Remaining: ₱{calculateRemaining(item.limit, item.spent).toFixed(2)}
+                </Text>
+                <View style={styles.progressBar}>
+                  <View
+                    style={{
+                      ...styles.progress,
+                      width: `${Math.min((item.spent / item.limit) * 100, 100)}%`,
+                      backgroundColor: item.spent > item.limit ? "red" : "#4caf50",
+                    }}
+                  />
+                </View>
+                {item.spent > item.limit && <Text style={styles.limitExceeded}>*Limit exceeded</Text>}
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => deleteBudget(item.name)}
+                >
+                  <Text style={styles.deleteButtonText}>DELETE</Text>
+                </TouchableOpacity>
               </View>
-              {item.spent > item.limit && <Text style={styles.limitExceeded}>*Limit exceeded</Text>}
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => deleteBudget(item.name)}
-              >
-                <Text style={styles.deleteButtonText}>DELETE</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        />
-      ) : (
-        <Text style={styles.noBudgetText}>
-          No budgets set for this month. Start by setting your budgets below.
-        </Text>
-      )}
-
-      <Text style={styles.sectionHeader}>Not budgeted this month</Text>
-      <FlatList
-        data={categories.filter((category) => !budgets[category.name])}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.categoryRow}>
-            <Text style={styles.categoryIcon}>{item.icon}</Text>
-            <Text style={styles.categoryName}>{item.name}</Text>
-            <TouchableOpacity
-              style={styles.setBudgetButton}
-              onPress={() => handleOpenModal(item.name)}
-            >
-              <Text style={styles.setBudgetButtonText}>SET</Text>
-            </TouchableOpacity>
-          </View>
+            )}
+          />
+        ) : (
+          <Text style={styles.noBudgetText}>
+            No budgets set for this month. Start by setting your budgets below.
+          </Text>
         )}
-      />
-    </View>
-  );
+  
+<Text style={styles.sectionHeader}>Manage Budget</Text>
+<TouchableOpacity
+  style={styles.setBudgetButton}
+  onPress={() => setModalVisible(true)}  // Open the modal without passing an item name
+>
+  <Text style={styles.setBudgetButtonText}>SET</Text>
+</TouchableOpacity>
+
+      </View>
+    );
+  };
+  
+  
 
   const renderIncomeExpenseContent = () => {
     // Helper function to limit the items to 5
@@ -451,7 +511,6 @@ const BudgetScreen = () => {
             data={getLimitedItems(incomes)} // Limit the number of income items to 5
             keyExtractor={(item) => item._id.toString()}
             renderItem={({ item }) => {
-              console.log('Income item:', item); // Debug log
               const amount = parseFloat(item.amount); // Ensure amount is a number
   
               return (
@@ -468,6 +527,18 @@ const BudgetScreen = () => {
                       </Text>
                       <Text style={styles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
                     </View>
+  
+                    {/* Red TouchableOpacity for Delete */}
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: 'red', // Red background
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={() => deleteIncome(item._id)} // Specific delete function for income
+                    >
+                      <Text style={{ color: 'white' }}>Delete</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               );
@@ -484,7 +555,6 @@ const BudgetScreen = () => {
             data={getLimitedItems(expenses)} // Limit the number of expense items to 5
             keyExtractor={(item) => item._id.toString()}
             renderItem={({ item }) => {
-              console.log('Expense item:', item); // Debug log
               const amount = parseFloat(item.amount); // Ensure amount is a number
   
               return (
@@ -501,6 +571,18 @@ const BudgetScreen = () => {
                       </Text>
                       <Text style={styles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
                     </View>
+  
+                    {/* Red TouchableOpacity for Delete */}
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: 'red', // Red background
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={() => deleteExpense(item._id)} // Specific delete function for expense
+                    >
+                      <Text style={{ color: 'white' }}>Delete</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               );

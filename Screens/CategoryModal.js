@@ -14,6 +14,17 @@ const categoryIconMapping = {
   // Add more mappings here as needed
 };
 
+const incomeCategoryIconMapping = {
+  'Awards': '🏆',
+  'Coupons': '🎟️',
+  'Grants': '💰',
+  'Lottery': '🎰',
+  'Refunds': '🔙',
+  'Rental': '🏠',
+  'Salary': '💵',
+  'Sale': '🛍️',
+};
+
 const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
   const [categories, setCategories] = useState([]); // State to store categories data
   const [loading, setLoading] = useState(true); // State to manage loading status
@@ -38,7 +49,7 @@ const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
         const data = await response.json();
         console.log('Categories:', data);
 
-        // Process categories to create a list
+        // Process categories to create a list for expense categories
         const categoryData = data.reduce((acc, budget) => {
           if (!acc.find(item => item.name === budget.category)) {
             acc.push({
@@ -48,8 +59,15 @@ const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
             });
           }
           return acc;
-        }, []); 
-        setCategories(categoryData);
+        }, []);
+
+        // Add income categories as well
+        const incomeCategories = Object.keys(incomeCategoryIconMapping).map(category => ({
+          name: category,
+          icon: incomeCategoryIconMapping[category],
+        }));
+
+        setCategories({ expense: categoryData, income: incomeCategories });
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -94,13 +112,13 @@ const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
 
         {/* Dynamically display categories based on modalType */}
         {modalType === 'expense' ? (
-          categories.length === 0 ? (
+          categories.expense.length === 0 ? (
             <Text>No categories available</Text>
           ) : (
             <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
-              {categories.map((category, index) => (
+              {categories.expense.map((category, index) => (
                 <TouchableOpacity
-                  key={index} // Use index if no unique ID is available
+                  key={index}
                   style={[CategoryModalStyle.categoryButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
                   onPress={() => {
                     onCategorySelect(category); // Pass the selected category to the parent
@@ -115,9 +133,29 @@ const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
               ))}
             </ScrollView>
           )
-        ) : (
-          <Text style={{ color: textColor }}>Income categories are selected differently.</Text>
-        )}
+        ) : modalType === 'income' ? (
+          categories.income.length === 0 ? (
+            <Text>No income categories available</Text>
+          ) : (
+            <ScrollView contentContainerStyle={CategoryModalStyle.categoriesContainer}>
+              {categories.income.map((category, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[CategoryModalStyle.categoryButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
+                  onPress={() => {
+                    onCategorySelect(category); // Pass the selected category to the parent
+                    closeModal(); // Close the modal after selection
+                  }}
+                >
+                  <Text style={CategoryModalStyle.categoryLabel}>
+                    <Text>{category.icon}</Text>
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )
+        ) : null}
 
         {/* Close button */}
         <TouchableOpacity onPress={closeModal} style={CategoryModalStyle.closeButton}>
