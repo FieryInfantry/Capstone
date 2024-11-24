@@ -157,10 +157,6 @@ const BudgetScreen = () => {
     return monthNames[monthIndex];
   };
 
-  const handleOpenModal = (itemName) => {
-    setSelectedItem(itemName);  // Store the selected item
-    setModalVisible(true);  // Open the modal
-  };
 
   const handleSaveBudget = async (categoryName, amount, currentDate) => {
     const amountFloat = parseFloat(amount); // Convert to float

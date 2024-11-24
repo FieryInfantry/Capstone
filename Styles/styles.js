@@ -134,11 +134,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor:'rgba(255, 255, 255, 0.8)', // Adjusted to make the background slightly visible
   },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',  // Center modal vertically
+    alignItems: 'center',      // Center modal horizontally
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',  // White with 80% opacity
+  },
   modalView: {
-    backgroundColor: '#fff', // Matching background color
+    width: '80%',  // Adjust width as needed
     padding: 20,
+    backgroundColor: 'white',
     borderRadius: 10,
-    width: '80%',
+    elevation: 5,  // For Android shadow
+    shadowColor: '#000',  // For iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   modalTitle: {
     fontSize: 20,

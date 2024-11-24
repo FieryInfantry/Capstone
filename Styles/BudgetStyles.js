@@ -193,6 +193,30 @@ const BudgetStyles = StyleSheet.create({
       fontSize: 14,
       color: '#888',
     },
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    deleteButton: {
+      backgroundColor: 'blue', // Adjust the color to match your desired style
+      padding: 10,
+      borderRadius: 5,
+    },
+    deleteButtonText: {
+      color: 'white',
+      fontSize: 16,
+    },
+    modalView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+    },
+    modalText: {
+      color: 'white',
+      fontSize: 18,
+    },
   });
   
 
