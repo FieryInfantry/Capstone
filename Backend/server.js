@@ -499,6 +499,54 @@ app.get('/investments', authenticateUser, async (req, res) => {
   }
 });
 
+// Delete Investment
+app.delete('/investments/:id', authenticateUser, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedInvestment = await Investment.findOneAndDelete({ _id: id, userId: req.userId });
+    if (!deletedInvestment) {
+      return res.status(404).json({ error: 'Investment not found or not authorized' });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
+app.put('/investments/:id', authenticateUser, async (req, res) => {
+  const { id } = req.params;
+  const { investmentAmount, interestRate, duration, predictedValues } = req.body;
+
+  // Validate required fields
+  if (investmentAmount === undefined || interestRate === undefined || duration === undefined) {
+    return res.status(400).json({ error: 'Investment Amount, Interest Rate, and Duration are required.' });
+  }
+
+  try {
+    // Update the investment in the database
+    const updatedInvestment = await Investment.findOneAndUpdate(
+      { _id: id, userId: req.userId }, // Ensure the investment belongs to the authenticated user
+      { investmentAmount, interestRate, duration, predictedValues }, // Update these fields (predictedValues is optional)
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedInvestment) {
+      return res.status(404).json({ error: 'Investment not found or not authorized' });
+    }
+
+    // Return the updated investment data
+    res.json(updatedInvestment);
+  } catch (error) {
+    console.error('Error updating investment:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
+
 
 app.post('/budget', authenticateUser, async (req, res) => {
   const { category, amount, month, year } = req.body;

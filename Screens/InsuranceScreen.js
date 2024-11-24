@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { FlatList } from 'react-native';
 import ReusableModal from './AlertModal';
-
+import styles from '../Styles/styles';
 
 const InsuranceScreen = () => {
   const { theme } = useUser(); // Access theme from context
@@ -29,8 +29,21 @@ const InsuranceScreen = () => {
   const [potentialBenefits, setPotentialBenefits] = useState('');
   const [insuranceList, setInsuranceList] = useState([]);
   const [selectedInsuranceId, setSelectedInsuranceId] = useState(null);
+  const [investmentList, setInvestmentList] = useState([]);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [investmentAmount, setInvestmentAmount] = useState('');
+  const [duration, setDuration] = useState('1'); // Default duration as string
+  const [predictedValues, setPredictedValues] = useState([]);
+  const [selectedInvestment, setSelectedInvestment] = useState(null);
+
 
   const navigation = useNavigation(); // For navigation control
+
+  const handleUpdateInvestment = (item) => {
+    setSelectedInvestment(item);  // Set the investment to be updated
+    setIsUpdateModalVisible(true); // Open the update modal
+  };
+
 
   useEffect(() => {
     navigation.setOptions({
@@ -50,7 +63,8 @@ const InsuranceScreen = () => {
   }, [navigation]);
 
   useEffect(() => {
-    fetchInsurances(); // Fetch insurance data when the component mounts
+    fetchInsurances();
+    fetchInvestments(); // Fetch insurance data when the component mounts
   }, []);
 
   const fetchInsurances = async () => {
@@ -71,6 +85,26 @@ const InsuranceScreen = () => {
       Alert.alert('Error', 'Failed to fetch insurance data. Please try again later.');
     }
   };
+
+  const fetchInvestments = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await axios.get('http://localhost:3000/investments', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      setInvestmentList(response.data); // Assuming you have a state for storing investments
+    } catch (error) {
+      console.error('Error fetching investments:', error);
+      Alert.alert('Error', 'Failed to fetch investment data. Please try again later.');
+    }
+  };
+  
 
   const handleUpdate = (insurance) => {
     setSelectedInsuranceId(insurance._id);
@@ -116,6 +150,7 @@ const InsuranceScreen = () => {
     }
   };
 
+  
   const handleDelete = async (insuranceId) => {
     try {
       const userToken = await AsyncStorage.getItem('authToken');
@@ -138,6 +173,61 @@ const InsuranceScreen = () => {
       Alert.alert('Error', 'Failed to delete insurance policy');
     }
   };
+
+  const handleDeleteInvestment = async (investmentId) => {
+    try {
+      const userToken = await AsyncStorage.getItem('authToken');
+      if (!userToken) {
+        Alert.alert('Error', 'User is not authenticated. Please log in.');
+        return;
+      }
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      };
+  
+      await axios.delete(`http://localhost:3000/investments/${investmentId}`, config);
+      Alert.alert('Success', 'Investment deleted successfully');
+      fetchInvestments(); // Call the fetch function to refresh the investment list
+    } catch (error) {
+      console.error('Error deleting investment:', error);
+      Alert.alert('Error', 'Failed to delete investment');
+    }
+  };
+
+  const handleSaveInvestment = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem('authToken');
+      if (!userToken) {
+        Alert.alert('Error', 'User is not authenticated. Please log in.');
+        return;
+      }
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      };
+  
+      const investmentData = {
+        investmentAmount,
+        interestRate,
+        duration,
+        predictedValues,
+      };
+  
+      await axios.put(`http://localhost:3000/investments/${item._id}`, investmentData, config);
+      Alert.alert('Success', 'Investment updated successfully');
+      fetchInvestments(); // Refresh the investment list
+      setModalVisible(false); // Close the modal
+    } catch (error) {
+      console.error('Error updating investment:', error);
+      Alert.alert('Error', 'Failed to update investment');
+    }
+  };
+  
 
   const handleAddSave = async () => {
     const newInsurance = {
@@ -202,68 +292,68 @@ const InsuranceScreen = () => {
   };
   const inputBackground = theme === 'dark' ? '#333' : '#FFF';
   const border = theme === 'dark' ? "1a1a19" : "#859F3D";
-
-  return (
-    <View style={containerStyle}>
-     <View style={{ padding: 20 }}>
-  {insuranceList.length === 0 ? (
-    <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16 }}>
-      No insurance policies available. Please add an insurance policy.
-    </Text>
-  ) : (
-    <FlatList
-      data={insuranceList}
-      keyExtractor={(item) => item._id}
-      renderItem={({ item }) => (
-        <View
-          style={{
-            marginVertical: 10,
-            padding: 15,
-            borderRadius: 8,
-            backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
-          }}
-        >
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-            Provider: {item.provider}
-          </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-            Policy Name: {item.policyName}
-          </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-            Coverage Type: {item.coverageType}
-          </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-            Premium: {item.premium} annually
-          </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-            Interest Rate: {item.interestRate}
-          </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-            Potential Benefits: {item.potentialBenefits}
-          </Text>
-
-          {/* Container for buttons */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-            <TouchableOpacity
+  
+return (
+  <View style={containerStyle}>
+    <View style={{ padding: 20 }}>
+      {/* Insurance Section */}
+      {insuranceList.length === 0 ? (
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16 }}>
+          No insurance policies available. Please add an insurance policy.
+        </Text>
+      ) : (
+        <FlatList
+          data={insuranceList}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View
               style={{
-                padding: 10,
-                backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
-                borderRadius: 5,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 40,
-                elevation: 2,
-                flex: 1,
-                marginRight: 10,
+                marginVertical: 10,
+                padding: 15,
+                borderRadius: 8,
+                backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
               }}
-              onPress={() => handleUpdate(item)}
             >
-              <Icon name="edit" size={20} color="#333" />
-              <Text style={{ color: 'white', marginLeft: 5 }}>Edit</Text>
-            </TouchableOpacity>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Provider: {item.provider}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Policy Name: {item.policyName}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Coverage Type: {item.coverageType}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Premium: {item.premium} annually
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Interest Rate: {item.interestRate}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Potential Benefits: {item.potentialBenefits}
+              </Text>
 
-            <TouchableOpacity
+              {/* Buttons for insurance */}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
+                    borderRadius: 5,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: 40,
+                    elevation: 2,
+                    flex: 1,
+                    marginRight: 10,
+                  }}
+                  onPress={() => handleUpdate(item)}
+                >
+                  <Icon name="edit" size={20} color="#333" />
+                  <Text style={{ color: 'white', marginLeft: 5 }}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
               style={{
                 padding: 10,
                 backgroundColor: 'red',
@@ -286,17 +376,112 @@ const InsuranceScreen = () => {
         onClose={() => setDeleteModalVisible(false)}
         title="Confirm Delete"
         message="Are you sure you want to delete this item? This action cannot be undone."
-        onConfirm={() => handleDelete(item._id) }
+        onConfirm={async () => {
+          await handleDelete(item._id);  // Handle the deletion
+          setDeleteModalVisible(false);  // Close the modal after successful deletion
+        }}
         confirmText="Delete"
         cancelText="Cancel"
         
       />
-          </View>
-        </View>
+              </View>
+            </View>
+          )}
+        />
       )}
-    />
-  )}
-</View>
+
+{/* Investment Section */}
+{investmentList.length === 0 ? (
+  <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 16, marginTop: 20 }}>
+    No investments available. Please add an investment.
+  </Text>
+) : (
+  <FlatList
+    data={investmentList}
+    keyExtractor={(item) => item._id}
+    renderItem={({ item }) => (
+      <View
+        style={{
+          marginVertical: 10,
+          padding: 15,
+          borderRadius: 8,
+          backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+        }}
+      >
+        {/* Investment Amount */}
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          Investment Amount: {item.investmentAmount}
+        </Text>
+
+        {/* Interest Rate */}
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          Interest Rate: {item.interestRate}%
+        </Text>
+
+        {/* Duration (Years) */}
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          Duration: {item.duration} Years
+        </Text>
+
+        {/* Buttons for investment */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D',
+              borderRadius: 5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 40,
+              elevation: 2,
+              flex: 1,
+              marginRight: 10,
+            }}
+            onPress={() => handleUpdateInvestment(item)} // Call the update function for investment
+          >
+            <Icon name="edit" size={20} color="#333" />
+            <Text style={{ color: 'white', marginLeft: 5 }}>Edit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              backgroundColor: 'red',
+              borderRadius: 5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 40,
+              elevation: 2,
+              flex: 1,
+            }}
+            onPress={() => setDeleteModalVisible(true)}
+          >
+            <Icon name="delete" size={20} color="#333" />
+            <Text style={{ color: 'white', marginLeft: 5 }}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ReusableModal
+          visible={isModalVisible}
+          onClose={() => setDeleteModalVisible(false)}
+          title="Confirm Delete"
+          message="Are you sure you want to delete this item? This action cannot be undone."
+          onConfirm={async () => {
+            await handleDeleteInvestment(item._id); // Handle the deletion
+            setDeleteModalVisible(false); // Close the modal after successful deletion
+          }}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+      </View>
+    )}
+  />
+)}
+
+    </View>
+
 
 
       {/* Modal for updating insurance details */}
@@ -518,7 +703,7 @@ const InsuranceScreen = () => {
             />
 
             <View style={InsuranceStyle.buttonContainer}>
-            <TouchableOpacity style={[InsuranceStyle.button, {backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D'}]} onPress={handleSave}>
+            <TouchableOpacity style={[InsuranceStyle.button, {backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D'}]} onPress={handleAddSave}>
                 <Text style={InsuranceStyle.buttonText}>Add Insurance </Text>
               </TouchableOpacity>
               <TouchableOpacity style={[InsuranceStyle.button, {backgroundColor: theme === 'dark' ? 'red' : 'red'}]} onPress={handleCancel}>
@@ -528,6 +713,106 @@ const InsuranceScreen = () => {
           </View>
         </View>
       </Modal>
+
+      <Modal transparent={true} visible={isUpdateModalVisible} animationType="slide">
+  <View style={styles.modalBackground}>
+    <View style={styles.modalView}>
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 20 }}>
+        Edit Investment Details
+      </Text>
+
+      {/* Investment Amount */}
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Investment Amount:</Text>
+      <TextInput
+        style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
+        value={selectedInvestment?.investmentAmount || ''}  // Make sure you're binding to 'investmentAmount' key
+        onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, investmentAmount: text }))}
+        keyboardType="numeric"
+      />
+
+      {/* Interest Rate */}
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate (%)</Text>
+      <TextInput
+        style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
+        value={selectedInvestment?.interestRate || ''}  // Pre-fill with selectedInvestment interest rate
+        onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, interestRate: text }))}
+        keyboardType="numeric"
+      />
+
+      {/* Duration (Years) */}
+      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Duration (Years)</Text>
+      <Picker
+        selectedValue={selectedInvestment?.duration || '1'}  // Pre-fill with selectedInvestment duration or default to '1'
+        onValueChange={(value) =>
+          setSelectedInvestment((prev) => ({ ...prev, duration: value }))
+        }
+        style={{
+          inputAndroid: {
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            color: theme === 'dark' ? '#fff' : '#000',
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? '#555' : '#ccc',
+            marginVertical: 5,
+          },
+          inputIOS: {
+            backgroundColor: theme === 'dark' ? '#333' : '#fff',
+            color: theme === 'dark' ? '#fff' : '#000',
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+            borderRadius: 5,
+            borderWidth: 1,
+            borderColor: theme === 'dark' ? '#555' : '#ccc',
+            marginVertical: 5,
+          },
+        }}
+      >
+        <Picker.Item label="1 Year" value="1" />
+        <Picker.Item label="3 Years" value="3" />
+        <Picker.Item label="5 Years" value="5" />
+        <Picker.Item label="10 Years" value="10" />
+      </Picker>
+
+      {/* Margin Between Picker and Buttons */}
+      <View style={{ height: 20 }} />
+
+      {/* Centered Save and Close Buttons with a gap */}
+      <View style={{ flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
+        {/* Save Button */}
+        <TouchableOpacity
+          style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D', width: '48%' }]}
+          onPress={handleSaveInvestment}  // Call function to save the investment
+        >
+          <Text style={{ textAlign: 'center', color: '#fff' }}>
+            Save
+          </Text>
+        </TouchableOpacity>
+
+        {/* Small gap between buttons */}
+        <View style={{ width: 10 }} />
+
+        {/* Close Button */}
+        <TouchableOpacity
+          style={[styles.modalButton, { backgroundColor: 'red', width: '48%' }]}
+          onPress={() => setIsUpdateModalVisible(false)}  // Close the modal
+        >
+          <Text style={{ textAlign: 'center', color: '#fff' }}>
+            Close
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
+
+
+
+
+
+
     </View>
   );
 };
