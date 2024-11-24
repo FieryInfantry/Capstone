@@ -41,8 +41,10 @@ const InsuranceScreen = () => {
 
   const handleUpdateInvestment = (item) => {
     setSelectedInvestment(item);  // Set the investment to be updated
+    console.log('Selected Investment:', item); // Debugging: log the selected item
     setIsUpdateModalVisible(true); // Open the update modal
   };
+  
   
 
 
@@ -198,7 +200,7 @@ const InsuranceScreen = () => {
     }
   };
 
-  const handleSaveInvestment = async (item) => {
+  const handleSaveInvestment = async () => {
     try {
       const userToken = await AsyncStorage.getItem('authToken');
       if (!userToken) {
@@ -212,14 +214,19 @@ const InsuranceScreen = () => {
         },
       };
   
+      // Ensure the selectedInvestment is properly populated before sending to backend
       const investmentData = {
-        investmentAmount,
-        interestRate,
-        duration,
-        predictedValues,
+        investmentAmount: selectedInvestment?.investmentAmount,  // Use selectedInvestment directly
+        interestRate: selectedInvestment?.interestRate,
+        duration: selectedInvestment?.duration,
+        predictedValues: selectedInvestment?.predictedValues,  // If applicable, ensure it's defined
       };
   
-      await axios.put(`http://localhost:3000/investments/${item._id}`, investmentData, config);
+      console.log('Investment Data:', investmentData); // Debugging to verify the data
+  
+      // Update the investment
+      await axios.put(`http://localhost:3000/investments/${selectedInvestment._id}`, investmentData, config);
+  
       Alert.alert('Success', 'Investment updated successfully');
       fetchInvestments(); // Refresh the investment list
       setIsUpdateModalVisible(false); // Close the modal
@@ -726,16 +733,24 @@ return (
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Investment Amount:</Text>
       <TextInput
   style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
-  value={selectedInvestment?.investmentAmount || ''}  // Make sure to bind investmentAmount to the value
-  onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, investmentAmount: text }))}  // Update state on change
+  value={selectedInvestment?.investmentAmount || ''}
+  onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, investmentAmount: text }))}
   keyboardType="numeric"
 />
 
 <TextInput
   style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
-  value={selectedInvestment?.interestRate || ''}  // Bind interestRate to the value
-  onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, interestRate: text }))}  // Update state on change
+  value={selectedInvestment?.interestRate || ''}
+  onChangeText={(text) => {
+    // Ensure the input is numeric and does not exceed 100
+    const numericValue = Math.min(100, Math.max(0, parseFloat(text) || 0)); 
+    setSelectedInvestment((prev) => ({
+      ...prev,
+      interestRate: numericValue.toString(), // Convert to string for TextInput
+    }));
+  }}
   keyboardType="numeric"
+  maxLength={5}  // Optional: Limit length if needed
 />
       {/* Duration (Years) */}
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Duration (Years)</Text>

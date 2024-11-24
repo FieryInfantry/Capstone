@@ -267,21 +267,27 @@ const DashboardScreen = ({ navigation }) => {
 
             <Text style={textColor}>Enter Interest Rate (%)</Text>
             <TextInput
-              style={[styles.input, { color: textColor }]}
-              value={interestRate}
-              onChangeText={(text) => {
-                if (text === '') {
-                  setInterestRate('');
-                  return;
-                }
-                const numericValue = text.replace(/[^0-9]/g, '');
-                if (parseInt(numericValue) <= 100) {
-                  setInterestRate(numericValue);
-                }
-              }}
-              keyboardType="numeric"
-              maxLength={3}
-            />
+  style={[styles.input, { color: textColor }]}
+  value={interestRate}
+  onChangeText={(text) => {
+    if (text === '') {
+      setInterestRate('');
+      return;
+    }
+
+    // Remove any non-numeric characters
+    const numericValue = text.replace(/[^0-9]/g, '');
+
+    // Ensure the value doesn't exceed 100
+    if (parseInt(numericValue) > 100) {
+      setInterestRate('100');
+    } else {
+      setInterestRate(numericValue);
+    }
+  }}
+  keyboardType="numeric"
+  maxLength={3}
+/>
 
             <Text style={textColor}>Enter Duration (Years)</Text>
             <Picker
