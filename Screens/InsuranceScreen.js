@@ -43,6 +43,7 @@ const InsuranceScreen = () => {
     setSelectedInvestment(item);  // Set the investment to be updated
     setIsUpdateModalVisible(true); // Open the update modal
   };
+  
 
 
   useEffect(() => {
@@ -197,7 +198,7 @@ const InsuranceScreen = () => {
     }
   };
 
-  const handleSaveInvestment = async () => {
+  const handleSaveInvestment = async (item) => {
     try {
       const userToken = await AsyncStorage.getItem('authToken');
       if (!userToken) {
@@ -221,7 +222,7 @@ const InsuranceScreen = () => {
       await axios.put(`http://localhost:3000/investments/${item._id}`, investmentData, config);
       Alert.alert('Success', 'Investment updated successfully');
       fetchInvestments(); // Refresh the investment list
-      setModalVisible(false); // Close the modal
+      setIsUpdateModalVisible(false); // Close the modal
     } catch (error) {
       console.error('Error updating investment:', error);
       Alert.alert('Error', 'Failed to update investment');
@@ -724,21 +725,18 @@ return (
       {/* Investment Amount */}
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Investment Amount:</Text>
       <TextInput
-        style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
-        value={selectedInvestment?.investmentAmount || ''}  // Make sure you're binding to 'investmentAmount' key
-        onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, investmentAmount: text }))}
-        keyboardType="numeric"
-      />
+  style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
+  value={selectedInvestment?.investmentAmount || ''}  // Make sure to bind investmentAmount to the value
+  onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, investmentAmount: text }))}  // Update state on change
+  keyboardType="numeric"
+/>
 
-      {/* Interest Rate */}
-      <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate (%)</Text>
-      <TextInput
-        style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
-        value={selectedInvestment?.interestRate || ''}  // Pre-fill with selectedInvestment interest rate
-        onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, interestRate: text }))}
-        keyboardType="numeric"
-      />
-
+<TextInput
+  style={[styles.input, { color: theme === 'dark' ? '#fff' : '#000' }]}
+  value={selectedInvestment?.interestRate || ''}  // Bind interestRate to the value
+  onChangeText={(text) => setSelectedInvestment((prev) => ({ ...prev, interestRate: text }))}  // Update state on change
+  keyboardType="numeric"
+/>
       {/* Duration (Years) */}
       <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Duration (Years)</Text>
       <Picker
@@ -782,13 +780,14 @@ return (
       <View style={{ flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
         {/* Save Button */}
         <TouchableOpacity
-          style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D', width: '48%' }]}
-          onPress={handleSaveInvestment}  // Call function to save the investment
-        >
-          <Text style={{ textAlign: 'center', color: '#fff' }}>
-            Save
-          </Text>
-        </TouchableOpacity>
+  style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D', width: '48%' }]}
+  onPress={() => handleSaveInvestment(selectedInvestment)}  // Pass selectedInvestment to handleSaveInvestment
+>
+  <Text style={{ textAlign: 'center', color: '#fff' }}>
+    Save
+  </Text>
+</TouchableOpacity>
+
 
         {/* Small gap between buttons */}
         <View style={{ width: 10 }} />
