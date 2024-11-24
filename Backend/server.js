@@ -768,52 +768,72 @@ app.get('/incomes/monthly', authenticateUser, async (req, res) => {
   }
 });
 
-app.delete('/api/incomes/:id', async (req, res) => {
+
+app.delete('/income/:id', authenticateUser, async (req, res) => {
+  const { id } = req.params;  // Read the ID from the URL parameter
+
+  if (!id) {
+    return res.status(400).json({ error: 'Missing required parameter: id' });
+  }
+
   try {
-    const incomeId = req.params.id;
-    const income = await Income.findByIdAndDelete(incomeId); // Deletes the income by its ID
+    // Find and delete the income entry by ID
+    const income = await Income.findByIdAndDelete(id);
 
     if (!income) {
-      console.log(`Income not found with ID: ${incomeId}`);
-      return res.status(404).json({ message: 'Income not found' });
+      return res.status(404).json({ error: 'Income entry not found' });
     }
 
-    console.log(`Income with ID: ${incomeId} deleted successfully`);
-    res.status(200).json({ message: 'Income deleted successfully' });
+    res.status(200).json({ message: 'Income entry deleted successfully' });
   } catch (error) {
-    console.error('Error deleting income:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while deleting the income entry' });
   }
 });
 
-// Route for deleting income with authentication middleware
-app.delete('/api/incomes/:id', authenticateUser, async (req, res) => {
-  const { id } = req.params;
+app.delete('/expense/:id', authenticateUser, async (req, res) => {
+  const { id } = req.params;  // Read the ID from the URL parameter
+
+  if (!id) {
+    return res.status(400).json({ error: 'Missing required parameter: id' });
+  }
 
   try {
-    const deletedIncome = await Income.findOneAndDelete({ _id: id, userId: req.userId }); // Delete income by ID and userId
-    if (!deletedIncome) {
-      return res.status(404).json({ error: 'Income not found or not authorized' });
+    // Find and delete the expense entry by ID
+    const expense = await Expense.findByIdAndDelete(id);
+
+    if (!expense) {
+      return res.status(404).json({ error: 'Expense entry not found' });
     }
 
-    res.status(204).send(); // Successful deletion
+    res.status(200).json({ message: 'Expense entry deleted successfully' });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while deleting the expense entry' });
   }
 });
 
-// Route for deleting expense with authentication middleware
-app.delete('/api/expenses/:id', authenticateUser, async (req, res) => {
+app.put('/budgets/:id', authenticateUser, async (req, res) => {
   const { id } = req.params;
-
+  const { category, amount } = req.body;  // Only category and amount can be updated
+  
   try {
-    const deletedExpense = await Expense.findOneAndDelete({ _id: id, userId: req.userId }); // Delete expense by ID and userId
-    if (!deletedExpense) {
-      return res.status(404).json({ error: 'Expense not found or not authorized' });
+    // Find the budget by id and userId (to ensure the user can only update their own budgets)
+    const updatedBudget = await Budget.findOneAndUpdate(
+      { _id: id, userId: req.userId },
+      { category, amount },
+      { new: true }  // This returns the updated document
+    );
+  
+    // If no budget is found or the user is not authorized, send a 404 error
+    if (!updatedBudget) {
+      return res.status(404).json({ error: 'Budget not found or not authorized' });
     }
-
-    res.status(204).send(); // Successful deletion
+    
+    // Return the updated budget in the response
+    res.status(200).json(updatedBudget);
   } catch (error) {
+    // Handle any errors that occur
     res.status(400).json({ error: error.message });
   }
 });
