@@ -1,6 +1,6 @@
 // DashboardScreen.js
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList } from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
 import { useUser } from '../Context/UserContext'; // Import the UserContext
 import AddUpdateBank from './AddUpdateBank';
@@ -9,8 +9,16 @@ import { LineChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+
 
 const DashboardScreen = ({ navigation }) => {
+  const [banks, setBanks] = useState([]);
+  const [insuranceList, setInsuranceList] = useState([]);
+  const [investmentList, setInvestmentList] = useState([]);
+  const [currentSavings, setCurrentSavings] = useState(0);
+  const [currentInvestments, setCurrentInvestments] = useState(0);
+  const [futurePredictions, setFuturePredictions] = useState(0)
   const { userData, theme } = useUser();  // Access user data and theme from context
   const [isBankModalVisible, setBankModalVisible] = useState(false);
   const [isCalculatorModalVisible, setCalculatorModalVisible] = useState(false);
@@ -25,6 +33,25 @@ const DashboardScreen = ({ navigation }) => {
     setBankModalVisible(false);
   };
 
+  useEffect(() => {
+    // Calculate the total balance from all banks
+    const totalBalance = banks.reduce((acc, curr) => acc + (Number(curr.balance) || 0), 0); 
+    setCurrentSavings(totalBalance); // Set total balance as savings
+    
+    // Calculate only investments
+    const investments = banks
+      .filter((bank) => bank.type === 'investment')
+      .reduce((acc, curr) => acc + (Number(curr.balance) || 0), 0); 
+    setCurrentInvestments(investments);
+  
+    // Calculate future predictions (e.g., compound interest)
+    const rate = 0.05; // Example interest rate
+    const years = 5; // Example years
+    const predictions = investments * Math.pow(1 + rate, years);
+    setFuturePredictions(predictions.toFixed(2));
+  }, [banks]); // Recalculate when the banks data changes
+  
+
   const openBankModal = () => {
     setCalculatorModalVisible(false);  // Close the calculator modal
     setBankModalVisible(true);         // Open the bank modal
@@ -35,6 +62,72 @@ const DashboardScreen = ({ navigation }) => {
     setCalculatorModalVisible(true);  // Open the calculator modal
   };
 
+  const fetchBanks = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+
+      const response = await axios.get('http://localhost:3000/banks', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setBanks(response.data); // Update state with fetched data
+    } catch (error) {
+      console.error('Error fetching banks:', error);
+      Alert.alert('Error', 'Failed to fetch banks. Please try again later.');
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchBanks(); // Refresh bank list when screen gains focus
+    }, [])
+  );
+
+  const fetchInsurances = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+
+      const response = await axios.get('http://localhost:3000/insurances', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setInsuranceList(response.data);
+    } catch (error) {
+      console.error('Error fetching insurances:', error);
+      Alert.alert('Error', 'Failed to fetch insurance data. Please try again later.');
+    }
+  };
+
+  const fetchInvestments = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+  
+      const response = await axios.get('http://localhost:3000/investments', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      setInvestmentList(response.data); // Assuming you have a state for storing investments
+    } catch (error) {
+      console.error('Error fetching investments:', error);
+      Alert.alert('Error', 'Failed to fetch investment data. Please try again later.');
+    }
+  };
+  useEffect(() => {
+    fetchInsurances();
+    fetchInvestments(); // Fetch insurance data when the component mounts
+  }, []);
 
   const calculateInvestment = () => {
     const principal = parseFloat(investmentAmount);
@@ -58,6 +151,8 @@ const DashboardScreen = ({ navigation }) => {
     setPredictedValues([]);
     setModalVisible(false);
   };
+
+
 
   const handleSaveInvestment = async () => {
     try {
@@ -137,38 +232,92 @@ const DashboardScreen = ({ navigation }) => {
 
         <View style={DashboardStyles.summaryContainer}>
           <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Savings</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Savings ${currentSavings}</Text>
           </View>
           <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Investments</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Investments ${currentInvestments}</Text>
           </View>
           <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Future Value Predictions</Text>
+            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Future Value Predictions ${futurePredictions}</Text>
           </View>
         </View>
 
         <View style={DashboardStyles.section}>
           <View style={DashboardStyles.sectionHeader}>
             <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Savings Accounts</Text>
-            <TouchableOpacity>
-              <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>See all</Text>
-            </TouchableOpacity>
+            <TouchableOpacity
+  onPress={() => navigation.navigate('BankList')}
+>
+  <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>
+    See all
+  </Text>
+</TouchableOpacity>
           </View>
           <View style={DashboardStyles.accountBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Connected bank account</Text>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Individual balances</Text>
-          </View>
-        </View>
+  <FlatList
+    data={banks.slice(0, 2)}
+    keyExtractor={(item) => item._id}
+    renderItem={({ item }) => (
+      <View
+        style={{
+          marginVertical: 10,
+          padding: 15,
+          borderRadius: 8,
+          backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+        }}
+      >
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Type: {item.type}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Balance: {item.balance}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate: {item.interestRate}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Rewards: {item.rewards}</Text>
+      </View>
+    )}
+  />
+</View>
+</View>
+
 
         <View style={DashboardStyles.section}>
           <View style={DashboardStyles.sectionHeader}>
             <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Investment Accounts</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('InsuranceScreen')}            >
               <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>See all</Text>
             </TouchableOpacity>
           </View>
           <View style={DashboardStyles.accountBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Details such as interest rates, dividends, etc.</Text>
+          <FlatList
+          data={insuranceList.slice(0, 2)}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                marginVertical: 10,
+                padding: 15,
+                borderRadius: 8,
+                backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+              }}
+            >
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Provider: {item.provider}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Policy Name: {item.policyName}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Coverage Type: {item.coverageType}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Premium: {item.premium} annually
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Interest Rate: {item.interestRate}
+              </Text>
+              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+                Potential Benefits: {item.potentialBenefits}
+              </Text>
+              
+          </View>)}/>
           </View>
         </View>
 
