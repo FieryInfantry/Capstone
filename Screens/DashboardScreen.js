@@ -34,22 +34,22 @@ const DashboardScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    // Calculate the total balance from all banks
+    // Calculate the total balance from all banks (for current savings)
     const totalBalance = banks.reduce((acc, curr) => acc + (Number(curr.balance) || 0), 0); 
     setCurrentSavings(totalBalance); // Set total balance as savings
     
-    // Calculate only investments
-    const investments = banks
-      .filter((bank) => bank.type === 'investment')
-      .reduce((acc, curr) => acc + (Number(curr.balance) || 0), 0); 
+    // Calculate only investments based on `investmentAmount` from each item
+    const investments = investmentList.reduce((acc, curr) => acc + (Number(curr.investmentAmount) || 0), 0); 
     setCurrentInvestments(investments);
-  
-    // Calculate future predictions (e.g., compound interest)
+    
+    // Combine current savings and investments for future predictions (e.g., compound interest)
     const rate = 0.05; // Example interest rate
     const years = 5; // Example years
-    const predictions = investments * Math.pow(1 + rate, years);
-    setFuturePredictions(predictions.toFixed(2));
-  }, [banks]); // Recalculate when the banks data changes
+    const totalAmount = totalBalance + investments; // Add savings and investments together
+    const predictions = totalAmount * Math.pow(1 + rate, years); // Calculate future value with compound interest
+    
+    setFuturePredictions(predictions.toFixed(2)); // Set future value predictions
+  }, [banks, investmentList]); // Recalculate when the banks or investmentList data changes
   
 
   const openBankModal = () => {
@@ -118,12 +118,16 @@ const DashboardScreen = ({ navigation }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
   
-      setInvestmentList(response.data); // Assuming you have a state for storing investments
+      // Sort investments by the 'createdAt' field in descending order (latest first)
+      const sortedInvestments = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      setInvestmentList(sortedInvestments); // Store the sorted investment data in state
     } catch (error) {
       console.error('Error fetching investments:', error);
       Alert.alert('Error', 'Failed to fetch investment data. Please try again later.');
     }
   };
+  
   useEffect(() => {
     fetchInsurances();
     fetchInvestments(); // Fetch insurance data when the component mounts
@@ -171,7 +175,7 @@ const DashboardScreen = ({ navigation }) => {
       }
   
       // Make the POST request to save the investment
-      const response = await axios.post('http://192.168.1.108:3000/investments', investmentData, {
+      const response = await axios.post('http://localhost:3000/investments', investmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -231,16 +235,22 @@ const DashboardScreen = ({ navigation }) => {
         </View>
 
         <View style={DashboardStyles.summaryContainer}>
-          <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Savings ${currentSavings}</Text>
-          </View>
-          <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Current Investments ${currentInvestments}</Text>
-          </View>
-          <View style={DashboardStyles.summaryBox}>
-            <Text style={{ color: theme === 'dark' ? '#000' : '#000' }}>Future Value Predictions ${futurePredictions}</Text>
-          </View>
-        </View>
+  <View style={DashboardStyles.summaryBox}>
+    <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+      Current Savings ${currentSavings}
+    </Text>
+  </View>
+  <View style={DashboardStyles.summaryBox}>
+    <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+      Current Investments ${currentInvestments}
+    </Text>
+  </View>
+  <View style={DashboardStyles.summaryBox}>
+    <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+      Future Value Predictions ${futurePredictions}
+    </Text>
+  </View>
+</View>
 
         <View style={DashboardStyles.section}>
           <View style={DashboardStyles.sectionHeader}>
@@ -287,7 +297,7 @@ const DashboardScreen = ({ navigation }) => {
           </View>
           <View style={DashboardStyles.accountBox}>
           <FlatList
-          data={insuranceList.slice(0, 2)}
+          data={investmentList.slice(0, 2)}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <View
@@ -298,24 +308,20 @@ const DashboardScreen = ({ navigation }) => {
                 backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
               }}
             >
-              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-                Provider: {item.provider}
-              </Text>
-              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-                Policy Name: {item.policyName}
-              </Text>
-              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-                Coverage Type: {item.coverageType}
-              </Text>
-              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-                Premium: {item.premium} annually
-              </Text>
-              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-                Interest Rate: {item.interestRate}
-              </Text>
-              <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-                Potential Benefits: {item.potentialBenefits}
-              </Text>
+             
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          Investment Amount: {item.investmentAmount}
+        </Text>
+
+        
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          Interest Rate: {item.interestRate}%
+        </Text>
+
+        
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          Duration: {item.duration} Years
+        </Text>
               
           </View>)}/>
           </View>

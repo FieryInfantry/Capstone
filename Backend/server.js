@@ -67,7 +67,7 @@ require('dotenv').config();
     interestRate: { type: String, required: true },
     rewards: { type: String, required: false },
     balance: { type: Number, default: 0 }
-  });
+  }, { timestamps: true });
 
   const insuranceSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -77,7 +77,7 @@ require('dotenv').config();
     premium: { type: Number, required: true },
     interestRate: { type: Number, required: false },
     potentialBenefits: { type: String, required: false }
-  });
+  }, { timestamps: true });
 
 
 const InvestmentSchema = new mongoose.Schema({
@@ -87,7 +87,7 @@ const InvestmentSchema = new mongoose.Schema({
   duration: { type: Number, required: true },
   predictedValues: { type: [Number], default: [] },
   createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 const budgetSchema = new mongoose.Schema({
   category: { type: String, required: true },
