@@ -1,21 +1,25 @@
 import { StyleSheet } from 'react-native';
 
 const DashboardStyles = StyleSheet.create({
-  maninContainer:{
-    flex : 1
+  mainContainer: {
+    flex: 1, // Makes it take up the full available space
+    paddingBottom: 200, // Adjust padding to make space for the navigation bar
   },
   container: {
 
     flexGrow: 1,
     padding: 16,
-    paddingBottom: 120
+  },
+  innerContainer:{
+    paddingBottom : 70
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20, 
+    marginBottom: 10, 
     height: 60,
+    paddingTop: 40
    
   },
   logo: {
@@ -107,8 +111,11 @@ const DashboardStyles = StyleSheet.create({
     section: {
       marginBottom: 16, // Space between sections
       padding: 16, // Padding inside the section
-
+      height: 180,
       borderRadius: 8, // Rounded corners for the section container
+      paddingBottom: 12
+
+
     },
     sectionHeader: {
       flexDirection: 'row',
@@ -140,7 +147,8 @@ const DashboardStyles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 10,
+    paddingBottom: 20
   },
   actionButton: {
     flex: 1,

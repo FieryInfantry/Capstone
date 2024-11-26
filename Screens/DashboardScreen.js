@@ -1,6 +1,6 @@
 // DashboardScreen.js
 import React, { useState, useEffect } from 'react';
-import {SafeAreaView , View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList } from 'react-native';
+import {SafeAreaView , View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList, Dimensions } from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
 import { useUser } from '../Context/UserContext'; // Import the UserContext
 import AddUpdateBank from './AddUpdateBank';
@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+
 
 const DashboardScreen = ({ navigation }) => {
   const [banks, setBanks] = useState([]);
@@ -32,7 +33,8 @@ const DashboardScreen = ({ navigation }) => {
   const [activeSection, setActiveSection] = useState('currentSavings');
   const [containerColor, setContainerColor] = useState('#729762'); // Default color for Current Savings
   const [isVisible, setIsVisible] = useState(true); // Control value visibility
-  
+  const screenWidth = Dimensions.get('window').width;
+ 
 
   // Handle button press
   const handlePress = (section, color) => {
@@ -99,7 +101,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.86.249:3000/banks', {
+      const response = await axios.get('http://192.168.0.115:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -124,7 +126,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.86.249:3000/insurances', {
+      const response = await axios.get('http://192.168.0.115:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -144,7 +146,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
   
-      const response = await axios.get('http://192.168.86.249:3000/investments', {
+      const response = await axios.get('http://192.168.0.115:3000/investments', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -221,7 +223,7 @@ const DashboardScreen = ({ navigation }) => {
       }
   
       // Make the POST request to save the investment
-      const response = await axios.post('http://192.168.86.249:3000/investments', investmentData, {
+      const response = await axios.post('http://192.168.0.115:3000/investments', investmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -266,6 +268,7 @@ const DashboardScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={DashboardStyles.maninContainer}>
+      <View style={DashboardStyles.innerContainer}>
       <ScrollView style={[DashboardStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
         <View style={DashboardStyles.header}>
           <Image source={require('../assets/logo.png')} style={DashboardStyles.logo} />
@@ -384,7 +387,8 @@ const DashboardScreen = ({ navigation }) => {
           backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
           width: 300, // Set a fixed width for each card
           borderColor : "#859F3D",
-          borderWidth: 2
+          borderWidth: 2,
+          height: 120
         }}
       >
         <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
@@ -406,55 +410,63 @@ const DashboardScreen = ({ navigation }) => {
 
 
 
+<View style={DashboardStyles.section}>
+  <View style={DashboardStyles.sectionHeader}>
+    <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>
+      Investment Accounts
+    </Text>
+    <TouchableOpacity onPress={() => navigation.navigate('InsuranceScreen')}>
+      <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>See all</Text>
+    </TouchableOpacity>
+  </View>
 
-        <View style={DashboardStyles.section}>
-          <View style={DashboardStyles.sectionHeader}>
-            <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Investment Accounts</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('InsuranceScreen')}            >
-              <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>See all</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={[DashboardStyles.accountBox, {backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',height: 50 }]}>
-          <FlatList
-          data={investmentList.slice(0, 1)}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                marginHorizontal: 10, // Add horizontal spacing between cards
-                padding: 15,
-                borderRadius: 8,
-                backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
-                width: 300, // Set a fixed width for each card
-                borderColor : "#859F3D",
-                borderWidth: 2
-              }}
-            >
-             
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-          Investment Amount: {item.investmentAmount}
-        </Text>
-
-        
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-          Interest Rate: {item.interestRate}%
-        </Text>
-
-        
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-          Duration: {item.duration} Years
-        </Text>
-              
-          </View>)}
-              horizontal // Enable horizontal scrolling
-              showsHorizontalScrollIndicator={false} // Hide the horizontal scrollbar
-              contentContainerStyle={{ paddingHorizontal: 10 }} // Add padding to the start and end
-              snapToInterval={320} // Adjust for card width + margin
-              decelerationRate="fast" // Smooth snap effect
-              snapToAlignment="center" // Align snapped card in the center
-              />
-          </View>
+  <View
+    style={[
+      DashboardStyles.accountBox,
+      {
+        backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',
+        height: 200,  // Adjusted for proper height
+        flexDirection: 'row',  // Make sure items are laid out horizontally
+        overflow: 'hidden',  // Avoid any overflow
+      },
+    ]}
+  >
+    <FlatList
+      data={investmentList} // Display all items in investmentList
+      keyExtractor={(item) => item._id}
+      renderItem={({ item }) => (
+        <View
+          style={{
+            marginHorizontal: 10, // Add horizontal spacing between cards
+            padding: 15,
+            borderRadius: 8,
+            backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+            width: 300, // Set a fixed width for each card
+            borderColor : "#859F3D",
+            borderWidth: 2,
+            height: 120
+          }}
+        >
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Investment Amount: {item.investmentAmount}
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Interest Rate: {item.interestRate}%
+          </Text>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+            Duration: {item.duration} Years
+          </Text>
         </View>
+      )}
+      horizontal // Enable horizontal scrolling
+    showsHorizontalScrollIndicator={false} // Hide the horizontal scrollbar
+    contentContainerStyle={{ paddingHorizontal: 10 }} // Add padding to the start and end
+    snapToInterval={320} // Adjust for card width + margin
+    decelerationRate="fast" // Smooth snap effect
+    snapToAlignment="center" // Align snapped card in the center
+    />
+  </View>
+</View>
 
         <View style={DashboardStyles.section}>
           <View style={DashboardStyles.sectionHeader}>
@@ -486,37 +498,38 @@ const DashboardScreen = ({ navigation }) => {
 
       
       </ScrollView>
+      </View>
 
 
       <View style={[DashboardStyles.navigation, { backgroundColor: theme === 'dark' ? '#2F3B2D' : '#fff' }]}>
         <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('BankList')}>
           <View style={DashboardStyles.navItem}>
             <Image source={require('../assets/bank.png')} style={DashboardStyles.navIcon} />
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Bank</Text>
+            <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 11 }}>Bank</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('InsuranceScreen')}>
           <View style={DashboardStyles.navItem}>
             <Image source={require('../assets/life-insurance.png')} style={DashboardStyles.navIcon} />
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Insurance</Text>
+            <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 11 }}>Insurance</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('GovernmentScreen')}>
           <View style={DashboardStyles.navItem}>
             <Image source={require('../assets/government.png')} style={DashboardStyles.navIcon} />
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Government</Text>
+            <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 11}}>Government</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('CalculatorScreen')}>
           <View style={DashboardStyles.navItem}>
             <Image source={require('../assets/calculator.png')} style={DashboardStyles.navIcon} />
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Calculator</Text>
+            <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 11 }}>Calculator</Text>
           </View>
         </TouchableOpacity>        
         <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('BudgetScreen')}>
           <View style={DashboardStyles.navItem}>
           <Image source={require('../assets/budget.png')} style={DashboardStyles.navIcon} />
-            <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Budget</Text>
+            <Text style={{ color: theme === 'dark' ? '#fff' : '#000', fontSize: 11 }}>Budget</Text>
           </View>
         </TouchableOpacity>
       </View>

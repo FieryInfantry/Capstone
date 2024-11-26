@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     fontFamily: 'YourPreferredFont', // Updated font
+    textAlign:"center"
   },
   actionButton: {
     backgroundColor: '#fff',

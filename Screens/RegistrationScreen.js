@@ -26,7 +26,7 @@ const RegistrationScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.220:3000/register', {
+      const response = await axios.post('http://192.168.0.115:3000/register', {
         fullName,
         email,
         password,

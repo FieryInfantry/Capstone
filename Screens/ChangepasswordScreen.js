@@ -18,7 +18,7 @@ const ChangePasswordScreen = () => {
     // First, check if the current password is correct
     try {
       const response = await axios.post(
-        'http://192.168.100.220:3000/verify-password',
+        'http://192.168.0.115:3000/verify-password',
         { currentPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -32,7 +32,7 @@ const ChangePasswordScreen = () => {
 
         // Proceed with changing the password
         const changePasswordResponse = await axios.post(
-          'http://192.168.100.220:3000/change-password',
+          'http://192.168.0.115:3000/change-password',
           { currentPassword, newPassword },
           { headers: { Authorization: `Bearer ${token}` } }
         );

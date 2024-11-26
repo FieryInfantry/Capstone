@@ -18,10 +18,11 @@ const BudgetStyles = StyleSheet.create({
       marginBottom: 10,
     },
     activeButton: {
-      backgroundColor: "#45a049",
+      backgroundColor: "#859F3D",
     },
+    
     navButtonText: {
-      color: "#000",
+      color: "#fff",
       fontSize: 16,
       fontWeight: "bold",
     },
@@ -38,26 +39,41 @@ const BudgetStyles = StyleSheet.create({
       borderRadius: 5,
       marginBottom: 20,
       flexDirection: "row", // Align horizontally
-      justifyContent: "flex-start", // Align to the start
-      alignItems: "center", // Align items vertically centered
+      justifyContent: "center", // Center both containers with separation
+      alignItems: "center", // Keep items vertically centered
     },
+    
+    amountContainer: {
+      alignItems: "center", // Center the amount and text within each container
+      paddingHorizontal: 10, // Add some padding to bring the containers closer
+    },
+    
     summaryText: {
       fontSize: 16,
-      marginRight: 8, // Space between text and number
+      marginTop: 5, // Space between the amount and the label
+      opacity: 0.7, // Slight opacity for a less bold text
     },
+    
     summaryAmount: {
       fontSize: 20,
       fontWeight: "bold",
       color: "#388e3c",
-      paddingLeft: 5, // Adds space between the text and the number
-      marginRight: 40,
     },
+    
     summaryAmountSpent: {
       fontSize: 20,
       fontWeight: "bold",
       color: "red",
-      marginRight: 8, // Space between the text and the amount
     },
+    
+    separator: {
+      width: 1, // Thin line
+      height: "60%", // Make it shorter so it doesn't occupy the whole height
+      backgroundColor: "#000", // Black color for the separator line
+      marginHorizontal: 15, // Space the separator from the two columns
+    },
+    
+    
   
     sectionHeader: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
     budgetCard: {
@@ -91,18 +107,46 @@ const BudgetStyles = StyleSheet.create({
       borderRadius: 5,
     },
     setBudgetButtonText: { color: "#fff", fontSize: 16 },
-    bankBalance: {
-      backgroundColor: "#e1f5fe",
+    outerContainer: {
+      backgroundColor: "#859F3D", // Outer container background color
       padding: 15,
-      borderRadius: 5,
+      borderRadius: 10,
       marginBottom: 20,
+      alignItems: "center", // Center content horizontally
+      height: 150
+
     },
-    bankBalanceText: { fontSize: 16 },
-    incomeExpenseContainer: {
+    
+    innerContainer: {
+      backgroundColor: "white", // Inner container background color (white)
       padding: 20,
-      backgroundColor: "#f1f8e9",
       borderRadius: 5,
+      alignItems: "center", // Center content horizontally
+      width: "70%", // Make inner container fill the width of the outer container
+      height: 80,
+      shadowColor: "#000", // Optional: Add shadow for depth
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 3, // Add elevation for Android
     },
+    
+    bankBalanceText: {
+      fontSize: 23,
+      fontWeight: "bold",
+      color: "#fff", // Slightly dark color for the title
+    },
+    
+    summaryAmount: {
+      fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
+  
+    },
+    eyeIcon:{
+      alignItems:"center",
+      marginLeft : 8
+    },
+    
     incomeExpenseText: { fontSize: 16 },
     deleteButton: {
       backgroundColor: "red",

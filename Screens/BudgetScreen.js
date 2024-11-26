@@ -7,6 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import styles from "../Styles/BudgetStyles";
 import { useCallback } from "react";
+import Icon from 'react-native-vector-icons/Ionicons';
+import BudgetStyles from "../Styles/BudgetStyles";
+
 const categories = [
   { id: '1', name: 'Baby', icon: '🍼' },
   { id: '2', name: 'Beauty', icon: '💄' },
@@ -28,6 +31,11 @@ const BudgetScreen = () => {
   const [expenses, setExpenses] = useState([]); 
   const [incomes, setIncomes] = useState([]);
   // Fetch bank balance (simulated function)
+  const [isVisible, setIsVisible] = useState(false); // State to manage visibility of the amount
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible); // Toggle visibility
+  };
   const fetchBankBalance = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
@@ -38,7 +46,7 @@ const BudgetScreen = () => {
       }
   
 
-      const response = await fetch('http://192.168.86.249:3000/banks/balances', {
+      const response = await fetch('http://192.168.0.115:3000/banks/balances', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -72,7 +80,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.86.249:3000/expenses/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.0.115:3000/expenses/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -106,7 +114,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.86.249:3000/incomes/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.0.115:3000/incomes/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -180,7 +188,7 @@ const BudgetScreen = () => {
       }
   
       // Fetch the bank balance from the backend
-      const bankBalanceResponse = await fetch('http://192.168.86.249:3000/banks/balances', { // Replace with your IP
+      const bankBalanceResponse = await fetch('http://192.168.0.115:3000/banks/balances', { // Replace with your IP
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -200,7 +208,7 @@ const BudgetScreen = () => {
       }
   
       // Save the budget to the backend
-      const response = await fetch('http://192.168.86.249:3000/budget', { // Replace with your IP
+      const response = await fetch('http://192.168.0.115:3000/budget', { // Replace with your IP
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -245,7 +253,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.86.249:3000/budget/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.0.115:3000/budget/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -282,7 +290,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.86.249:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
+        `http://192.168.0.115:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
         {
           method: 'DELETE',
           headers: {
@@ -342,7 +350,7 @@ const BudgetScreen = () => {
       console.log('Deleting income with ID:', incomeId); // Corrected to incomeId
 
       const response = await fetch(
-        `http://192.168.86.249:3000/income/${incomeId}`, // Using _id as the identifier
+        `http://192.168.0.115:3000/income/${incomeId}`, // Using _id as the identifier
         {
           method: 'DELETE',
           headers: {
@@ -376,7 +384,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.86.249:3000/expense/${id}`,  // Using ID in the URL
+        `http://192.168.0.115:3000/expense/${id}`,  // Using ID in the URL
         {
           method: 'DELETE',
           headers: {
@@ -419,19 +427,28 @@ const BudgetScreen = () => {
     return (
       <View style={{ flex: 1 }}>
         {/* Summary Section */}
-        <View style={styles.summary}>
-          <Text style={styles.summaryText}>TOTAL BUDGET</Text>
-          <Text style={styles.summaryAmount}>
-            ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.limit || 0), 0).toFixed(2)}
-          </Text>
-          <Text style={styles.summaryText}>TOTAL SPENT</Text>
-          <Text style={styles.summaryAmountSpent}>
-            ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.spent || 0), 0).toFixed(2)}
-          </Text>
-        </View>
+<View style={BudgetStyles.summary}>
+  <View style={BudgetStyles.amountContainer}>
+    <Text style={BudgetStyles.summaryAmount}>
+      ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.limit || 0), 0).toFixed(2)}
+    </Text>
+    <Text style={BudgetStyles.summaryText}>TOTAL BUDGET</Text>
+  </View>
+
+  <View style={BudgetStyles.separator} />
+
+  <View style={BudgetStyles.amountContainer}>
+    <Text style={BudgetStyles.summaryAmountSpent}>
+      ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.spent || 0), 0).toFixed(2)}
+    </Text>
+    <Text style={BudgetStyles.summaryText}>TOTAL SPENT</Text>
+  </View>
+</View>
+
+
   
         {/* Budgeted Categories */}
-        <Text style={styles.sectionHeader}>
+        <Text style={BudgetStyles.sectionHeader}>
           Budgeted categories: {getMonthName(month)}, {year}
         </Text>
         {Object.keys(updatedBudgets).length > 0 ? (
@@ -442,40 +459,40 @@ const BudgetScreen = () => {
             }))}
             keyExtractor={(item) => item.name}
             renderItem={({ item }) => (
-              <View style={styles.budgetCard}>
-                <Text style={styles.budgetCardHeader}>{item.name}</Text>
-                <Text style={styles.budgetDetails}>Limit: ₱{item.limit.toFixed(2)}</Text>
-                <Text style={styles.budgetDetails}>Spent: ₱{item.spent.toFixed(2)}</Text>
-                <Text style={styles.budgetDetails}>
+              <View style={BudgetStyles.budgetCard}>
+                <Text style={BudgetStyles.budgetCardHeader}>{item.name}</Text>
+                <Text style={BudgetStyles.budgetDetails}>Limit: ₱{item.limit.toFixed(2)}</Text>
+                <Text style={BudgetStyles.budgetDetails}>Spent: ₱{item.spent.toFixed(2)}</Text>
+                <Text style={BudgetStyles.budgetDetails}>
                   Remaining: ₱{calculateRemaining(item.limit, item.spent).toFixed(2)}
                 </Text>
-                <View style={styles.progressBar}>
+                <View style={BudgetStyles.progressBar}>
                   <View
                     style={{
-                      ...styles.progress,
+                      ...BudgetStyles.progress,
                       width: `${Math.min((item.spent / item.limit) * 100, 100)}%`,
                       backgroundColor: item.spent > item.limit ? "red" : "#4caf50",
                     }}
                   />
                 </View>
-                {item.spent > item.limit && <Text style={styles.limitExceeded}>*Limit exceeded</Text>}
+                {item.spent > item.limit && <Text style={BudgetStyles.limitExceeded}>*Limit exceeded</Text>}
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={BudgetStyles.deleteButton}
                   onPress={() => deleteBudget(item.name)}
                 >
-                  <Text style={styles.deleteButtonText}>DELETE</Text>
+                  <Text style={BudgetStyles.deleteButtonText}>DELETE</Text>
                 </TouchableOpacity>
               </View>
             )}
           />
         ) : (
-          <Text style={styles.noBudgetText}>
+          <Text style={BudgetStyles.noBudgetText}>
             No budgets set for this month. Start by setting your budgets below.
           </Text>
         )}
   
   <TouchableOpacity
-          style={styles.floatingButton} // Reuse floatingButton style, adjust position
+          style={BudgetStyles.floatingButton} // Reuse floatingButton style, adjust position
           onPress={() => setModalVisible(true)} // Open the modal
         >
           <MaterialIcons name="add" size={30} color="white" />
@@ -493,11 +510,11 @@ const BudgetScreen = () => {
     };
   
     return (
-      <View style={styles.incomeExpenseContainer}>
-        <Text style={styles.incomeExpenseText}>Income & Expense:</Text>
+      <View style={BudgetStyles.incomeExpenseContainer}>
+        <Text style={BudgetStyles.incomeExpenseText}>Income & Expense:</Text>
   
         {/* Income Section */}
-        <Text style={styles.sectionHeader}>Income</Text>
+        <Text style={BudgetStyles.sectionHeader}>Income</Text>
         {incomes.length > 0 ? (
           <FlatList
             data={getLimitedItems(incomes)}
@@ -505,24 +522,24 @@ const BudgetScreen = () => {
             renderItem={({ item }) => {
               const amount = parseFloat(item.amount);
               return (
-                <View style={styles.cardContainer}>
-                  <View style={styles.incomeCard}>
-                    <Text style={styles.incomeName}>{item.name}</Text>
-                    <Text style={styles.incomeAmount}>
+                <View style={BudgetStyles.cardContainer}>
+                  <View style={BudgetStyles.incomeCard}>
+                    <Text style={BudgetStyles.incomeName}>{item.name}</Text>
+                    <Text style={BudgetStyles.incomeAmount}>
                       ₱+{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
                     </Text>
-                    <View style={styles.incomeDetailsContainer}>
-                      <Text style={styles.incomeCategory}>Category: {item.category}</Text>
-                      <Text style={styles.incomeDate}>
+                    <View style={BudgetStyles.incomeDetailsContainer}>
+                      <Text style={BudgetStyles.incomeCategory}>Category: {item.category}</Text>
+                      <Text style={BudgetStyles.incomeDate}>
                         Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
                       </Text>
-                      <Text style={styles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
+                      <Text style={BudgetStyles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
                     </View>
                     <TouchableOpacity
-                      style={styles.deleteButton}
+                      style={BudgetStyles.deleteButton}
                       onPress={() => deleteIncome(item._id)} // Delete income
                     >
-                      <Text style={styles.deleteButtonText}>DELETE</Text>
+                      <Text style={BudgetStyles.deleteButtonText}>DELETE</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -530,11 +547,11 @@ const BudgetScreen = () => {
             }}
           />
         ) : (
-          <Text style={styles.noDataText}>No income for this month.</Text>
+          <Text style={BudgetStyles.noDataText}>No income for this month.</Text>
         )}
   
         {/* Expense Section */}
-        <Text style={styles.sectionHeader}>Expenses</Text>
+        <Text style={BudgetStyles.sectionHeader}>Expenses</Text>
         {expenses.length > 0 ? (
           <FlatList
             data={getLimitedItems(expenses)}
@@ -542,24 +559,24 @@ const BudgetScreen = () => {
             renderItem={({ item }) => {
               const amount = parseFloat(item.amount);
               return (
-                <View style={styles.cardContainer}>
-                  <View style={styles.expenseCard}>
-                    <Text style={styles.expenseName}>{item.name}</Text>
-                    <Text style={styles.expenseAmount}>
+                <View style={BudgetStyles.cardContainer}>
+                  <View style={BudgetStyles.expenseCard}>
+                    <Text style={BudgetStyles.expenseName}>{item.name}</Text>
+                    <Text style={BudgetStyles.expenseAmount}>
                       ₱-{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
                     </Text>
-                    <View style={styles.expenseDetailsContainer}>
-                      <Text style={styles.expenseCategory}>Category: {item.category}</Text>
-                      <Text style={styles.expenseDate}>
+                    <View style={BudgetStyles.expenseDetailsContainer}>
+                      <Text style={BudgetStyles.expenseCategory}>Category: {item.category}</Text>
+                      <Text style={BudgetStyles.expenseDate}>
                         Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
                       </Text>
-                      <Text style={styles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
+                      <Text style={BudgetStyles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
                     </View>
                     <TouchableOpacity
-                      style={styles.deleteButton}
+                      style={BudgetStyles.deleteButton}
                       onPress={() => deleteExpense(item._id)} // Delete expense
                     >
-                      <Text style={styles.deleteButtonText}>DELETE</Text>
+                      <Text style={BudgetStyles.deleteButtonText}>DELETE</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -567,12 +584,12 @@ const BudgetScreen = () => {
             }}
           />
         ) : (
-          <Text style={styles.noDataText}>No expenses for this month.</Text>
+          <Text style={BudgetStyles.noDataText}>No expenses for this month.</Text>
         )}
   
         {/* Floating Plus Button */}
         <TouchableOpacity
-          style={styles.floatingButton}
+          style={BudgetStyles.floatingButton}
           onPress={() => navigation.navigate('ExpenseInputScreen')}
         >
           <MaterialIcons name="add" size={30} color="white" />
@@ -590,47 +607,64 @@ const BudgetScreen = () => {
   
   
   return (
-    <View style={styles.container}>
-      <View style={styles.monthSelector}>
+    <View style={BudgetStyles.container}>
+      <View style={BudgetStyles.monthSelector}>
         <TouchableOpacity onPress={handlePrevMonth}>
-          <Text style={styles.arrow}>{"<"}</Text>
+          <Text style={BudgetStyles.arrow}>{"<"}</Text>
         </TouchableOpacity>
-        <Text style={styles.monthText}>{getMonthName(month)}, {year}</Text>
+        <Text style={BudgetStyles.monthText}>{getMonthName(month)}, {year}</Text>
         <TouchableOpacity onPress={handleNextMonth}>
-          <Text style={styles.arrow}>{">"}</Text>
+          <Text style={BudgetStyles.arrow}>{">"}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.navBar}>
+      <View style={BudgetStyles.navBar}>
       <TouchableOpacity
   style={[
-    styles.navButton,
+    BudgetStyles.navButton,
     { backgroundColor: activeScreen === "Budget" ? "#FFFFFF" : "#D3D3D3" }, // White for active, gray for inactive
-    activeScreen === "Budget" && styles.activeButton,
+    activeScreen === "Budget" && BudgetStyles.activeButton,
   ]}
   onPress={() => setActiveScreen("Budget")}
 >
-  <Text style={styles.navButtonText}>Budget</Text>
+  <Text style={BudgetStyles.navButtonText}>Budget</Text>
 </TouchableOpacity>
 <TouchableOpacity
   style={[
-    styles.navButton,
+    BudgetStyles.navButton,
     { backgroundColor: activeScreen === "IncomeExpense" ? "#FFFFFF" : "#D3D3D3" }, // White for active, gray for inactive
-    activeScreen === "IncomeExpense" && styles.activeButton,
+    activeScreen === "IncomeExpense" && BudgetStyles.activeButton,
+   
   ]}
   onPress={() => setActiveScreen("IncomeExpense")}
 >
-  <Text style={styles.navButtonText}>Income & Expense</Text>
+  <Text style={BudgetStyles.navButtonText}>Income & Expense</Text>
 </TouchableOpacity>
 
       </View>
 
       {/* Display the bank balance */}
-      <View style={styles.bankBalance}>
-  <Text style={styles.bankBalanceText}>Bank Balance</Text>
-  <Text style={styles.summaryAmount}>
-    {bankBalance === 0 ? 'Loading...' : `₱${bankBalance.toFixed(2)}`}
-  </Text>
-</View>
+      <View style={BudgetStyles.outerContainer}>
+        <Text style={BudgetStyles.bankBalanceText}>Bank Balance</Text>
+      <View style={BudgetStyles.innerContainer}>
+        
+        <View style={BudgetStyles.amountContainer}>
+          <Text style={BudgetStyles.summaryAmount}>
+            {isVisible ? `₱${bankBalance.toFixed(2)}` : '*****'} {/* Toggle based on state */}
+            <TouchableOpacity onPress={toggleVisibility}>
+            <Icon 
+              name={isVisible ? "eye" : "eye-off"} 
+              size={24} 
+              color="#000" 
+              
+              
+              style={BudgetStyles.eyeIcon}
+            />
+          </TouchableOpacity>
+          </Text>
+
+        </View>
+      </View>
+    </View>
 
 
 
