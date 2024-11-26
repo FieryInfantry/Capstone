@@ -22,7 +22,7 @@ const AccountModal = ({ closeModal, onSelectAccount, modalType }) => {
       ];
 
       try {
-        const response = await fetch('http://localhost:3000/banks', {
+        const response = await fetch('http://192.168.100.220:3000/banks', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

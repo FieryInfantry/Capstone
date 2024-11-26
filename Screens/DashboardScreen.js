@@ -70,7 +70,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/banks', {
+      const response = await axios.get('http://192.168.100.220:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -95,7 +95,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/insurances', {
+      const response = await axios.get('http://192.168.100.220:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -114,7 +114,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
   
-      const response = await axios.get('http://localhost:3000/investments', {
+      const response = await axios.get('http://192.168.100.220:3000/investments', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -175,7 +175,7 @@ const DashboardScreen = ({ navigation }) => {
       }
   
       // Make the POST request to save the investment
-      const response = await axios.post('http://localhost:3000/investments', investmentData, {
+      const response = await axios.post('http://192.168.100.220:3000/investments', investmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -237,17 +237,17 @@ const DashboardScreen = ({ navigation }) => {
         <View style={DashboardStyles.summaryContainer}>
   <View style={DashboardStyles.summaryBox}>
     <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-      Current Savings ${currentSavings}
+      Current Savings ₱{currentSavings}
     </Text>
   </View>
   <View style={DashboardStyles.summaryBox}>
     <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-      Current Investments ${currentInvestments}
+      Current Investments ₱{currentInvestments}
     </Text>
   </View>
   <View style={DashboardStyles.summaryBox}>
     <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-      Future Value Predictions ${futurePredictions}
+      Future Value Predictions ₱{futurePredictions}
     </Text>
   </View>
 </View>
