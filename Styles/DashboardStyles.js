@@ -1,68 +1,137 @@
 import { StyleSheet } from 'react-native';
 
 const DashboardStyles = StyleSheet.create({
+  maninContainer:{
+    flex : 1
+  },
   container: {
-    flex: 1,
+
+    flexGrow: 1,
     padding: 16,
-    backgroundColor: '#F6FCDF', // Updated background color
-    paddingBottom: 80, // Padding to avoid content hidden under nav bar
+    paddingBottom: 120
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20, 
+    height: 60,
+   
   },
   logo: {
     width: 50,
     height: 80,
-    marginTop: 30,
-    marginBottom: -20,
+    paddingLeft: 70
+
   },
   welcome: {
     fontSize: 18,
   },
   summaryContainer: {
+    padding: 16,
+  },
+  buttonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-
+    marginBottom: 0, // No space between buttons and value container
   },
-  summaryBox: {
+  button1: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 16,
-    marginHorizontal: 4,
+    paddingVertical: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius : 8,
+
+    
+  },
+  button2: {
+    flex: 1,
+    paddingVertical: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 0, // No rounded corners for buttons
+    
+  },
+  button3: {
+    flex: 1,
+    paddingVertical: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopRightRadius : 8,
+
+    
+  },
+  summaryLabel: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    textAlign: "center",
+    color : "#fff"
+  },
+  valueContainer: {
+    padding: 20,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,   
+     marginTop: 0, // Remove space between buttons and container
+    alignItems: 'center', // Center value inside the container
+    justifyContent: 'center',
+    minHeight: 100,
+  },
+  innerValueContainer: {
+    backgroundColor: '#fff', // White background for the inner container
+    padding: 20,
+    borderRadius: 8, // Optional: Add rounded corners for the inner container
+    minWidth: 200, // Set a minimum width for the inner container
+    Height: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    elevation: 2,
+    shadowColor: '#000', // Optional: Add shadow for a floating effect
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
-  section: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
+  summaryValue: {
+    fontSize: 24,
     fontWeight: 'bold',
-    fontFamily: 'YourPreferredFont', // Updated font
+    color: '#000',
   },
-  seeAll: {
-    color: '#007bff',
-  },
-  accountBox: {
-    backgroundColor: '#fff',
-    padding: 16,
-    marginTop: 8,
+  valueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 8,
-    elevation: 1,
+    justifyContent: 'center',
   },
+  eyeIcon: {
+    marginLeft: 8,
+  },
+  
+
+    section: {
+      marginBottom: 16, // Space between sections
+      padding: 16, // Padding inside the section
+
+      borderRadius: 8, // Rounded corners for the section container
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8, // Space between header and content
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    seeAll: {
+      fontSize: 14,
+      textDecorationLine: 'underline',
+    },
+    accountBox: {
+      flex: 1,
+      backgroundColor: '#fff', // Background for the account box
+      borderRadius: 8,
+      overflow: 'hidden', // Ensures no content spills out
+      
+    },
+
   bankLogo: {
     width: 40,
     height: 40,
@@ -84,17 +153,16 @@ const DashboardStyles = StyleSheet.create({
     elevation: 2,
   },
   navigation: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    elevation: 1,
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#fff', // Change this for dark mode if needed
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
   navButton: {
     flex: 1,
@@ -107,6 +175,10 @@ const DashboardStyles = StyleSheet.create({
     width: 24,
     height: 24,
     marginBottom: 5,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 16,
   },
   settingsButton: {
     marginTop: 20,
@@ -127,6 +199,38 @@ const DashboardStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  menuContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    padding: 20,
+    
+  },
+  iconContainer: {
+    padding: 10,
+  },
+  menu: {
+    backgroundColor: '#fff',
+    position: 'absolute',
+    right: 20,
+    top: 60,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    
+  },
+  menuItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#333',
   },
   
 });
