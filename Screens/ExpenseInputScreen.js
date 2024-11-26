@@ -65,8 +65,16 @@ const ExpenseInputScreen = ({ navigation }) => {
       Alert.alert('Error', 'Please select an account and category.');
       return;
     }
-    if (!amount || isNaN(parseFloat(amount))) {
-      Alert.alert('Error', 'Please enter a valid numeric amount.');
+    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+      Alert.alert('Error', 'Please enter a valid numeric amount greater than zero.');
+      return;
+    }
+  
+    if (parseFloat(amount) > parseFloat(selectedAccount.balance)) {
+      Alert.alert(
+        'Insufficient Funds',
+        `The selected account (${selectedAccount.name}) has insufficient funds. Available balance: ₱${selectedAccount.balance.toFixed(2)}`
+      );
       return;
     }
   
@@ -85,13 +93,13 @@ const ExpenseInputScreen = ({ navigation }) => {
       }
   
       const payload = {
-        category: selectedCategory.name,  // Send the category name as a string
+        category: selectedCategory.name, // Send the category name as a string
         amount: parseFloat(amount),
-        account: selectedAccount.name,  // Send the selected account name
+        account: selectedAccount.name, // Send the selected account name
         date: new Date().toISOString(),
       };
   
-      const response = await axios.post('http://192.168.100.220:3000/expense', payload, {
+      const response = await axios.post('http://192.168.86.249:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -108,6 +116,12 @@ const ExpenseInputScreen = ({ navigation }) => {
           return updatedBudgets;
         });
   
+        // Deduct the expense amount from the selected account's balance
+        setSelectedAccount((prevAccount) => ({
+          ...prevAccount,
+          balance: parseFloat(prevAccount.balance) - parseFloat(amount),
+        }));
+  
         Alert.alert('Success', 'Expense added successfully');
         // Reset form state after successful submission
         setInputValue('');
@@ -120,6 +134,7 @@ const ExpenseInputScreen = ({ navigation }) => {
       Alert.alert('Error', error.response?.data?.error || 'Server Error');
     }
   };
+  
   
   
   

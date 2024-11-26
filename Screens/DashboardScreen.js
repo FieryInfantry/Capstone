@@ -1,16 +1,17 @@
 // DashboardScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList } from 'react-native';
+import {SafeAreaView , View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList } from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
 import { useUser } from '../Context/UserContext'; // Import the UserContext
 import AddUpdateBank from './AddUpdateBank';
+import SideNavModal from './SideNavModal';
 import styles from '../Styles/styles';
 import { LineChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const DashboardScreen = ({ navigation }) => {
   const [banks, setBanks] = useState([]);
@@ -27,7 +28,32 @@ const DashboardScreen = ({ navigation }) => {
   const [duration, setDuration] = useState('1'); // Default duration as string
   const [predictedValues, setPredictedValues] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const handleSaveBank = (bankDetails) => {
+  const [sideModalVisible, setSideModalVisible] = useState(false);
+  const [activeSection, setActiveSection] = useState('currentSavings');
+  const [containerColor, setContainerColor] = useState('#729762'); // Default color for Current Savings
+  const [isVisible, setIsVisible] = useState(true); // Control value visibility
+  
+
+  // Handle button press
+  const handlePress = (section, color) => {
+    setActiveSection(section);
+    setContainerColor(color); // Change container background color
+  };
+
+  // Toggle visibility
+  const toggleVisibility = () => setIsVisible(!isVisible);
+
+  // Masked value for hidden state
+  const maskedValue = '*******';
+
+  // Determine the current value based on the active section
+  const getCurrentValue = () => {
+    if (activeSection === 'currentSavings') return currentSavings.toLocaleString();
+    if (activeSection === 'currentInvestments') return currentInvestments.toLocaleString();
+    if (activeSection === 'futurePredictions') return futurePredictions.toLocaleString();
+    return '';
+  };
+    const handleSaveBank = (bankDetails) => {
     // Logic to save the bank details (optional: send to API or update context)
     console.log('Saved Bank Details:', bankDetails);
     setBankModalVisible(false);
@@ -61,6 +87,9 @@ const DashboardScreen = ({ navigation }) => {
     setBankModalVisible(false);       // Close the bank modal
     setCalculatorModalVisible(true);  // Open the calculator modal
   };
+  const handleCloseModal = () => {
+    setSideModalVisible(false);
+  };
 
   const fetchBanks = async () => {
     try {
@@ -70,7 +99,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.100.220:3000/banks', {
+      const response = await axios.get('http://192.168.86.249:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -95,7 +124,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.100.220:3000/insurances', {
+      const response = await axios.get('http://192.168.86.249:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -106,6 +135,7 @@ const DashboardScreen = ({ navigation }) => {
     }
   };
 
+
   const fetchInvestments = async () => {
     try {
       const token = await AsyncStorage.getItem('authToken');
@@ -114,7 +144,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
   
-      const response = await axios.get('http://192.168.100.220:3000/investments', {
+      const response = await axios.get('http://192.168.86.249:3000/investments', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -125,6 +155,22 @@ const DashboardScreen = ({ navigation }) => {
     } catch (error) {
       console.error('Error fetching investments:', error);
       Alert.alert('Error', 'Failed to fetch investment data. Please try again later.');
+    }
+  };
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Logout Failed', 'Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Alert.alert('Error', 'An error occurred during logout.');
     }
   };
   
@@ -175,7 +221,7 @@ const DashboardScreen = ({ navigation }) => {
       }
   
       // Make the POST request to save the investment
-      const response = await axios.post('http://192.168.100.220:3000/investments', investmentData, {
+      const response = await axios.post('http://192.168.86.249:3000/investments', investmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -219,61 +265,126 @@ const DashboardScreen = ({ navigation }) => {
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={DashboardStyles.maninContainer}>
       <ScrollView style={[DashboardStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
         <View style={DashboardStyles.header}>
           <Image source={require('../assets/logo.png')} style={DashboardStyles.logo} />
-          <Text style={[DashboardStyles.welcome, { color: theme === 'dark' ? '#fff' : '#000', paddingTop: 50}]}>
-  Welcome, 
-  <Text style={{ fontWeight: 'bold', color: theme === 'dark' ? '#fff' : '#000'}}>
-    {userData?.fullName || '[User Name]'}
-  </Text>
-  !
-</Text>
+          <TouchableOpacity onPress={() => setSideModalVisible(true)} style={{paddingRight :10}}>
+        <Icon
+          name="menu"
+          size={20}
+          style={{ color: theme === 'dark' ? '#fff' : '#000' }}
+        />
+      </TouchableOpacity>
 
+      <SideNavModal
+        userData={userData}
+        navigation={navigation}
+        handleLogout={handleLogout}
+        modalVisible={sideModalVisible}
+        onClose={handleCloseModal} // Pass the function to close the modal
+      />
 
         </View>
 
+        
+
         <View style={DashboardStyles.summaryContainer}>
-  <View style={DashboardStyles.summaryBox}>
-    <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-      Current Savings ₱{currentSavings}
+
+
+<View style={DashboardStyles.buttonsRow}>
+  <TouchableOpacity 
+    style={[DashboardStyles.button1, { backgroundColor: '#729762' }]} 
+    onPress={() => handlePress('currentSavings', '#729762')}
+
+  >
+    <Text style={[DashboardStyles.summaryLabel, { color: '#fff' }]}>
+      Current Savings
     </Text>
-  </View>
-  <View style={DashboardStyles.summaryBox}>
-    <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-      Current Investments ₱{currentInvestments}
+  </TouchableOpacity>
+
+  <TouchableOpacity 
+    style={[DashboardStyles.button2, { backgroundColor: '#658147' }]} 
+    onPress={() => handlePress('currentInvestments', '#658147')}
+  >
+    <Text style={[DashboardStyles.summaryLabel, { color: '#fff' }]}>
+      Current Investments
     </Text>
-  </View>
-  <View style={DashboardStyles.summaryBox}>
-    <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
-      Future Value Predictions ₱{futurePredictions}
+  </TouchableOpacity>
+
+  <TouchableOpacity 
+    style={[DashboardStyles.button3, { backgroundColor: '#597445' }]} 
+    onPress={() => handlePress('futurePredictions', '#597445')}
+  >
+    <Text style={[DashboardStyles.summaryLabel, { color: '#fff' }]}>
+      Future Value Predictions
     </Text>
-  </View>
+  </TouchableOpacity>
 </View>
 
-        <View style={DashboardStyles.section}>
-          <View style={DashboardStyles.sectionHeader}>
-            <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Savings Accounts</Text>
-            <TouchableOpacity
-  onPress={() => navigation.navigate('BankList')}
->
-  <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>
-    See all
-  </Text>
-</TouchableOpacity>
-          </View>
-          <View style={DashboardStyles.accountBox}>
+<View style={[DashboardStyles.valueContainer, { backgroundColor: containerColor }]}>
+
+  <View style={DashboardStyles.innerValueContainer}>
+    <View style={DashboardStyles.valueRow}>
+
+      {activeSection === 'currentSavings' && (
+        <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
+          {isVisible ? `₱${currentSavings.toLocaleString()}` : maskedValue}
+        </Text>
+      )}
+
+      {activeSection === 'currentInvestments' && (
+        <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
+          {isVisible ? `₱${currentInvestments.toLocaleString()}` : maskedValue}
+        </Text>
+      )}
+
+      {activeSection === 'futurePredictions' && (
+        <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
+          {isVisible ? `₱${futurePredictions.toLocaleString()}` : maskedValue}
+        </Text>
+      )}
+
+  
+      <TouchableOpacity onPress={toggleVisibility}>
+        <Icon 
+          name={isVisible ? 'eye' : 'eye-off'} 
+          size={24} 
+          color="#000" 
+          style={DashboardStyles.eyeIcon} 
+        />
+      </TouchableOpacity>
+    </View>
+  </View>
+</View>
+</View>
+<View style={DashboardStyles.section}>
+
+  <View style={DashboardStyles.sectionHeader}>
+    <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>
+      Savings Accounts
+    </Text>
+    <TouchableOpacity onPress={() => navigation.navigate('BankList')}>
+      <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>
+        See all
+      </Text>
+    </TouchableOpacity>
+  </View>
+
+  <View style={[DashboardStyles.accountBox, {backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',height: 50 }]}>
   <FlatList
-    data={banks.slice(0, 2)}
+    data={banks} // Use the full array of banks
     keyExtractor={(item) => item._id}
     renderItem={({ item }) => (
       <View
         style={{
-          marginVertical: 10,
+          marginHorizontal: 10, // Add horizontal spacing between cards
           padding: 15,
           borderRadius: 8,
           backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+          width: 300, // Set a fixed width for each card
+          borderColor : "#859F3D",
+          borderWidth: 2
         }}
       >
         <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
@@ -283,9 +394,17 @@ const DashboardScreen = ({ navigation }) => {
         <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Rewards: {item.rewards}</Text>
       </View>
     )}
+    horizontal // Enable horizontal scrolling
+    showsHorizontalScrollIndicator={false} // Hide the horizontal scrollbar
+    contentContainerStyle={{ paddingHorizontal: 10 }} // Add padding to the start and end
+    snapToInterval={320} // Adjust for card width + margin
+    decelerationRate="fast" // Smooth snap effect
+    snapToAlignment="center" // Align snapped card in the center
   />
 </View>
 </View>
+
+
 
 
         <View style={DashboardStyles.section}>
@@ -295,17 +414,20 @@ const DashboardScreen = ({ navigation }) => {
               <Text style={[DashboardStyles.seeAll, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>See all</Text>
             </TouchableOpacity>
           </View>
-          <View style={DashboardStyles.accountBox}>
+          <View style={[DashboardStyles.accountBox, {backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF',height: 50 }]}>
           <FlatList
-          data={investmentList.slice(0, 2)}
+          data={investmentList.slice(0, 1)}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <View
               style={{
-                marginVertical: 10,
+                marginHorizontal: 10, // Add horizontal spacing between cards
                 padding: 15,
                 borderRadius: 8,
                 backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+                width: 300, // Set a fixed width for each card
+                borderColor : "#859F3D",
+                borderWidth: 2
               }}
             >
              
@@ -323,7 +445,14 @@ const DashboardScreen = ({ navigation }) => {
           Duration: {item.duration} Years
         </Text>
               
-          </View>)}/>
+          </View>)}
+              horizontal // Enable horizontal scrolling
+              showsHorizontalScrollIndicator={false} // Hide the horizontal scrollbar
+              contentContainerStyle={{ paddingHorizontal: 10 }} // Add padding to the start and end
+              snapToInterval={320} // Adjust for card width + margin
+              decelerationRate="fast" // Smooth snap effect
+              snapToAlignment="center" // Align snapped card in the center
+              />
           </View>
         </View>
 
@@ -344,24 +473,20 @@ const DashboardScreen = ({ navigation }) => {
         style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={openBankModal} // Open the bank modal
       >
-        <Text style={{ color: 'white' }}>Add new savings</Text>
+        <Text style={styles.buttonText}>Add new savings</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[DashboardStyles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={openCalculatorModal} // Open the calculator modal
       >
-        <Text style={{ color: 'white' }}>Add new investment</Text>
+        <Text style={styles.buttonText}>Add new investment</Text>
       </TouchableOpacity>
     </View>
 
-        <TouchableOpacity 
-          style={[DashboardStyles.settingsButton, { backgroundColor: theme === 'dark' ? '#2F3B2D' : '#fff' }]} 
-          onPress={() => navigation.navigate('SettingsScreen')}
-        >
-          <Text style={[DashboardStyles.settingsButtonText, { color: theme === 'dark' ? '#fff' : '#007bff' }]}>Settings</Text>
-        </TouchableOpacity>
+      
       </ScrollView>
+
 
       <View style={[DashboardStyles.navigation, { backgroundColor: theme === 'dark' ? '#2F3B2D' : '#fff' }]}>
         <TouchableOpacity style={DashboardStyles.navButton} onPress={() => navigation.navigate('BankList')}>
@@ -395,12 +520,15 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </View>
+
+
       <AddUpdateBank
         visible={isBankModalVisible}
         onClose={() => setBankModalVisible(false)}
         onSave={handleSaveBank} // Save the bank details
         bank={null} // Pass null for adding a new bank
       />
+     
 <Modal
         transparent={true}
         visible={isCalculatorModalVisible}
@@ -488,7 +616,7 @@ const DashboardScreen = ({ navigation }) => {
     <Text style={styles.buttonText}>Calculate</Text>
   </TouchableOpacity>
 
-  {/* Save Button */}
+
   <TouchableOpacity
     style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D', width: '48%' }]}
     onPress={() => handleSaveInvestment()}
@@ -497,7 +625,6 @@ const DashboardScreen = ({ navigation }) => {
   </TouchableOpacity>
 </View>
 
-{/* Close Button */}
 <View style={{ alignItems: 'center', width: '100%', marginTop: 10 }}>
   <TouchableOpacity
     style={[styles.modalButton, { backgroundColor: 'red', width: '48%' }]}
@@ -507,7 +634,7 @@ const DashboardScreen = ({ navigation }) => {
   </TouchableOpacity>
 </View>
 
-            {/* Investment Predictions Modal */}
+        
             <Modal
   transparent={true}
   visible={modalVisible}
@@ -584,8 +711,7 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -118,7 +118,28 @@ const BudgetStyles = StyleSheet.create({
       fontSize: 16,
       textAlign: "center",
     },
-  });
-  
+    incomeExpenseContainer: {
+      flex: 1, // Allow the container to take up full screen height
+      paddingHorizontal: 15,
+      paddingBottom: 80, // Add padding to avoid content overlapping with floating button
+    },
+    floatingButton: {
+      position: 'absolute',
+      bottom: 30, // Position the button near the bottom of the screen
+      right: 20, // Align to the right
+      backgroundColor: '#28A745',
+      width: 60,
+      height: 60,
+      borderRadius: 30, // Make it circular
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      elevation: 5, // For Android shadow
+    },
+});
+
 
   export default BudgetStyles;

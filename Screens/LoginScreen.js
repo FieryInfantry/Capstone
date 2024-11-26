@@ -41,7 +41,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.220:3000/login', { email, password });
+      const response = await axios.post('http://192.168.86.249:3000/login', { email, password });
 
       if (response.status === 200) {
         console.log('Login successful', response.data);
@@ -78,7 +78,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.220:3000/forgot-password', { email: forgotPasswordEmail });
+      const response = await axios.post('http://192.168.86.249:3000/forgot-password', { email: forgotPasswordEmail });
       Alert.alert('Success', response.data.message);
       toggleModal(); // Close the modal after successful submission
       setForgotPasswordEmail(''); // Clear the email input for forgot password

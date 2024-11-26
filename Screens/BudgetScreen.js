@@ -1,11 +1,12 @@
-import React, { useLayoutEffect, useState,useEffect } from "react";
+import React, { useLayoutEffect, useState,useEffect,} from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import BudgetModal from "./SetBudgetModal"; // Ensure this component exists and is properly implemented
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useFocusEffect  } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
 import styles from "../Styles/BudgetStyles";
+import { useCallback } from "react";
 const categories = [
   { id: '1', name: 'Baby', icon: '🍼' },
   { id: '2', name: 'Beauty', icon: '💄' },
@@ -36,7 +37,8 @@ const BudgetScreen = () => {
         return;
       }
   
-      const response = await fetch('http://192.168.100.220:3000/banks/balances', {
+
+      const response = await fetch('http://192.168.86.249:3000/banks/balances', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -70,7 +72,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.100.220:3000/expenses/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.86.249:3000/expenses/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -104,7 +106,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.100.220:3000/incomes/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.86.249:3000/incomes/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -178,7 +180,7 @@ const BudgetScreen = () => {
       }
   
       // Fetch the bank balance from the backend
-      const bankBalanceResponse = await fetch('http://192.168.100.220:3000/banks/balances', { // Replace with your IP
+      const bankBalanceResponse = await fetch('http://192.168.86.249:3000/banks/balances', { // Replace with your IP
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -198,7 +200,7 @@ const BudgetScreen = () => {
       }
   
       // Save the budget to the backend
-      const response = await fetch('http://192.168.100.220:3000/budget', { // Replace with your IP
+      const response = await fetch('http://192.168.86.249:3000/budget', { // Replace with your IP
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -243,7 +245,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.100.220:3000/budget/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.86.249:3000/budget/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -280,7 +282,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.100.220:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
+        `http://192.168.86.249:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
         {
           method: 'DELETE',
           headers: {
@@ -310,33 +312,24 @@ const BudgetScreen = () => {
   
   
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ paddingRight: 15 }} // Add padding to the right
-          onPress={() => navigation.navigate('ExpenseInputScreen')}
-        >
-          <MaterialIcons 
-            name="add" 
-            size={30} 
-            color="black" 
-          />
-        </TouchableOpacity>
-      ),
-    });
+  useFocusEffect(
+    useCallback(() => {
+      fetchBankBalance(); // Fetch the bank balance when the screen is focused
+    }, [])
+  );
   
-    fetchBankBalance(); // Fetch the bank balance when the component is mounted
-  }, [navigation]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchBudgets(); // Fetch the budgets when the month or year changes and screen is focused
+    }, [month, year])
+  );
   
-  useLayoutEffect(() => {
-    fetchBudgets(); // Fetch the budgets when the month or year changes
-  }, [month, year]);
-  
-  useEffect(() => {
-    fetchExpenses();
-    fetchIncomes();
-  }, [month, year]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchExpenses();
+      fetchIncomes(); // Fetch expenses and incomes when the month or year changes and screen is focused
+    }, [month, year])
+  );
   
   const deleteIncome = async (incomeId) => {
     try {
@@ -349,7 +342,7 @@ const BudgetScreen = () => {
       console.log('Deleting income with ID:', incomeId); // Corrected to incomeId
 
       const response = await fetch(
-        `http://192.168.100.220:3000/income/${incomeId}`, // Using _id as the identifier
+        `http://192.168.86.249:3000/income/${incomeId}`, // Using _id as the identifier
         {
           method: 'DELETE',
           headers: {
@@ -383,7 +376,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.100.220:3000/expense/${id}`,  // Using ID in the URL
+        `http://192.168.86.249:3000/expense/${id}`,  // Using ID in the URL
         {
           method: 'DELETE',
           headers: {
@@ -424,7 +417,7 @@ const BudgetScreen = () => {
     }, {});
   
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         {/* Summary Section */}
         <View style={styles.summary}>
           <Text style={styles.summaryText}>TOTAL BUDGET</Text>
@@ -481,14 +474,12 @@ const BudgetScreen = () => {
           </Text>
         )}
   
-<Text style={styles.sectionHeader}>Manage Budget</Text>
-<TouchableOpacity
-  style={styles.setBudgetButton}
-  onPress={() => setModalVisible(true)}  // Open the modal without passing an item name
->
-  <Text style={styles.setBudgetButtonText}>SET</Text>
-</TouchableOpacity>
-
+  <TouchableOpacity
+          style={styles.floatingButton} // Reuse floatingButton style, adjust position
+          onPress={() => setModalVisible(true)} // Open the modal
+        >
+          <MaterialIcons name="add" size={30} color="white" />
+        </TouchableOpacity>
       </View>
     );
   };
@@ -509,33 +500,35 @@ const BudgetScreen = () => {
         <Text style={styles.sectionHeader}>Income</Text>
         {incomes.length > 0 ? (
           <FlatList
-  data={getLimitedItems(incomes)}
-  keyExtractor={(item) => item._id.toString()}
-  renderItem={({ item }) => {
-    const amount = parseFloat(item.amount);
-    return (
-      <View style={styles.cardContainer}>
-        <View style={styles.incomeCard}>
-          <Text style={styles.incomeName}>{item.name}</Text>
-          <Text style={styles.incomeAmount}>
-            ₱+{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
-          </Text>
-          <View style={styles.incomeDetailsContainer}>
-            <Text style={styles.incomeCategory}>Category: {item.category}</Text>
-            <Text style={styles.incomeDate}>Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}</Text>
-            <Text style={styles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => deleteIncome(item._id)}  // Delete income
-          >
-            <Text style={styles.deleteButtonText}>DELETE</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }}
-/>
+            data={getLimitedItems(incomes)}
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item }) => {
+              const amount = parseFloat(item.amount);
+              return (
+                <View style={styles.cardContainer}>
+                  <View style={styles.incomeCard}>
+                    <Text style={styles.incomeName}>{item.name}</Text>
+                    <Text style={styles.incomeAmount}>
+                      ₱+{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
+                    </Text>
+                    <View style={styles.incomeDetailsContainer}>
+                      <Text style={styles.incomeCategory}>Category: {item.category}</Text>
+                      <Text style={styles.incomeDate}>
+                        Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
+                      </Text>
+                      <Text style={styles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteIncome(item._id)} // Delete income
+                    >
+                      <Text style={styles.deleteButtonText}>DELETE</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            }}
+          />
         ) : (
           <Text style={styles.noDataText}>No income for this month.</Text>
         )}
@@ -543,40 +536,54 @@ const BudgetScreen = () => {
         {/* Expense Section */}
         <Text style={styles.sectionHeader}>Expenses</Text>
         {expenses.length > 0 ? (
-         <FlatList
-         data={getLimitedItems(expenses)}
-         keyExtractor={(item) => item._id.toString()}
-         renderItem={({ item }) => {
-           const amount = parseFloat(item.amount);
-           return (
-             <View style={styles.cardContainer}>
-               <View style={styles.expenseCard}>
-                 <Text style={styles.expenseName}>{item.name}</Text>
-                 <Text style={styles.expenseAmount}>
-                   ₱-{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
-                 </Text>
-                 <View style={styles.expenseDetailsContainer}>
-                   <Text style={styles.expenseCategory}>Category: {item.category}</Text>
-                   <Text style={styles.expenseDate}>Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}</Text>
-                   <Text style={styles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
-                 </View>
-                 <TouchableOpacity
-                   style={styles.deleteButton}
-                   onPress={() => deleteExpense(item._id)}  // Delete expense
-                 >
-                   <Text style={styles.deleteButtonText}>DELETE</Text>
-                 </TouchableOpacity>
-               </View>
-             </View>
-           );
-         }}
-       />       
+          <FlatList
+            data={getLimitedItems(expenses)}
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item }) => {
+              const amount = parseFloat(item.amount);
+              return (
+                <View style={styles.cardContainer}>
+                  <View style={styles.expenseCard}>
+                    <Text style={styles.expenseName}>{item.name}</Text>
+                    <Text style={styles.expenseAmount}>
+                      ₱-{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
+                    </Text>
+                    <View style={styles.expenseDetailsContainer}>
+                      <Text style={styles.expenseCategory}>Category: {item.category}</Text>
+                      <Text style={styles.expenseDate}>
+                        Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
+                      </Text>
+                      <Text style={styles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteExpense(item._id)} // Delete expense
+                    >
+                      <Text style={styles.deleteButtonText}>DELETE</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            }}
+          />
         ) : (
           <Text style={styles.noDataText}>No expenses for this month.</Text>
         )}
+  
+        {/* Floating Plus Button */}
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate('ExpenseInputScreen')}
+        >
+          <MaterialIcons name="add" size={30} color="white" />
+        </TouchableOpacity>
+
+
       </View>
     );
   };
+  
+  
   
   
   

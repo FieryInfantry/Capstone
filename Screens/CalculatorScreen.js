@@ -55,7 +55,7 @@ const CalculatorScreen = () => {
   
       console.log('Payload:', payload);
   
-      const response = await axios.post('http://192.168.100.220:3000/expense', payload, {
+      const response = await axios.post('http://192.168.86.249:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const CalculatorScreen = () => {
 
   const textColor = { 
     color: theme === 'dark' ? '#FFF' : '#000',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 'bold',
   };
   const modalBackground = {
@@ -166,7 +166,7 @@ const CalculatorScreen = () => {
       />
 <View style={{ height: 20 }} />
       <TouchableOpacity
-        style={[styles.modalButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
+        style={[styles.button, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
         onPress={calculateInvestment}
       >
         
