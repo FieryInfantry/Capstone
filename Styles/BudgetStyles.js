@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 
+
 const BudgetStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -81,6 +82,8 @@ const BudgetStyles = StyleSheet.create({
       padding: 15,
       borderRadius: 5,
       marginBottom: 10,
+      borderColor: "#859F3D",
+      borderWidth: 1
     },
     budgetCardHeader: { fontSize: 18, fontWeight: "bold" },
     budgetDetails: { fontSize: 16 },
@@ -162,6 +165,14 @@ const BudgetStyles = StyleSheet.create({
       fontSize: 16,
       textAlign: "center",
     },
+    expenseCard:{
+      backgroundColor: "#fff",
+      padding: 15,
+      borderRadius: 5,
+      marginBottom: 10,
+      borderColor: "#859F3D",
+      borderWidth: 1
+    },
     incomeExpenseContainer: {
       flex: 1, // Allow the container to take up full screen height
       paddingHorizontal: 15,
@@ -171,7 +182,7 @@ const BudgetStyles = StyleSheet.create({
       position: 'absolute',
       bottom: 30, // Position the button near the bottom of the screen
       right: 20, // Align to the right
-      backgroundColor: '#28A745',
+      backgroundColor: '#859F3D',
       width: 60,
       height: 60,
       borderRadius: 30, // Make it circular

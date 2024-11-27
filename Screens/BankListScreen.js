@@ -142,6 +142,8 @@ const BankListScreen = () => {
                   padding: 15,
                   borderRadius: 8,
                   backgroundColor: theme === 'dark' ? '#2A2A2A' : '#FFF',
+                  borderColor: "#859F3D",
+                  borderWidth: 1,
                 }}
               >
                 <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>

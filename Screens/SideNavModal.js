@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Animated } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; // Import Entypo icons
+import { useUser } from '../Context/UserContext';
 
-const SideNavModal = ({ userData, navigation, handleLogout, modalVisible, onClose, theme }) => {
+
+const SideNavModal = ({ userData, navigation, handleLogout, modalVisible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(250)); // Start position off-screen to the right
+    const {theme } = useUser();
+
 
   useEffect(() => {
     if (modalVisible) {

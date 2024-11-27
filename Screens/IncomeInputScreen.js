@@ -151,7 +151,7 @@ const IncomeInputScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View>
+        <View style={ExpenseStyle.modalButtonsContainer}>
         <TouchableOpacity onPress={handleSubmitIncome} style={[ExpenseStyle.button, {backgroundColor: isDarkMode ? '#31511E' : '#859F3D'}]}>
         <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Submit Income</Text>
           </TouchableOpacity>

@@ -24,7 +24,7 @@ const ExpenseStyle = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40, // Reduced height for a more compact button
+    height: 50, // Reduced height for a more compact button
     elevation: 2, // Added elevation for consistency
     backgroundColor:"#859F3D"
   },
@@ -122,6 +122,8 @@ const ExpenseStyle = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between', // Align buttons horizontally
     marginBottom: 20,
+    height: 68,
+  
   },
   submitButton: {
     flex: 1,

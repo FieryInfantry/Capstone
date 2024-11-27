@@ -9,6 +9,7 @@ import styles from "../Styles/BudgetStyles";
 import { useCallback } from "react";
 import Icon from 'react-native-vector-icons/Ionicons';
 import BudgetStyles from "../Styles/BudgetStyles";
+import { useUser } from "../Context/UserContext"; 
 
 const categories = [
   { id: '1', name: 'Baby', icon: '🍼' },
@@ -32,7 +33,8 @@ const BudgetScreen = () => {
   const [incomes, setIncomes] = useState([]);
   // Fetch bank balance (simulated function)
   const [isVisible, setIsVisible] = useState(false); // State to manage visibility of the amount
-
+  const { theme } = useUser(); // 'dark' or 'light'
+  const isDarkMode = theme === 'dark';
   const toggleVisibility = () => {
     setIsVisible(!isVisible); // Toggle visibility
   };
@@ -69,6 +71,8 @@ const BudgetScreen = () => {
       Alert.alert('Error', 'An error occurred while fetching the bank balance');
     }
   };
+  
+  
 
   const fetchExpenses = async () => {
     try {
@@ -408,7 +412,39 @@ const BudgetScreen = () => {
       Alert.alert('Error', 'An error occurred while deleting the expense');
     }
   };
-  
+  const dynamicStyles = {
+    container: {
+      flex: 1,
+      backgroundColor: isDarkMode ? '#1A1A19' : '#F6FCDF',
+    },
+    text: {
+      color: isDarkMode ? '#FFF' : '#000',
+    },
+    card: {
+      backgroundColor: isDarkMode ? '#2A2A2A' : '#FFF',
+      borderRadius: 8,
+      padding: 10,
+      marginVertical: 8,
+    },
+    button: {
+      backgroundColor: isDarkMode ? '#31511E' : '#859F3D',
+      borderRadius: 5,
+      padding: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    floatingButton: {
+      position: 'absolute',
+      bottom: 20,
+      right: 20,
+      backgroundColor: '#4CAF50',
+      borderRadius: 50,
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  };
   
   
   
@@ -427,7 +463,7 @@ const BudgetScreen = () => {
     return (
       <View style={{ flex: 1 }}>
         {/* Summary Section */}
-<View style={BudgetStyles.summary}>
+<View style={[BudgetStyles.summary, {}]}>
   <View style={BudgetStyles.amountContainer}>
     <Text style={BudgetStyles.summaryAmount}>
       ₱{Object.values(updatedBudgets).reduce((sum, b) => sum + (b.limit || 0), 0).toFixed(2)}
@@ -448,7 +484,7 @@ const BudgetScreen = () => {
 
   
         {/* Budgeted Categories */}
-        <Text style={BudgetStyles.sectionHeader}>
+        <Text style={[BudgetStyles.sectionHeader, {color : theme === 'dark' ? '#fff' : '#000'}]}>
           Budgeted categories: {getMonthName(month)}, {year}
         </Text>
         {Object.keys(updatedBudgets).length > 0 ? (
@@ -459,11 +495,11 @@ const BudgetScreen = () => {
             }))}
             keyExtractor={(item) => item.name}
             renderItem={({ item }) => (
-              <View style={BudgetStyles.budgetCard}>
-                <Text style={BudgetStyles.budgetCardHeader}>{item.name}</Text>
-                <Text style={BudgetStyles.budgetDetails}>Limit: ₱{item.limit.toFixed(2)}</Text>
-                <Text style={BudgetStyles.budgetDetails}>Spent: ₱{item.spent.toFixed(2)}</Text>
-                <Text style={BudgetStyles.budgetDetails}>
+              <View style={[BudgetStyles.budgetCard, {backgroundColor: theme === 'dark' ? '#2A2A2A' : '#fff' }]}>
+                <Text style={[BudgetStyles.budgetCardHeader,{ color: theme === 'dark' ? '#fff' : '#000' }]}>{item.name}</Text>
+                <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>Limit: ₱{item.limit.toFixed(2)}</Text>
+                <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>Spent: ₱{item.spent.toFixed(2)}</Text>
+                <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>
                   Remaining: ₱{calculateRemaining(item.limit, item.spent).toFixed(2)}
                 </Text>
                 <View style={BudgetStyles.progressBar}>
@@ -511,10 +547,10 @@ const BudgetScreen = () => {
   
     return (
       <View style={BudgetStyles.incomeExpenseContainer}>
-        <Text style={BudgetStyles.incomeExpenseText}>Income & Expense:</Text>
+        <Text style={[BudgetStyles.sectionHeader,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Income & Expense:</Text>
   
         {/* Income Section */}
-        <Text style={BudgetStyles.sectionHeader}>Income</Text>
+        <Text style={[BudgetStyles.sectionHeader,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Income</Text>
         {incomes.length > 0 ? (
           <FlatList
             data={getLimitedItems(incomes)}
@@ -522,18 +558,19 @@ const BudgetScreen = () => {
             renderItem={({ item }) => {
               const amount = parseFloat(item.amount);
               return (
-                <View style={BudgetStyles.cardContainer}>
-                  <View style={BudgetStyles.incomeCard}>
-                    <Text style={BudgetStyles.incomeName}>{item.name}</Text>
-                    <Text style={BudgetStyles.incomeAmount}>
-                      ₱+{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
+                <View style={[BudgetStyles.cardContainer, {backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF'}]}>
+                  <View style={[BudgetStyles.expenseCard, {backgroundColor: theme === 'dark' ? '#2a2a2a' : '#F6FCDF'}]}>
+                    <Text style={[BudgetStyles.budgetCardHeader, { color: theme === 'dark' ? '#fff' : '#000' }]}>{item.name}</Text>
+                    <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>
+
+                       ₱+{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
                     </Text>
                     <View style={BudgetStyles.incomeDetailsContainer}>
-                      <Text style={BudgetStyles.incomeCategory}>Category: {item.category}</Text>
-                      <Text style={BudgetStyles.incomeDate}>
+                    <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>Category: {item.category}</Text>
+                      <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>
                         Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
                       </Text>
-                      <Text style={BudgetStyles.incomeBank}>Bank: {item.bank || 'N/A'}</Text>
+                      <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>Bank: {item.bank || 'N/A'}</Text>
                     </View>
                     <TouchableOpacity
                       style={BudgetStyles.deleteButton}
@@ -551,7 +588,7 @@ const BudgetScreen = () => {
         )}
   
         {/* Expense Section */}
-        <Text style={BudgetStyles.sectionHeader}>Expenses</Text>
+        <Text style={[BudgetStyles.sectionHeader,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Expenses</Text>
         {expenses.length > 0 ? (
           <FlatList
             data={getLimitedItems(expenses)}
@@ -559,18 +596,18 @@ const BudgetScreen = () => {
             renderItem={({ item }) => {
               const amount = parseFloat(item.amount);
               return (
-                <View style={BudgetStyles.cardContainer}>
-                  <View style={BudgetStyles.expenseCard}>
-                    <Text style={BudgetStyles.expenseName}>{item.name}</Text>
-                    <Text style={BudgetStyles.expenseAmount}>
+                <View style={[BudgetStyles.cardContainer, {backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF'}]}>
+                  <View style={[BudgetStyles.expenseCard, {backgroundColor: theme === 'dark' ? '#2a2a2a' : '#F6FCDF'}]}>
+                    <Text style={[BudgetStyles.budgetCardHeader, { color: theme === 'dark' ? '#fff' : '#000' }]}>{item.name}</Text>
+                    <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>
                       ₱-{!isNaN(amount) ? amount.toFixed(2) : 'Invalid amount'}
                     </Text>
                     <View style={BudgetStyles.expenseDetailsContainer}>
-                      <Text style={BudgetStyles.expenseCategory}>Category: {item.category}</Text>
-                      <Text style={BudgetStyles.expenseDate}>
+                      <Text style={[BudgetStyles.budgetDetails,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Category: {item.category}</Text>
+                      <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>
                         Date: {item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}
                       </Text>
-                      <Text style={BudgetStyles.expenseBank}>Bank: {item.bank || 'N/A'}</Text>
+                      <Text style={[BudgetStyles.budgetDetails, { color: theme === 'dark' ? '#fff' : '#000' }]}>Bank: {item.bank || 'N/A'}</Text>
                     </View>
                     <TouchableOpacity
                       style={BudgetStyles.deleteButton}
@@ -601,49 +638,73 @@ const BudgetScreen = () => {
   };
   
   
-  
-  
-  
-  
-  
   return (
-    <View style={BudgetStyles.container}>
+    <View style={[BudgetStyles.container, {backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF'}]}>
       <View style={BudgetStyles.monthSelector}>
         <TouchableOpacity onPress={handlePrevMonth}>
-          <Text style={BudgetStyles.arrow}>{"<"}</Text>
+          <Text style={[BudgetStyles.arrow,{color: theme === 'dark' ? '#fff' : '#000'}]}>{"<"}</Text>
         </TouchableOpacity>
-        <Text style={BudgetStyles.monthText}>{getMonthName(month)}, {year}</Text>
+        <Text style={[BudgetStyles.monthText, {color: theme === 'dark' ? '#fff' : '#000'}]}>{getMonthName(month)}, {year}</Text>
         <TouchableOpacity onPress={handleNextMonth}>
-          <Text style={BudgetStyles.arrow}>{">"}</Text>
+          <Text style={[BudgetStyles.arrow, {color: theme === 'dark' ? '#fff' : '#000'}]}>{">"}</Text>
         </TouchableOpacity>
       </View>
       <View style={BudgetStyles.navBar}>
       <TouchableOpacity
   style={[
     BudgetStyles.navButton,
-    { backgroundColor: activeScreen === "Budget" ? "#FFFFFF" : "#D3D3D3" }, // White for active, gray for inactive
-    activeScreen === "Budget" && BudgetStyles.activeButton,
+    {
+      backgroundColor: activeScreen === "Budget" 
+        ? (theme === 'dark' ? "#2A2A2A" : "#FFFFFF") // Dark background for active button in dark mode, white in light mode
+        : "#D3D3D3", // Gray for inactive button
+    },
+    activeScreen === "Budget" && BudgetStyles.activeButton, // Additional active button styling if needed
   ]}
   onPress={() => setActiveScreen("Budget")}
 >
-  <Text style={BudgetStyles.navButtonText}>Budget</Text>
+  <Text
+    style={[
+      BudgetStyles.navButtonText,
+      {
+        color: activeScreen === "Budget"
+          ? (theme === 'dark' ? "#FFFFFF" : "#fff") // White text in dark mode, black text in light mode for active state
+          : "#000000", // Default text color for inactive button
+      }
+    ]}
+  >
+    Budget
+  </Text>
 </TouchableOpacity>
+
+
+
 <TouchableOpacity
   style={[
     BudgetStyles.navButton,
-    { backgroundColor: activeScreen === "IncomeExpense" ? "#FFFFFF" : "#D3D3D3" }, // White for active, gray for inactive
-    activeScreen === "IncomeExpense" && BudgetStyles.activeButton,
-   
+    {
+      backgroundColor: activeScreen === "IncomeExpence" 
+        ? (theme === 'dark' ? "#2A2A2A" : "#FFFFFF") // Dark background for active button in dark mode, white in light mode
+        : "#D3D3D3", // Gray for inactive button
+    },
+    activeScreen === "IncomeExpense" && BudgetStyles.activeButton, // Additional active button styling if needed
   ]}
   onPress={() => setActiveScreen("IncomeExpense")}
 >
-  <Text style={BudgetStyles.navButtonText}>Income & Expense</Text>
+  <Text
+    style={{
+      color: activeScreen === "IncomeExpense" 
+        ? (theme === 'dark' ? "#FFFFFF" : "#fff") // White text for dark mode, black for light mode
+        : "#000000", // Default color for inactive state
+    }}
+  >
+    Income & Expense
+  </Text>
 </TouchableOpacity>
 
       </View>
 
       {/* Display the bank balance */}
-      <View style={BudgetStyles.outerContainer}>
+      <View style={[BudgetStyles.outerContainer, {backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D'}]}>
         <Text style={BudgetStyles.bankBalanceText}>Bank Balance</Text>
       <View style={BudgetStyles.innerContainer}>
         
