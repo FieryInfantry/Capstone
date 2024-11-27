@@ -71,8 +71,8 @@ const InsuranceStyle = StyleSheet.create({
     color: '#4CAF50', // Matching text color
   },
   pickerContainer: {
+    borderColor: '#859F3D',
     borderWidth: 1,
-    borderColor: '#4CAF50', // Matching border color
     borderRadius: 5,
     marginBottom: 15,
   },

@@ -106,6 +106,7 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
     backgroundColor: theme === 'dark' ? '#1A1A19' : '#FFF',
     borderRadius: 10,
     width: '75%',
+    padding: 20
   };
 
   const textColor = theme === 'dark' ? '#FFF' : '#000';
@@ -125,19 +126,24 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
       <View style={modalContainerStyle}>
       <View style={modalBackground}>
         <Text style={[styles.title, {color : textColor}]}>{bankId ? 'Update Bank Details' : 'Add Bank Account'}</Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Select Bank</Text>
-          <Picker
-            selectedValue={selectedBank}
-            onValueChange={handleBankChange}
-            style={styles.picker}
-          >
-            {Object.keys(banksData).map((bank) => (
-              <Picker.Item key={bank} label={bank} value={bank} />
-            ))}
-          </Picker>
+          <Text style={[styles.label,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Select Bank</Text>
+          <View style={styles.pickerContainer}>
+  <Picker
+    selectedValue={selectedBank}
+    onValueChange={handleBankChange}
+    style={[styles.picker, {backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+      color: theme === 'dark' ? '#fff' : '#000' 
+    }]}
+  >
+    {Object.keys(banksData).map((bank) => (
+      <Picker.Item key={bank} label={bank} value={bank} />
+    ))}
+  </Picker>
+</View>
+
+<Text style={[styles.label,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Account Number</Text>
 
           <TextInput
-            placeholder="Account Number"
             value={accountNumber}
             onChangeText={setAccountNumber}
             style={{
@@ -146,23 +152,28 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
               borderRadius: 5, // Or set it to your desired value
               padding: 10,
               marginBottom: 20,
-              borderColor: '#000',
+              borderColor: '#859F3D',
+              borderWidth: 1,
             }}             
         />
 
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Account Type</Text>
+          <Text style={[styles.label,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Account Type</Text>
+          <View style={styles.pickerContainer}>
           <Picker
             selectedValue={accountType}
             onValueChange={handleAccountTypeChange}
-            style={styles.picker}
+            style={[styles.picker, {backgroundColor: theme === 'dark' ? '#333' : '#FFF',
+              color: theme === 'dark' ? '#fff' : '#000' 
+            }]}
           >
             {banksData[selectedBank].map((account) => (
               <Picker.Item key={account.label} label={account.label} value={account.label} />
             ))}
           </Picker>
+          </View>
+          <Text style={[styles.label,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Interest Rate</Text>
 
           <TextInput
-            placeholder="Interest Rate"
             value={interestRate}
             editable={false}
             style={{
@@ -171,12 +182,13 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
               borderRadius: 5, // Or set it to your desired value
               padding: 10,
               marginBottom: 20,
-              borderColor: '#000',
+              borderColor: '#859F3D',
+              borderWidth: 1,
             }}             
         />
-          
+               <Text style={[styles.label,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Account Balance</Text>
+     
           <TextInput
-            placeholder="Account Balance"
             value={accountBalance}
             onChangeText={setAccountBalance}
             keyboardType="numeric"
@@ -186,13 +198,14 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
               borderRadius: 5, // Or set it to your desired value
               padding: 10,
               marginBottom: 20,
-              borderColor: '#000',
+              borderColor: '#859F3D',
+              borderWidth: 1,
             }}             
         />
        
+       <Text style={[styles.label,{ color: theme === 'dark' ? '#fff' : '#000' }]}>Reward</Text>
 
           <TextInput
-            placeholder="Reward"
             value={reward}
             onChangeText={setReward}
             style={{
@@ -201,7 +214,8 @@ const AddUpdateBank = ({ visible, onClose, onSave, bank }) => {
               borderRadius: 5, // Or set it to your desired value
               padding: 10,
               marginBottom: 20,
-              borderColor: '#000',
+              borderColor: '#859F3D',
+              borderWidth: 1,
             }}             
         />
 
@@ -239,11 +253,16 @@ const styles = StyleSheet.create({
     padding: 8,
     borderColor: '#ccc',
   },
-  picker: {
-    height: 50,
+  pickerContainer: {
+    height: 60,
     marginBottom: 16,
-    borderColor: '#4CAF50', // Matching border color
+    borderColor: '#859F3D', // Matching border color
+    borderWidth: 1,
     borderRadius: 5,
+    justifyContent: 'center', // Center aligns the Picker within the container
+  },
+  picker: {
+    flex: 1, // Ensures the picker expands to fill the container
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -276,6 +295,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     color: '#4CAF50',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
 });
 

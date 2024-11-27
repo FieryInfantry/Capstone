@@ -180,8 +180,8 @@ const DashboardStyles = StyleSheet.create({
     alignItems: 'center',
   },
   navIcon: {
-    width: 24,
-    height: 24,
+    width: 30,
+    height: 30,
     marginBottom: 5,
   },
   scrollContent: {

@@ -26,7 +26,7 @@ const BankListScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.100.220:3000/banks', {
+      const response = await axios.get('http://192.168.0.115:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -52,7 +52,7 @@ const BankListScreen = () => {
         return;
       }
 
-      await axios.delete(`http://192.168.100.220:3000/banks/${id}`, {
+      await axios.delete(`http://192.168.0.115:3000/banks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -75,7 +75,7 @@ const BankListScreen = () => {
 
       if (selectedBank) {
         // Update bank
-        await axios.put(`http://192.168.100.220:3000/banks/${selectedBank._id}`, bankDetails, {
+        await axios.put(`http://192.168.0.115:3000/banks/${selectedBank._id}`, bankDetails, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -84,7 +84,7 @@ const BankListScreen = () => {
         );
       } else {
         // Add new bank
-        const response = await axios.post('http://192.168.100.220:3000/banks', bankDetails, {
+        const response = await axios.post('http://192.168.0.115:3000/banks', bankDetails, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

@@ -75,7 +75,7 @@ const DashboardScreen = ({ navigation }) => {
 
       if (selectedBank) {
         // Update bank
-        await axios.put(`http://192.168.100.220:3000/banks/${selectedBank._id}`, bankDetails, {
+        await axios.put(`http://192.168.0.115:3000/banks/${selectedBank._id}`, bankDetails, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -84,7 +84,7 @@ const DashboardScreen = ({ navigation }) => {
         );
       } else {
         // Add new bank
-        const response = await axios.post('http://192.168.100.220:3000/banks', bankDetails, {
+        const response = await axios.post('http://192.168.0.115:3000/banks', bankDetails, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -138,7 +138,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.100.220:3000/banks', {
+      const response = await axios.get('http://192.168.0.115:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -163,7 +163,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.100.220:3000/insurances', {
+      const response = await axios.get('http://192.168.0.115:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -189,7 +189,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
   
-      const response = await axios.get('http://192.168.100.220:3000/investments', {
+      const response = await axios.get('http://192.168.0.115:3000/investments', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -270,7 +270,7 @@ const DashboardScreen = ({ navigation }) => {
       }
   
       // Make the POST request to save the investment
-      const response = await axios.post('http://192.168.100.220:3000/investments', investmentData, {
+      const response = await axios.post('http://192.168.0.115:3000/investments', investmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

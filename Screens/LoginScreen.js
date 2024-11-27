@@ -81,7 +81,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.220:3000/login', { email, password });
+      const response = await axios.post('http://192.168.0.115:3000/login', { email, password });
 
       if (response.status === 200) {
         console.log('Login successful', response.data);
@@ -112,7 +112,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.220:3000/forgot-password', { email: forgotPasswordEmail });
+      const response = await axios.post('http://192.168.0.115:3000/forgot-password', { email: forgotPasswordEmail });
       Alert.alert('Success', response.data.message);
       toggleModal();
       setForgotPasswordEmail('');
@@ -291,18 +291,22 @@ const LoginScreen = () => {
           If you have any questions about these Terms, please contact us at angelchristj@gmail.com.
         </Text>
       </ScrollView>
-      <TouchableOpacity
-              style={styles.termsModalCloseButton}
-              onPress={handleAcceptTerms}
-            >
-              <Text style={styles.termsModalCloseButtonText}>Accept</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.termsModalCloseButton}
-              onPress={openConfirmationModal}
-            >
-              <Text style={styles.termsModalCloseButtonText}>Close</Text>
-            </TouchableOpacity>
+      <View style={{ flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" }}>
+  <TouchableOpacity
+    style={styles.termsModalCloseButtonAccept}
+    onPress={handleAcceptTerms}
+  >
+    <Text style={styles.termsModalCloseButtonText}>Accept</Text>
+  </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.termsModalCloseButton}
+    onPress={openConfirmationModal}
+  >
+    <Text style={styles.termsModalCloseButtonText}>Close</Text>
+  </TouchableOpacity>
+</View>
+
+
     </View>
   </View>
 </Modal>
@@ -318,14 +322,15 @@ const LoginScreen = () => {
               Are you sure you want to close? You won't be able to login if you do.
             </Text>
             <View style={styles.confirmationButtonsContainer}>
+            
               <TouchableOpacity
-                style={styles.confirmationButton}
+                style={styles.termsModalCloseButtonAccept}
                 onPress={handleConfirmClose}
               >
                 <Text style={styles.confirmationButtonText}>Yes</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.confirmationButton}
+                style={styles.termsModalCloseButton}
                 onPress={handleCancelClose}
               >
                 <Text style={styles.confirmationButtonText}>No</Text>

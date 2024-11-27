@@ -19,8 +19,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   confirmationButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row", justifyContent: "space-evenly", alignItems: "center" 
   },
   confirmationButton: {
     backgroundColor: '#007BFF',
@@ -241,9 +240,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 15,
   },
+  termsModalCloseButtonAccept: {
+    marginTop: 20,
+    backgroundColor: '#859F3D',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
   termsModalCloseButton: {
     marginTop: 20,
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'red',
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
