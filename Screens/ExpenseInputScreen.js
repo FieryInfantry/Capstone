@@ -99,7 +99,7 @@ const ExpenseInputScreen = ({ navigation }) => {
         date: new Date().toISOString(),
       };
   
-      const response = await axios.post('http://192.168.100.220:3000/expense', payload, {
+      const response = await axios.post('http://192.168.0.115:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -143,11 +143,25 @@ const ExpenseInputScreen = ({ navigation }) => {
     <View style={[ExpenseStyle.container, { backgroundColor: isDarkMode ? '#1A1A1A' : '#F6FCDF' }]}>
       <View style={ExpenseStyle.inputContainer}>
       <Text style={[ExpenseStyle.label, { color: isDarkMode ? '#FFF' : '#000' }]}>
-          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('IncomeInputScreen')}>
+          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} 
+              onPress={() => {
+                setInputValue('');
+                setAmount('');
+                setSelectedCategory(null);
+                setSelectedAccount(null);
+                navigation.navigate('IncomeInputScreen');}}
+          >
             <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Income</Text>
           </TouchableOpacity>
           {' | '}
-          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} onPress={() => navigation.navigate('ExpenseInputScreen')}>
+          <TouchableOpacity style={[ExpenseStyle.button, { backgroundColor: isDarkMode ? '#31511E' : '#859F3D' }]} 
+                        onPress={() => {
+                          setInputValue('');
+                          setAmount('');
+                          setSelectedCategory(null);
+                          setSelectedAccount(null);
+                          navigation.navigate('IncomeInputScreen');}}
+          >
             <Text style={[ExpenseStyle.buttonText, { color: isDarkMode ? '#FFF' : '#fff' }]}>Expense</Text>
           </TouchableOpacity>
         </Text>

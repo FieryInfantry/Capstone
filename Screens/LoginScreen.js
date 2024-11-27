@@ -121,12 +121,13 @@ const LoginScreen = () => {
       {!isModalVisible && <ErrorMessage message={errorMessage} />}
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+      
+      <Text style={styles.footerText}>Don't have an account? <TouchableOpacity onPress={navigateToRegistration}>
+  <Text style={{ textDecorationLine: 'underline', color: 'gray' }}>Sign up now!</Text>
+</TouchableOpacity></Text>
 
-      <TouchableOpacity onPress={navigateToRegistration}>
-        <Text style={styles.footerText}>Don't have an account? Sign up now!</Text>
-      </TouchableOpacity>
 
       {/* Forgot Password Modal */}
       <Modal

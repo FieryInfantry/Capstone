@@ -50,10 +50,7 @@ const SettingsScreen = () => {
   </TouchableOpacity>
 </View>
 
-      {/* Language Selection Section */}
-      <View style={styles.section}>
-        <Text style={[styles.label, { color: theme === 'dark' ? '#fff' : '#000' }]}>Language</Text>
-      </View>
+
 
       {/* Action Buttons */}
       <TouchableOpacity

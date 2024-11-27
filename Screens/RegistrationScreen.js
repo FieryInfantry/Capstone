@@ -80,9 +80,11 @@ const RegistrationScreen = () => {
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.footerText}>Already have an account? Login</Text>
-      </TouchableOpacity>
+
+        <Text style={styles.footerText}>Already have an account?<TouchableOpacity onPress={() => navigation.navigate('Login')}>
+  <Text style={{ textDecorationLine: 'underline', color: 'gray' }}>Login</Text>
+</TouchableOpacity></Text>
+
 
       <Text style={styles.terms}>Terms and Conditions | Privacy Policy</Text>
     </View>
