@@ -21,13 +21,21 @@ const LoginScreen = () => {
   const closeConfirmationModal = () => setConfirmationVisible(false);
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
 
+  const [failedAttempts, setFailedAttempts] = useState(0); // Track failed attempts
+  const [isLocked, setIsLocked] = useState(false); // Track if the login is locked
+  const [timer, setTimer] = useState(30); // 30 second timer
+  const [timerInterval, setTimerInterval] = useState(null); // Store the timer interval
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+
   const handleConfirmClose = () => {
     setTermsVisible(false); // Close the terms modal
     setConfirmationVisible(false); // Close the confirmation modal
     // Add any other logic to prevent login here if needed
   };
+  const handleCloseErrorModal = () => {
+    setIsErrorModalVisible(false);
+  }
 
-  // If "No" is pressed, simply close the confirmation modal
   const handleCancelClose = () => setConfirmationVisible(false);
 
   // Ref to track modal state
@@ -38,8 +46,6 @@ const LoginScreen = () => {
     setErrorMessage('');
   };
 
-
-
   useEffect(() => {
     if (!isAccepted) {
       console.log("Opening Terms Modal on page load");
@@ -47,6 +53,26 @@ const LoginScreen = () => {
     }
   }, []); // Empty dependency array makes this run only once when the component mounts
 
+  useEffect(() => {
+    // Timer countdown when login is locked
+    if (isLocked && timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+            setIsLocked(false); // Unlock login after 30 seconds
+            setTimer(30); // Reset timer
+          }
+          return prevTimer - 1;
+        });
+      }, 1000); // Decrement every second
+      setTimerInterval(interval);
+    } else if (timer === 0) {
+      clearInterval(timerInterval);
+    }
+
+    return () => clearInterval(timerInterval); // Clean up the interval on component unmount
+  }, [isLocked, timer]);
 
   const handleAcceptTerms = () => {
     console.log("Terms Accepted");
@@ -54,16 +80,11 @@ const LoginScreen = () => {
     setTermsVisible(false);
   };
 
-  const termsModal = () => {
-    console.log("Closing Terms Modal");
-    setTermsVisible(false);
-    termsModalRef.current = false; // Reset ref when closing the modal
-  };
-
   const openTermsModal = () => {
     setTermsVisible(true);
     termsModalRef.current = false;
-  }
+  };
+
   const navigateToRegistration = () => {
     navigation.navigate('Registration');
     setErrorMessage('');
@@ -75,25 +96,32 @@ const LoginScreen = () => {
   };
 
   const handleLogin = async () => {
+    if (isLocked) {
+      setErrorMessage(`Too many failed attempts. Please wait ${timer} seconds.`);
+      setIsErrorModalVisible(true);  // Show the error modal
+      return;
+    }
+  
     if (!email || !password) {
       setErrorMessage('Please fill in both email and password.');
       return;
     }
-
+  
     try {
-      const response = await axios.post('http://192.168.100.220:3000/login', { email, password });
-
+      const response = await axios.post('http://192.168.86.51:3000/login', { email, password });
+  
       if (response.status === 200) {
         console.log('Login successful', response.data);
         setEmail('');
         setPassword('');
         setErrorMessage('');
-
+        setFailedAttempts(0); // Reset failed attempts on successful login
+  
         setUserData(response.data.user);
         const token = response.data.token;
         await AsyncStorage.setItem('authToken', token);
         setToken(token);
-
+  
         navigation.navigate('Dashboard');
       }
     } catch (error) {
@@ -102,8 +130,20 @@ const LoginScreen = () => {
       } else {
         setErrorMessage(error.response.data.error || 'Invalid email or password');
       }
+  
+      // Track failed login attempts
+      setFailedAttempts((prev) => {
+        const attempts = prev + 1;
+        if (attempts >= 3) {
+          setIsLocked(true); // Lock login after 3 failed attempts
+          setTimer(30); // Set timer to 30 seconds
+          setIsErrorModalVisible(true); // Show the error modal
+        }
+        return attempts;
+      });
     }
   };
+  
 
   const handleForgotPassword = async () => {
     if (!forgotPasswordEmail) {
@@ -112,7 +152,7 @@ const LoginScreen = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.220:3000/forgot-password', { email: forgotPasswordEmail });
+      const response = await axios.post('http://192.168.86.51:3000/forgot-password', { email: forgotPasswordEmail });
       Alert.alert('Success', response.data.message);
       toggleModal();
       setForgotPasswordEmail('');
@@ -131,39 +171,47 @@ const LoginScreen = () => {
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
       <Text>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        editable = {isAccepted}
-      />
+    <TextInput
+      style={styles.input}
+      placeholder="Enter your Email"
+      value={email}
+      onChangeText={setEmail}
+      keyboardType="email-address"
+      autoCapitalize="none"
+      editable={!isLocked} // Disable input when locked
+    />
 
-      <Text>Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        editable = {isAccepted}
-      />
+    <Text>Password</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Password"
+      secureTextEntry
+      value={password}
+      onChangeText={setPassword}
+      editable={!isLocked} // Disable input when locked
+    />
 
+    <TouchableOpacity onPress={toggleModal}>
+      <Text style={styles.forgotPassword}>Forgot your password?</Text>
+    </TouchableOpacity>
 
-      <TouchableOpacity onPress={toggleModal}>
-        <Text style={styles.forgotPassword}>Forgot your password?</Text>
-      </TouchableOpacity>
-      {!isModalVisible && <ErrorMessage message={errorMessage} />}
+    {!isModalVisible && <ErrorMessage message={errorMessage} />}
+    {isLocked && (
+      <Text style={{ color: 'red', marginTop: 10 }}>
+        Too many failed attempts. Please wait {timer} seconds before trying to login again.
+      </Text>
+    )}
+    <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLocked}>
+      <Text style={styles.buttonText}>Login</Text>
+    </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.footerText}>Don't have an account? <TouchableOpacity onPress={navigateToRegistration}>
+    <Text style={styles.footerText}>Don't have an account? 
+      <TouchableOpacity onPress={navigateToRegistration}>
         <Text style={{ textDecorationLine: 'underline', color: 'gray' }}>Sign up now!</Text>
-      </TouchableOpacity></Text>
+      </TouchableOpacity>
+    </Text>
+
+
 
       {/* Forgot Password Modal */}
       <Modal
@@ -195,9 +243,8 @@ const LoginScreen = () => {
         </TouchableWithoutFeedback>
       </Modal>
 
-      <Text style={styles.terms}><TouchableOpacity
-        onPress={openTermsModal}
-      ><Text>Terms and Conditions</Text></TouchableOpacity> | Privacy Policy</Text>
+      <Text style={styles.terms}><TouchableOpacity onPress={openTermsModal}><Text>Terms and Conditions</Text></TouchableOpacity> | Privacy Policy</Text>
+   
   <Modal
   transparent={true}
   animationType="slide"
@@ -334,6 +381,7 @@ const LoginScreen = () => {
           </View>
         </View>
       </Modal>
+    
 
     </View>
     
