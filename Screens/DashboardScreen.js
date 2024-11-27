@@ -267,7 +267,7 @@ const DashboardScreen = ({ navigation }) => {
 
 
   return (
-    <SafeAreaView style={DashboardStyles.maninContainer}>
+    <View style={DashboardStyles.maninContainer}>
       <View style={DashboardStyles.innerContainer}>
       <ScrollView style={[DashboardStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
         <View style={DashboardStyles.header}>
@@ -724,7 +724,7 @@ const DashboardScreen = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
