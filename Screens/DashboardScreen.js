@@ -320,10 +320,10 @@ const DashboardScreen = ({ navigation }) => {
       <ScrollView style={[DashboardStyles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
         <View style={DashboardStyles.header}>
           <Image source={require('../assets/logo.png')} style={DashboardStyles.logo} />
-          <TouchableOpacity onPress={() => setSideModalVisible(true)} style={{paddingRight :10}}>
+          <TouchableOpacity onPress={() => setSideModalVisible(true)} style={{paddingRight :10, height: 35, paddingTop: 3}}>
         <Icon
           name="menu"
-          size={20}
+          size={30}
           style={{ color: theme === 'dark' ? '#fff' : '#000' }}
         />
       </TouchableOpacity>
@@ -428,7 +428,7 @@ const DashboardScreen = ({ navigation }) => {
     </View>
 </View>
 </View>
-<View style={DashboardStyles.section}>
+<View style={DashboardStyles.section1}>
 
   <View style={DashboardStyles.sectionHeader}>
     <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>
@@ -455,14 +455,14 @@ const DashboardScreen = ({ navigation }) => {
           width: 300, // Set a fixed width for each card
           borderColor : "#859F3D",
           borderWidth: 2,
-          height: 120
+          height: 140
         }}
       >
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Name: {item.name}</Text>
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Type: {item.type}</Text>
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Balance: {item.balance}</Text>
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Interest Rate: {item.interestRate}</Text>
-        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>Rewards: {item.rewards}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000' , paddingBottom: 3}}>Name: {item.name}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', paddingBottom: 3 }}>Type: {item.type}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', paddingBottom: 3 }}>Balance: {item.balance}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', paddingBottom: 3 }}>Interest Rate: {item.interestRate}</Text>
+        <Text style={{ color: theme === 'dark' ? '#fff' : '#000', paddingBottom: 3 }}>Rewards: {item.rewards}</Text>
       </View>
     )}
     horizontal // Enable horizontal scrolling
@@ -477,7 +477,7 @@ const DashboardScreen = ({ navigation }) => {
 
 
 
-<View style={DashboardStyles.section}>
+<View style={DashboardStyles.section2}>
   <View style={DashboardStyles.sectionHeader}>
     <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>
       Investment Accounts
@@ -511,16 +511,16 @@ const DashboardScreen = ({ navigation }) => {
             width: 300, // Set a fixed width for each card
             borderColor : "#859F3D",
             borderWidth: 2,
-            height: 120
+            height: 100
           }}
         >
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000',paddingBottom: 3 }}>
             Investment Amount: {item.investmentAmount}
           </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000',paddingBottom: 3 }}>
             Interest Rate: {item.interestRate}%
           </Text>
-          <Text style={{ color: theme === 'dark' ? '#fff' : '#000' }}>
+          <Text style={{ color: theme === 'dark' ? '#fff' : '#000',paddingBottom: 3 }}>
             Duration: {item.duration} Years
           </Text>
         </View>
@@ -535,7 +535,7 @@ const DashboardScreen = ({ navigation }) => {
   </View>
 </View>
 
-        <View style={DashboardStyles.section}>
+        <View style={DashboardStyles.section3}>
           <View style={DashboardStyles.sectionHeader}>
             <Text style={[DashboardStyles.sectionTitle, { color: theme === 'dark' ? '#fff' : '#000' }]}>Recent Transactions</Text>
             <TouchableOpacity>

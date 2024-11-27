@@ -23,8 +23,8 @@ const DashboardStyles = StyleSheet.create({
    
   },
   logo: {
-    width: 50,
-    height: 80,
+    width: 70,
+    height: 90,
     paddingLeft: 70
 
   },
@@ -108,12 +108,34 @@ const DashboardStyles = StyleSheet.create({
   },
   
 
-    section: {
+    section1: {
+      marginBottom: 16, // Space between sections
+      padding: 16, // Padding inside the section
+      height: 210,
+      borderRadius: 8, // Rounded corners for the section container
+      paddingBottom: 12,
+ 
+
+
+    },
+    section2: {
       marginBottom: 16, // Space between sections
       padding: 16, // Padding inside the section
       height: 180,
       borderRadius: 8, // Rounded corners for the section container
-      paddingBottom: 12
+      paddingBottom: 12,
+    
+
+
+
+    },
+    section3: {
+      marginBottom: 16, // Space between sections
+      padding: 16, // Padding inside the section
+      height: 100,
+      borderRadius: 8, // Rounded corners for the section container
+      paddingBottom: 12,
+
 
 
     },
