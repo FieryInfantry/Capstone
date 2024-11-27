@@ -1,6 +1,6 @@
 // DashboardScreen.js
 import React, { useState, useEffect } from 'react';
-import {SafeAreaView , View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList, Dimensions } from 'react-native';
+import {SafeAreaView , View, Text, ScrollView, TouchableOpacity, Image,Modal,TextInput,Alert, FlatList, Dimensions} from 'react-native';
 import DashboardStyles from '../Styles/DashboardStyles';
 import { useUser } from '../Context/UserContext'; // Import the UserContext
 import AddUpdateBank from './AddUpdateBank';
@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { useCallback } from 'react';
 
 const DashboardScreen = ({ navigation }) => {
   const [banks, setBanks] = useState([]);
@@ -34,8 +34,10 @@ const DashboardScreen = ({ navigation }) => {
   const [containerColor, setContainerColor] = useState('#729762'); // Default color for Current Savings
   const [isVisible, setIsVisible] = useState(true); // Control value visibility
   const screenWidth = Dimensions.get('window').width;
- 
-
+  const [selectedBank, setSelectedBank] = useState(null);
+  const [currentSavingsVisible, setCurrentSavingsVisible] = React.useState(false);
+  const [currentInvestmentsVisible, setCurrentInvestmentsVisible] = React.useState(false);
+  const [futurePredictionsVisible, setFuturePredictionsVisible] = React.useState(false);
   // Handle button press
   const handlePress = (section, color) => {
     setActiveSection(section);
@@ -43,7 +45,15 @@ const DashboardScreen = ({ navigation }) => {
   };
 
   // Toggle visibility
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  const toggleVisibility = (section) => {
+    if (section === 'currentSavings') {
+      setCurrentSavingsVisible((prev) => !prev);
+    } else if (section === 'currentInvestments') {
+      setCurrentInvestmentsVisible((prev) => !prev);
+    } else if (section === 'futurePredictions') {
+      setFuturePredictionsVisible((prev) => !prev);
+    }
+  };
 
   // Masked value for hidden state
   const maskedValue = '*******';
@@ -55,10 +65,37 @@ const DashboardScreen = ({ navigation }) => {
     if (activeSection === 'futurePredictions') return futurePredictions.toLocaleString();
     return '';
   };
-    const handleSaveBank = (bankDetails) => {
-    // Logic to save the bank details (optional: send to API or update context)
-    console.log('Saved Bank Details:', bankDetails);
-    setBankModalVisible(false);
+  const handleSaveBank = async (bankDetails) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Error', 'User not authenticated. Please log in.');
+        return;
+      }
+
+      if (selectedBank) {
+        // Update bank
+        await axios.put(`http://192.168.100.220:3000/banks/${selectedBank._id}`, bankDetails, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setBanks((prevBanks) =>
+          prevBanks.map((bank) => (bank._id === selectedBank._id ? { ...bank, ...bankDetails } : bank))
+        );
+      } else {
+        // Add new bank
+        const response = await axios.post('http://192.168.100.220:3000/banks', bankDetails, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setBanks((prevBanks) => [...prevBanks, response.data]);
+      }
+
+      setBankModalVisible(false);
+    } catch (error) {
+      console.error('Error saving bank:', error);
+      Alert.alert('Error', 'Failed to save bank. Please try again later.');
+    }
   };
 
   useEffect(() => {
@@ -101,7 +138,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.0.115:3000/banks', {
+      const response = await axios.get('http://192.168.100.220:3000/banks', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -126,7 +163,7 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://192.168.0.115:3000/insurances', {
+      const response = await axios.get('http://192.168.100.220:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -137,6 +174,12 @@ const DashboardScreen = ({ navigation }) => {
     }
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchInvestments(); 
+    }, [])
+  );
+
 
   const fetchInvestments = async () => {
     try {
@@ -146,12 +189,14 @@ const DashboardScreen = ({ navigation }) => {
         return;
       }
   
-      const response = await axios.get('http://192.168.0.115:3000/investments', {
+      const response = await axios.get('http://192.168.100.220:3000/investments', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
       // Sort investments by the 'createdAt' field in descending order (latest first)
-      const sortedInvestments = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const sortedInvestments = response.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
   
       setInvestmentList(sortedInvestments); // Store the sorted investment data in state
     } catch (error) {
@@ -159,6 +204,8 @@ const DashboardScreen = ({ navigation }) => {
       Alert.alert('Error', 'Failed to fetch investment data. Please try again later.');
     }
   };
+  
+  
   const handleLogout = async () => {
     try {
       const response = await fetch('http://localhost:3000/logout', {
@@ -177,9 +224,9 @@ const DashboardScreen = ({ navigation }) => {
   };
   
   useEffect(() => {
-    fetchInsurances();
-    fetchInvestments(); // Fetch insurance data when the component mounts
+    fetchInsurances(); // Fetch insurance data when the component mounts
   }, []);
+
 
   const calculateInvestment = () => {
     const principal = parseFloat(investmentAmount);
@@ -223,14 +270,15 @@ const DashboardScreen = ({ navigation }) => {
       }
   
       // Make the POST request to save the investment
-      const response = await axios.post('http://192.168.0.115:3000/investments', investmentData, {
+      const response = await axios.post('http://192.168.100.220:3000/investments', investmentData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-  
+      fetchInvestments();
       // Check the response
+      setCalculatorModalVisible(false);
       if (response.status === 201) {
         Alert.alert('Success', 'Investment saved successfully');
         // Optionally reset the form or close the modal after successful save
@@ -327,38 +375,57 @@ const DashboardScreen = ({ navigation }) => {
 
 <View style={[DashboardStyles.valueContainer, { backgroundColor: containerColor }]}>
 
-  <View style={DashboardStyles.innerValueContainer}>
-    <View style={DashboardStyles.valueRow}>
+<View style={DashboardStyles.innerValueContainer}>
+      <View style={DashboardStyles.valueRow}>
+        {activeSection === 'currentSavings' && (
+          <>
+            <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
+              {currentSavingsVisible ? `₱${currentSavings.toLocaleString()}` : maskedValue}
+            </Text>
+            <TouchableOpacity onPress={() => toggleVisibility('currentSavings')}>
+              <Icon
+                name={currentSavingsVisible ? 'eye' : 'eye-off'}
+                size={24}
+                color="#000"
+                style={DashboardStyles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </>
+        )}
 
-      {activeSection === 'currentSavings' && (
-        <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
-          {isVisible ? `₱${currentSavings.toLocaleString()}` : maskedValue}
-        </Text>
-      )}
+        {activeSection === 'currentInvestments' && (
+          <>
+            <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
+              {currentInvestmentsVisible ? `₱${currentInvestments.toLocaleString()}` : maskedValue}
+            </Text>
+            <TouchableOpacity onPress={() => toggleVisibility('currentInvestments')}>
+              <Icon
+                name={currentInvestmentsVisible ? 'eye' : 'eye-off'}
+                size={24}
+                color="#000"
+                style={DashboardStyles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </>
+        )}
 
-      {activeSection === 'currentInvestments' && (
-        <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
-          {isVisible ? `₱${currentInvestments.toLocaleString()}` : maskedValue}
-        </Text>
-      )}
-
-      {activeSection === 'futurePredictions' && (
-        <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
-          {isVisible ? `₱${futurePredictions.toLocaleString()}` : maskedValue}
-        </Text>
-      )}
-
-  
-      <TouchableOpacity onPress={toggleVisibility}>
-        <Icon 
-          name={isVisible ? 'eye' : 'eye-off'} 
-          size={24} 
-          color="#000" 
-          style={DashboardStyles.eyeIcon} 
-        />
-      </TouchableOpacity>
+        {activeSection === 'futurePredictions' && (
+          <>
+            <Text style={[DashboardStyles.summaryValue, { color: '#000' }]}>
+              {futurePredictionsVisible ? `₱${futurePredictions.toLocaleString()}` : maskedValue}
+            </Text>
+            <TouchableOpacity onPress={() => toggleVisibility('futurePredictions')}>
+              <Icon
+                name={futurePredictionsVisible ? 'eye' : 'eye-off'}
+                size={24}
+                color="#000"
+                style={DashboardStyles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     </View>
-  </View>
 </View>
 </View>
 <View style={DashboardStyles.section}>

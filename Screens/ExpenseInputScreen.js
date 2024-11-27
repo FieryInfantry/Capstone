@@ -99,7 +99,7 @@ const ExpenseInputScreen = ({ navigation }) => {
         date: new Date().toISOString(),
       };
   
-      const response = await axios.post('http://192.168.0.115:3000/expense', payload, {
+      const response = await axios.post('http://192.168.100.220:3000/expense', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

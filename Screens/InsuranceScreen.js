@@ -78,7 +78,7 @@ const InsuranceScreen = () => {
         return;
       }
 
-      const response = await axios.get('http://192.168.0.115:3000/insurances', {
+      const response = await axios.get('http://192.168.100.220:3000/insurances', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -97,7 +97,7 @@ const InsuranceScreen = () => {
         return;
       }
   
-      const response = await axios.get('http://192.168.0.115:3000/investments', {
+      const response = await axios.get('http://192.168.100.220:3000/investments', {
         headers: { Authorization: `Bearer ${token}` },
       });
   
@@ -143,7 +143,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.put(`http://192.168.0.115:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
+      await axios.put(`http://192.168.100.220:3000/insurances/${selectedInsuranceId}`, updatedInsurance, config);
       Alert.alert('Update', 'Insurance policy updated successfully');
       setModalVisible(false);
       fetchInsurances();
@@ -168,7 +168,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.delete(`http://192.168.0.115:3000/insurances/${insuranceId}`, config);
+      await axios.delete(`http://192.168.100.220:3000/insurances/${insuranceId}`, config);
       Alert.alert('Success', 'Insurance policy deleted successfully');
       fetchInsurances();
     } catch (error) {
@@ -191,7 +191,7 @@ const InsuranceScreen = () => {
         },
       };
   
-      await axios.delete(`http://192.168.0.115:3000/investments/${investmentId}`, config);
+      await axios.delete(`http://192.168.100.220:3000/investments/${investmentId}`, config);
       Alert.alert('Success', 'Investment deleted successfully');
       fetchInvestments(); // Call the fetch function to refresh the investment list
     } catch (error) {
@@ -225,7 +225,7 @@ const InsuranceScreen = () => {
       console.log('Investment Data:', investmentData); // Debugging to verify the data
   
       // Update the investment
-      await axios.put(`http://192.168.0.115:3000/investments/${selectedInvestment._id}`, investmentData, config);
+      await axios.put(`http://192.168.100.220:3000/investments/${selectedInvestment._id}`, investmentData, config);
   
       Alert.alert('Success', 'Investment updated successfully');
       fetchInvestments(); // Refresh the investment list
@@ -260,7 +260,7 @@ const InsuranceScreen = () => {
         },
       };
 
-      await axios.post('http://192.168.0.115:3000/insurances', newInsurance, config);
+      await axios.post('http://192.168.100.220:3000/insurances', newInsurance, config);
       Alert.alert('Add', 'Insurance policy added successfully');
       setAddModalVisible(false);
       fetchInsurances();

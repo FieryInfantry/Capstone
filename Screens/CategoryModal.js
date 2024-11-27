@@ -35,7 +35,7 @@ const CategoryModal = ({ closeModal, onCategorySelect, modalType }) => {
       const token = await AsyncStorage.getItem('authToken'); // Get the token from AsyncStorage
       
       try {
-        const response = await fetch('http://192.168.0.115:3000/budgets', { // Use the correct /budgets endpoint
+        const response = await fetch('http://192.168.100.220:3000/budgets', { // Use the correct /budgets endpoint
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

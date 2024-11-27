@@ -92,7 +92,7 @@ const IncomeInputScreen = ({ navigation }) => {
         date: new Date().toISOString(),
       };
   
-      const response = await axios.post('http://192.168.0.115:3000/income', payload, {
+      const response = await axios.post('http://192.168.100.220:3000/income', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',

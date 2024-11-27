@@ -19,23 +19,6 @@ const SettingsScreen = () => {
     Alert.alert('Change Password pressed');
   };
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('http://192.168.0.115:3000/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        navigation.navigate('Login');
-      } else {
-        Alert.alert('Logout Failed', 'Please try again.');
-      }
-    } catch (error) {
-      console.error('Error during logout:', error);
-      Alert.alert('Error', 'An error occurred during logout.');
-    }
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: theme === 'dark' ? '#1A1A19' : '#F6FCDF' }]}>
       <Text style={[styles.title, { color: theme === 'dark' ? '#fff' : '#000' }]}>Settings</Text>
@@ -87,12 +70,7 @@ const SettingsScreen = () => {
         <Text style={styles.buttonText}>Change Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.actionButton, { backgroundColor: theme === 'dark' ? '#31511E' : '#859F3D' }]}
-        onPress={handleLogout}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+
     </View>
   );
 };

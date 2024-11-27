@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, Animated,TouchableWithoutFeedback  } from 'react-native';
 import { Entypo } from '@expo/vector-icons'; // Import Entypo icons
 import { useUser } from '../Context/UserContext';
 
 
 const SideNavModal = ({ userData, navigation, handleLogout, modalVisible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(250)); // Start position off-screen to the right
-    const {theme } = useUser();
-
+  const { theme } = useUser();
 
   useEffect(() => {
     if (modalVisible) {
@@ -17,15 +16,19 @@ const SideNavModal = ({ userData, navigation, handleLogout, modalVisible, onClos
         duration: 300, // Duration of the animation
         useNativeDriver: true, // Use native driver for performance
       }).start();
-    } else {
-      // Trigger animation to slide out from left to right
-      Animated.timing(slideAnim, {
-        toValue: 250, // Move off-screen to the right
-        duration: 300, // Duration of the animation
-        useNativeDriver: true,
-      }).start();
     }
   }, [modalVisible, slideAnim]);
+
+  const handleOutsidePress = () => {
+    // Trigger animation to slide out from left to right
+    Animated.timing(slideAnim, {
+      toValue: 250, // Move off-screen to the right
+      duration: 300, // Duration of the animation
+      useNativeDriver: true,
+    }).start(() => {
+      onClose(); // Call the onClose function after the animation completes
+    });
+  };
 
   const modalBackgroundColor = theme === 'dark' ? '#1A1A19' : '#F6FCDF';
   const modalContainerColor = theme === 'dark' ? '#1A1A19' : '#F6FCDF';
@@ -39,59 +42,70 @@ const SideNavModal = ({ userData, navigation, handleLogout, modalVisible, onClos
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={[styles.modalOverlay, { backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.3)' }]}>
-        <Animated.View style={[styles.modalContainer, { backgroundColor: modalContainerColor, transform: [{ translateX: slideAnim }] }]}>
-          {/* Close Button with Chevron Icon */}
-          
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Entypo name="chevron-left" size={30} color={textColor} />
-          </TouchableOpacity>
-          
-          {/* User Information */}
-          <View style={styles.userInfoContainer}>
-            <Text style={[styles.userName, { color: textColor }]}>
-              {userData?.fullName || '[User Name]'}
-            </Text>
-            <Text style={[styles.userEmail, { color: textColor }]}>
-              {userData?.email || '[User Email]'}
-            </Text>
-          </View>
-
-          {/* Menu Options */}
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('SettingsScreen');
-              onClose(); // Close modal after navigating
-            }}
-            style={styles.menuItem}
+      <TouchableWithoutFeedback onPress={handleOutsidePress}>
+        <View
+          style={[
+            styles.modalOverlay,
+            { backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.3)' },
+          ]}
+        >
+          <Animated.View
+            style={[
+              styles.modalContainer,
+              { backgroundColor: modalContainerColor, transform: [{ translateX: slideAnim }] },
+            ]}
           >
-            <Entypo name="cog" size={24} color={iconColor} />
-            <Text style={[styles.menuText, { color: textColor }]}>Settings</Text>
-          </TouchableOpacity>
+            {/* Close Button with Chevron Icon */}
+            <TouchableOpacity onPress={handleOutsidePress} style={styles.closeButton}>
+              <Entypo name="chevron-left" size={30} color={textColor} />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('TermsModal');
-              onClose(); // Close modal after navigating
-            }}
-            style={styles.menuItem}
-          >
-            <Entypo name="document" size={24} color={iconColor} />
-            <Text style={[styles.menuText, { color: textColor }]}>Terms and Service</Text>
-          </TouchableOpacity>
+            {/* User Information */}
+            <View style={styles.userInfoContainer}>
+              <Text style={[styles.userName, { color: textColor }]}>
+                {userData?.fullName || '[User Name]'}
+              </Text>
+              <Text style={[styles.userEmail, { color: textColor }]}>
+                {userData?.email || '[User Email]'}
+              </Text>
+            </View>
 
-          <TouchableOpacity
-            onPress={() => {
-              handleLogout();
-              onClose(); // Close modal after logout
-            }}
-            style={styles.menuItem}
-          >
-            <Entypo name="log-out" size={24} color={iconColor} />
-            <Text style={[styles.menuText, { color: textColor }]}>Logout</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
+            {/* Menu Options */}
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('SettingsScreen');
+                handleOutsidePress(); // Close modal after navigating
+              }}
+              style={styles.menuItem}
+            >
+              <Entypo name="cog" size={24} color={iconColor} />
+              <Text style={[styles.menuText, { color: textColor }]}>Settings</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('TermsModal');
+                handleOutsidePress(); // Close modal after navigating
+              }}
+              style={styles.menuItem}
+            >
+              <Entypo name="document" size={24} color={iconColor} />
+              <Text style={[styles.menuText, { color: textColor }]}>Terms and Service</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                handleLogout();
+                handleOutsidePress(); // Close modal after logout
+              }}
+              style={styles.menuItem}
+            >
+              <Entypo name="log-out" size={24} color={iconColor} />
+              <Text style={[styles.menuText, { color: textColor }]}>Logout</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };

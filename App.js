@@ -44,7 +44,8 @@ const App = () => {
           <Stack.Screen
             name="Splash"
             component={SplashScreen}
-            options={{ headerShown: false }}
+            options={{ headerShown: false,
+             }}
           />
 
           <Stack.Screen
@@ -66,7 +67,9 @@ const App = () => {
           <Stack.Screen
             name="Dashboard"
             component={DashboardScreen}
-            options={{ headerShown: false }}
+            options={{ headerShown: false,
+              gestureEnabled: false
+             }}
           />
 
           <Stack.Screen

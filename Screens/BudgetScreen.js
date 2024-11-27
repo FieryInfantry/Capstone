@@ -48,7 +48,7 @@ const BudgetScreen = () => {
       }
   
 
-      const response = await fetch('http://192.168.0.115:3000/banks/balances', {
+      const response = await fetch('http://192.168.100.220:3000/banks/balances', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -84,7 +84,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.0.115:3000/expenses/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.100.220:3000/expenses/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -118,7 +118,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.0.115:3000/incomes/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.100.220:3000/incomes/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -192,7 +192,7 @@ const BudgetScreen = () => {
       }
   
       // Fetch the bank balance from the backend
-      const bankBalanceResponse = await fetch('http://192.168.0.115:3000/banks/balances', { // Replace with your IP
+      const bankBalanceResponse = await fetch('http://192.168.100.220:3000/banks/balances', { // Replace with your IP
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -212,7 +212,7 @@ const BudgetScreen = () => {
       }
   
       // Save the budget to the backend
-      const response = await fetch('http://192.168.0.115:3000/budget', { // Replace with your IP
+      const response = await fetch('http://192.168.100.220:3000/budget', { // Replace with your IP
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +257,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.0.115:3000/budget/monthly?month=${month + 1}&year=${year}`,
+        `http://192.168.100.220:3000/budget/monthly?month=${month + 1}&year=${year}`,
         {
           method: 'GET',
           headers: {
@@ -294,7 +294,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.0.115:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
+        `http://192.168.100.220:3000/budget?category=${categoryName}&month=${month + 1}&year=${year}`,
         {
           method: 'DELETE',
           headers: {
@@ -354,7 +354,7 @@ const BudgetScreen = () => {
       console.log('Deleting income with ID:', incomeId); // Corrected to incomeId
 
       const response = await fetch(
-        `http://192.168.0.115:3000/income/${incomeId}`, // Using _id as the identifier
+        `http://192.168.100.220:3000/income/${incomeId}`, // Using _id as the identifier
         {
           method: 'DELETE',
           headers: {
@@ -388,7 +388,7 @@ const BudgetScreen = () => {
       }
   
       const response = await fetch(
-        `http://192.168.0.115:3000/expense/${id}`,  // Using ID in the URL
+        `http://192.168.100.220:3000/expense/${id}`,  // Using ID in the URL
         {
           method: 'DELETE',
           headers: {
