@@ -62,7 +62,7 @@ require('dotenv').config();
   const bankSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
-    accountNumber: { type: String, required: true },
+    accountNumber: { type: String, required: false },
     type: { type: String, required: true },
     interestRate: { type: String, required: true },
     rewards: { type: String, required: false },
