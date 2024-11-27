@@ -1,6 +1,39 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+  confirmationModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  confirmationModalCard: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  confirmationModalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  confirmationButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  confirmationButton: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+    width: '40%',
+  },
+  confirmationButtonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 16,
+  },
+
   // Container Styles
   container: {
     flex: 1,
@@ -170,7 +203,57 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#859F3D', // Updated button color
   },
-
+  termsModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background for dimming
+  },
+  termsModalCard: {
+    width: '85%',
+    maxHeight: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5, // For Android shadow
+  },
+  termsModalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#4CAF50',
+    marginBottom: 15,
+  },
+  termsModalParagraph: {
+    fontSize: 16,
+    color: '#333',
+    lineHeight: 24,
+    marginBottom: 15,
+  },
+  termsModalSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+    marginBottom: 10,
+    marginTop: 15,
+  },
+  termsModalCloseButton: {
+    marginTop: 20,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
+  termsModalCloseButtonText: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: 'bold',
+  },
   // Insurance Screen Specific Styles
   header: {
     flexDirection: 'row',
