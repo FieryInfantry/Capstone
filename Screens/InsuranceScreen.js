@@ -360,7 +360,7 @@ return (
                   }}
                   onPress={() => handleUpdate(item)}
                 >
-                  <Icon name="edit" size={20} color="#333" />
+                  <Icon name="edit" size={20} color="#fff" />
                   <Text style={{ color: 'white', marginLeft: 5 }}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -378,7 +378,7 @@ return (
               }}
               onPress={() => setDeleteModalVisible(true)}
             >
-              <Icon name="delete" size={20} color="#333" />
+              <Icon name="delete" size={20} color="#fff" />
               <Text style={{ color: 'white', marginLeft: 5 }}>Delete</Text>
             </TouchableOpacity>
             <ReusableModal
